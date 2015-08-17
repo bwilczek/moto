@@ -1,16 +1,21 @@
+# TODO: fix this dumb verification of current working directory
+unless File.exists? "#{Dir.pwd}/config/moto.rb"
+  puts "Config file (config/moto.rb) not present."
+  puts "Does current working directory contain Moto application?"
+  exit 1
+end
+
 require 'logger'
 require 'pp'
 require 'yaml'
 require 'active_support/inflector'
 require 'active_support/core_ext/object/blank'
-# require 'active_support/core_ext'
+
+require 'bundler/setup'
+Bundler.require
 
 APP_DIR = Dir.pwd
 MOTO_DIR = File.dirname(File.dirname(__FILE__))
-
-# TODO detect if cwd contains MotoApp
-
-require "#{APP_DIR}/config/moto"
 
 require_relative './empty_listener'
 require_relative './test_logging'
@@ -44,7 +49,13 @@ module Moto
       
       # listeners = []
       listeners = [Moto::Listeners::Console]
-      runner = Moto::Runner.new(tests, listeners, thread_cnt: 3, environments: [:qa, :qa2])
+      environments = [:qa, :qa2]
+      # handle possible syntax error here
+      config = eval(File.read("#{APP_DIR}/config/moto.rb"))
+      # overwrite config with values from ARGV (if any given)
+      # e.g. config[:capybara][:default_driver] = :selenium
+      
+      runner = Moto::Runner.new(tests, listeners, environments, config)
       runner.run
     end
   

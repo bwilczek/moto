@@ -6,8 +6,9 @@ module Moto
     attr_reader :logger
     attr_reader :environments
     attr_reader :assert
+    attr_reader :config
     
-    def initialize(tests, listeners, config = {})
+    def initialize(tests, listeners, environments, config)
       @tests = tests
       @config = config
       @threads = []
@@ -20,7 +21,7 @@ module Moto
       @result = Result.new(self)
       
       # TODO: validate envs, maybe no-env should be supported as well?
-      @environments = config[:environments]
+      @environments = environments
       
       @listeners = []
       listeners.each do |l|
@@ -31,7 +32,7 @@ module Moto
     
     def run
       @listeners.each { |l| l.start_run }
-      test_slices = @tests.each_slice((@tests.size.to_f/@config[:thread_cnt]).ceil).to_a
+      test_slices = @tests.each_slice((@tests.size.to_f/@config[:thread_count]).ceil).to_a
       (0...test_slices.count).each do |i|
         @threads << Thread.new do
           tc = ThreadContext.new(self, test_slices[i])

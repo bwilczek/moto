@@ -74,7 +74,7 @@ module Moto
             # TODO: remove log files from previous execution
             @logger = Logger.new(File.open(@log_path, File::WRONLY | File::TRUNC | File::CREAT))
             # TODO: make logger level configurable
-            @logger.level = Moto::Config::LOG_LEVEL
+            @logger.level = @runner.config[:log_level]
             @current_test = test
             @runner.listeners.each { |l| l.start_test(test) }
             @clients.each_value { |c| c.start_test(test) }

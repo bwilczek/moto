@@ -10,17 +10,10 @@ module Moto
       ignore_logging(:page)
       ignore_logging(:context)
       ignore_logging(:session)
-  		
-  		def init
-  		  # can be overriden
-  		  @options = {
-  		    capybara_backend: :selenium
-  		  }
-  		end
-  		
+  		 		
       def start_run
         # TODO: make session driver configurable
-        @session = Capybara::Session.new(@options[:capybara_backend])
+        @session = Capybara::Session.new(context.runner.config[:capybara][:default_driver])
         @pages = {}
       end
       
