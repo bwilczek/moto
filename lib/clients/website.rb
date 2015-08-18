@@ -36,7 +36,7 @@ module Moto
   		  if @pages[page_class_name].nil?
           a = page_class_name.underscore.split('/')
           page_path = a[1..20].join('/')
-          require "#{APP_DIR}/#{page_path}"	    
+          require "#{MotoApp::DIR}/#{page_path}"	    
   		    @pages[page_class_name] = page_class_name.constantize.new(self)
   		  end
   		  @pages[page_class_name]

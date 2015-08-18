@@ -35,6 +35,9 @@ module Moto
       @summary[:cnt_passed] = @results.values.select{ |v| v[:result] == PASSED }.count
       @summary[:cnt_failure] = @results.values.select{ |v| v[:result] == FAILURE }.count
       @summary[:cnt_error] = @results.values.select{ |v| v[:result] == ERROR }.count
+      @summary[:tests_passed] = @results.select{ |k,v| v[:result] == PASSED }
+      @summary[:tests_failure] = @results.select{ |k,v| v[:result] == FAILURE }
+      @summary[:tests_error] = @results.select{ |k,v| v[:result] == ERROR }
     end
     
     def start_test(test)

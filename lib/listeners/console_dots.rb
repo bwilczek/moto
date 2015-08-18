@@ -7,11 +7,32 @@ module Moto
       
       def end_run
         puts ""
+        puts ""
         puts "FINISHED: #{@runner.result.summary[:result]}, duration: #{Time.at(@runner.result.summary[:duration]).utc.strftime("%H:%M:%S")}"
         puts "Tests executed: #{@runner.result.summary[:cnt_all]}"
         puts "  Passed:       #{@runner.result.summary[:cnt_passed]}"
         puts "  Failure:      #{@runner.result.summary[:cnt_failure]}"
         puts "  Error:        #{@runner.result.summary[:cnt_error]}"
+        
+        if @runner.result.summary[:cnt_failure] > 0
+          puts ""
+          puts "FAILURES: " 
+          @runner.result.summary[:tests_failure].each do |test_name, data|
+            puts test_name
+            puts "\t#{data[:failures].join("\n\t")}"
+            puts ""
+          end
+        end
+        
+        if @runner.result.summary[:cnt_error] > 0
+          puts ""
+          puts "ERRORS: " 
+          @runner.result.summary[:tests_error].each do |test_name, data|
+            puts test_name
+            puts "\t#{data[:error]}"
+            puts ""
+          end
+        end
       end
 
       def start_test(test)

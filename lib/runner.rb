@@ -15,12 +15,13 @@ module Moto
       
       # TODO: initialize logger from config (yml or just ruby code)
       # @logger = Logger.new(STDOUT)
-      @logger = Logger.new(File.open("#{APP_DIR}/moto.log", File::WRONLY | File::APPEND | File::CREAT))
+      @logger = Logger.new(File.open("#{MotoApp::DIR}/moto.log", File::WRONLY | File::APPEND | File::CREAT))
       # @logger.level = Logger::WARN
       
       @result = Result.new(self)
       
       # TODO: validate envs, maybe no-env should be supported as well?
+      environments << :__default if environments.empty?
       @environments = environments
       
       @listeners = []

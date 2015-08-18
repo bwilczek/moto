@@ -17,7 +17,7 @@ module Moto
       test_path = (a[1..20]+[a[-1]]).join('/')
       
       # TODO: check if this path and constant exists
-      require "#{APP_DIR}/#{test_path}"
+      require "#{MotoApp::DIR}/#{test_path}"
       test_const = class_name.safe_constantize  
       test_const.new    
     end
@@ -39,7 +39,7 @@ module Moto
       full_class_name = 'MotoApp::Tests::'+class_name
       a = full_class_name.underscore.split('/')
       test_path = (a[1..20]+[a[-1]]).join('/')
-      test_path = "#{APP_DIR}/#{test_path}.rb"
+      test_path = "#{MotoApp::DIR}/#{test_path}.rb"
 
       method_body = File.read(test_path) + "\n"
 

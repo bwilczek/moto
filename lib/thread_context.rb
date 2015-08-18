@@ -15,7 +15,7 @@ module Moto
         t.context = self
       end
       # TODO: add all *.yml files from that dir
-      @config = YAML.load_file("#{APP_DIR}/config/const.yml")
+      @config = YAML.load_file("#{MotoApp::DIR}/config/const.yml")
     end
     
     def client(name)
@@ -24,13 +24,13 @@ module Moto
       name_app = 'MotoApp::Clients::' + name
       name_moto = 'Moto::Clients::' + name
       
-      c = try_client(name_app, APP_DIR)
+      c = try_client(name_app, MotoApp::DIR)
       unless c.nil?
         @clients[name] = c
         return c
       end
 
-      c = try_client(name_moto, "#{MOTO_DIR}/lib")
+      c = try_client(name_moto, "#{Moto::DIR}/lib")
       unless c.nil?
         @clients[name] = c
         return c
@@ -55,23 +55,25 @@ module Moto
     end
     
     def const(key)
-      # TODO: add support to consts with no env
+      # TODO: add support for consts with no env
+      # TODO: add support for complex keys (e.g. webapp.url)
       @config[@current_test.env.to_s][key.to_s]
     end
     
     def run
       @tests.each do |test|
+        # remove log files from previous execution
+        FileUtils.rm_rf Dir.glob("#{test.dir}/*.log")
         @runner.environments.each do |env|
           params_path = "#{test.dir}/#{test.filename}.yml"
           params_all = [{}]
-          params_all = YAML.load_file(params_path).map{|h| Hash[ h.map{|k,v| [ k.to_sym, v ] } ] } if File.exists?(params_path)
           # params_all = YAML.load_file(params_path) if File.exists?(params_path)
+          params_all = YAML.load_file(params_path).map{|h| Hash[ h.map{|k,v| [ k.to_sym, v ] } ] } if File.exists?(params_path)
           params_all.each do |params|
             # TODO: add filtering out params that are specific to certain envs
             test.init(env, params)
             # TODO: log path might be specified (to some extent) by the configuration
             @log_path = "#{test.dir}/#{test.name.gsub(/\s+/, '_').gsub('::', '_').gsub('/', '_')}.log"
-            # TODO: remove log files from previous execution
             @logger = Logger.new(File.open(@log_path, File::WRONLY | File::TRUNC | File::CREAT))
             # TODO: make logger level configurable
             @logger.level = @runner.config[:log_level]

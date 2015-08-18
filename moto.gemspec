@@ -11,4 +11,5 @@ Gem::Specification.new do |s|
   s.license     = 'MIT'
   s.executables << 'moto'
   s.add_runtime_dependency 'activesupport', '~> 3.2'
+  s.add_runtime_dependency 'fileutils'
 end

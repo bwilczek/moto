@@ -10,12 +10,18 @@ require 'pp'
 require 'yaml'
 require 'active_support/inflector'
 require 'active_support/core_ext/object/blank'
+require 'fileutils'
 
 require 'bundler/setup'
 Bundler.require
 
-APP_DIR = Dir.pwd
-MOTO_DIR = File.dirname(File.dirname(__FILE__))
+module MotoApp
+  DIR = Dir.pwd
+end
+
+module Moto
+  DIR = File.dirname(File.dirname(__FILE__))
+end
 
 require_relative './empty_listener'
 require_relative './test_logging'
@@ -29,6 +35,7 @@ require_relative './page'
 require_relative './clients/base'
 require_relative './listeners/base'
 require_relative './listeners/console'
+require_relative './listeners/console_dots'
 require_relative './test_generator'
 
 module Moto
@@ -38,7 +45,7 @@ module Moto
     def self.run(argv)
       test_class_name = argv[0]
       
-      tg = TestGenerator.new(APP_DIR)
+      tg = TestGenerator.new(MotoApp::DIR)
       t = tg.generate(test_class_name)
       
       tests = [t]
@@ -48,10 +55,10 @@ module Moto
       # instantiate listeners/reporters
       
       # listeners = []
-      listeners = [Moto::Listeners::Console]
+      listeners = [Moto::Listeners::ConsoleDots]
       environments = [:qa, :qa2]
       # handle possible syntax error here
-      config = eval(File.read("#{APP_DIR}/config/moto.rb"))
+      config = eval(File.read("#{MotoApp::DIR}/config/moto.rb"))
       # overwrite config with values from ARGV (if any given)
       # e.g. config[:capybara][:default_driver] = :selenium
       
