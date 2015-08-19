@@ -55,9 +55,15 @@ module Moto
     end
     
     def const(key)
-      # TODO: add support for consts with no env
-      # TODO: add support for complex keys (e.g. webapp.url)
-      @config[@current_test.env.to_s][key.to_s]
+      key = "#{@current_test.env.to_s}.#{key}" if @current_test.env != :__default
+      code = "@config#{key.split('.').map{|a| "['#{a}']" }.join('')}"
+      begin
+        v = eval code
+        raise if v.nil?
+      rescue
+        raise "There is no const defined for key: #{key}"
+      end
+      v
     end
     
     def run
@@ -67,8 +73,9 @@ module Moto
         @runner.environments.each do |env|
           params_path = "#{test.dir}/#{test.filename}.yml"
           params_all = [{}]
-          # params_all = YAML.load_file(params_path) if File.exists?(params_path)
-          params_all = YAML.load_file(params_path).map{|h| Hash[ h.map{|k,v| [ k.to_sym, v ] } ] } if File.exists?(params_path)
+          params_all = YAML.load_file(params_path) if File.exists?(params_path)
+          # or convert keys to symbols?
+          # params_all = YAML.load_file(params_path).map{|h| Hash[ h.map{|k,v| [ k.to_sym, v ] } ] } if File.exists?(params_path)
           params_all.each do |params|
             # TODO: add filtering out params that are specific to certain envs
             test.init(env, params)

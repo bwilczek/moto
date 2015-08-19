@@ -40,10 +40,10 @@ module Moto
     def set_name
       if @env == :__default 
         return @name = "#{self.class.to_s}" if @params.empty?
-        return @name = "#{self.class.to_s}/#{@params[:__name]}" if @params.key?(:__name)
+        return @name = "#{self.class.to_s}/#{@params['__name']}" if @params.key?('__name')
       else
         return @name = "#{self.class.to_s}/#{@env}" if @params.empty?
-        return @name = "#{self.class.to_s}/#{@env}/#{@params[:__name]}" if @params.key?(:__name)
+        return @name = "#{self.class.to_s}/#{@env}/#{@params['__name']}" if @params.key?('__name')
       end
       @name = self.class.to_s
     end
