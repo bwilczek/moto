@@ -24,7 +24,7 @@ module Moto
       name_app = 'MotoApp::Clients::' + name
       name_moto = 'Moto::Clients::' + name
       
-      c = try_client(name_app, MotoApp::DIR)
+      c = try_client(name_app, "#{MotoApp::DIR}/lib")
       unless c.nil?
         @clients[name] = c
         return c
@@ -83,7 +83,7 @@ module Moto
             @log_path = "#{test.dir}/#{test.name.gsub(/\s+/, '_').gsub('::', '_').gsub('/', '_')}.log"
             @logger = Logger.new(File.open(@log_path, File::WRONLY | File::TRUNC | File::CREAT))
             # TODO: make logger level configurable
-            @logger.level = @runner.config[:log_level]
+            @logger.level = @runner.my_config[:log_level]
             @current_test = test
             @runner.listeners.each { |l| l.start_test(test) }
             @clients.each_value { |c| c.start_test(test) }

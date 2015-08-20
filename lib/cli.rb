@@ -36,6 +36,7 @@ require_relative './clients/base'
 require_relative './listeners/base'
 require_relative './listeners/console'
 require_relative './listeners/console_dots'
+require_relative './listeners/junit_xml'
 require_relative './test_generator'
 
 module Moto
@@ -55,7 +56,7 @@ module Moto
       # instantiate listeners/reporters
       
       # listeners = []
-      listeners = [Moto::Listeners::ConsoleDots]
+      listeners = [Moto::Listeners::ConsoleDots, Moto::Listeners::JunitXml]
       environments = [:qa, :qa2]
       # handle possible syntax error here
       config = eval(File.read("#{MotoApp::DIR}/config/moto.rb"))

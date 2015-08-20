@@ -31,9 +31,25 @@ module Moto
       @listeners.unshift(@result)
     end
     
+    def my_config
+      caller_path = caller.first.to_s.split(/:\d/)[0]
+      keys = []
+      if caller_path.include? MotoApp::DIR
+        caller_path.sub!( "#{MotoApp::DIR}/lib/", '' )
+        keys << 'moto_app'
+      elsif caller_path.include? Moto::DIR
+        caller_path.sub!( "#{Moto::DIR}/lib/", '' )
+        keys << 'moto'
+      end
+      caller_path.sub!('.rb', '')
+      keys << caller_path.split('/')
+      keys.flatten!
+      eval "@config#{keys.map{|k| "[:#{k}]" }.join('')}"
+    end
+    
     def run
       @listeners.each { |l| l.start_run }
-      test_slices = @tests.each_slice((@tests.size.to_f/@config[:thread_count]).ceil).to_a
+      test_slices = @tests.each_slice((@tests.size.to_f/my_config[:thread_count]).ceil).to_a
       (0...test_slices.count).each do |i|
         @threads << Thread.new do
           tc = ThreadContext.new(self, test_slices[i])

@@ -13,6 +13,10 @@ module Moto
       @results[key]
     end
     
+    def all
+      @results
+    end
+    
     def initialize(runner)
       @runner = runner
       @results = {}
