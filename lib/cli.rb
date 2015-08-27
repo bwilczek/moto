@@ -44,26 +44,21 @@ module Moto
   class Cli
   
     def self.run(argv)
-      test_class_name = argv[0]
-      
+      tests = []
+      argv[ :tests ].each{ |test_name|
+      test_class_name = test_name
+            
       tg = TestGenerator.new(MotoApp::DIR)
-      t = tg.generate(test_class_name)
+      t = tg.generate(test_class_name)      
+      tests << t
+      }
       
-      tests = [t]
-      
-      # parsing ARGV and creating config will come here
-      # instantiation of tests for ARGV params also happens here
-      # instantiate listeners/reporters
-      
-      # listeners = []
-      listeners = [Moto::Listeners::ConsoleDots, Moto::Listeners::JunitXml]
-      environments = [:qa, :qa2]
+      # TODO empty env
+      argv[ :environments ] = [:qa]
       # handle possible syntax error here
-      config = eval(File.read("#{MotoApp::DIR}/config/moto.rb"))
-      # overwrite config with values from ARGV (if any given)
-      # e.g. config[:capybara][:default_driver] = :selenium
+
       
-      runner = Moto::Runner.new(tests, listeners, environments, config)
+      runner = Moto::Runner.new(tests, argv[ :reporter ], argv[ :environments ], argv[ :config ])
       runner.run
     end
   
