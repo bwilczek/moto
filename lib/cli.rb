@@ -40,8 +40,8 @@ require_relative './listeners/junit_xml'
 require_relative './test_generator'
 require_relative './exceptions/moto'
 require_relative './exceptions/test_skipped'
-require_relative './exceptions/test_failed'
-require_relative './exceptions/test_passed'
+require_relative './exceptions/test_forced_failure'
+require_relative './exceptions/test_forced_passed'
 
 module Moto
 

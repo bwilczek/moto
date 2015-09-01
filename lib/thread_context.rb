@@ -91,6 +91,9 @@ module Moto
             @logger.info "Start: #{test.name}"
             begin
               test.run
+            rescue Exceptions::TestForcedPassed, Exceptions::TestForcedFailure, Exceptions::TestSkipped => e
+              logger.info(e.message)
+              @runner.result.add_error(test, e)
             rescue Exception => e  
               @logger.error("#{e.class.name}: #{e.message}")  
               @logger.error(e.backtrace.join("\n"))

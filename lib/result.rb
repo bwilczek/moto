@@ -59,9 +59,9 @@ module Moto
       unless @results[test.name][:error].nil?
         if @results[test.name][:error].is_a? Moto::Exceptions::TestSkipped
           test.result = SKIPPED
-        elsif @results[test.name][:error].is_a? Moto::Exceptions::TestPassed
+        elsif @results[test.name][:error].is_a? Moto::Exceptions::TestForcedPassed
           test.result = PASSED
-        elsif @results[test.name][:error].is_a? Moto::Exceptions::TestFailed
+        elsif @results[test.name][:error].is_a? Moto::Exceptions::TestForcedFailure
           add_failure(test, @results[test.name][:error].message)
           test.result = FAILURE
         else

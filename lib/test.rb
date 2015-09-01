@@ -90,20 +90,20 @@ module Moto
 
     def fail(msg = nil)
       if msg.nil?
-        msg = "Test failed with no reason given."
+        msg = "Test forcibly failed with no reason given."
       else
-        msg = "Fail reason: #{msg}"
+        msg = "Forced failure, reason: #{msg}"
       end
-      raise Exceptions::TestFailed.new msg
+      raise Exceptions::TestForcedFailure.new msg
     end
 
     def pass(msg = nil)
       if msg.nil?
-        msg = "Test passed with no reason given."
+        msg = "Test forcibly passed with no reason given."
       else
-        msg = "Pass reason: #{msg}"
+        msg = "Forced passed, reason: #{msg}"
       end
-      raise Exceptions::TestPassed.new msg
+      raise Exceptions::TestForcedPassed.new msg
     end
 
   end

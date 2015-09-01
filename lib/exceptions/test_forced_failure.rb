@@ -1,6 +1,6 @@
 module Moto
   module Exceptions
-    class TestPassed  < MotoException
+    class TestForcedFailure  < MotoException
       
     end
   end
