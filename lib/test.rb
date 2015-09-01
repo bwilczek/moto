@@ -78,6 +78,33 @@ module Moto
     def client(name)
       @context.client(name)
     end
+ 
+    def skip(msg = nil)
+      if msg.nil?
+        msg = "Test skipped with no reason given."
+      else
+        msg = "Skip reason: #{msg}"
+      end
+      raise Exceptions::TestSkipped.new msg
+    end
+
+    def fail(msg = nil)
+      if msg.nil?
+        msg = "Test failed with no reason given."
+      else
+        msg = "Fail reason: #{msg}"
+      end
+      raise Exceptions::TestFailed.new msg
+    end
+
+    def pass(msg = nil)
+      if msg.nil?
+        msg = "Test passed with no reason given."
+      else
+        msg = "Pass reason: #{msg}"
+      end
+      raise Exceptions::TestPassed.new msg
+    end
 
   end
 end

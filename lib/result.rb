@@ -6,6 +6,7 @@ module Moto
     PASSED = :passed # 0
     FAILURE = :failure # 1
     ERROR = :error # 2
+    SKIPPED = :skipped # 3
 
     attr_reader :summary
 
@@ -36,12 +37,14 @@ module Moto
       @summary[:result] = FAILURE unless @results.values.select{ |v| v[:failures].count > 0 }.empty?
       @summary[:result] = ERROR unless @results.values.select{ |v| !v[:error].nil? }.empty?
       @summary[:cnt_all] = @results.count
-      @summary[:cnt_passed] = @results.values.select{ |v| v[:result] == PASSED }.count
-      @summary[:cnt_failure] = @results.values.select{ |v| v[:result] == FAILURE }.count
-      @summary[:cnt_error] = @results.values.select{ |v| v[:result] == ERROR }.count
       @summary[:tests_passed] = @results.select{ |k,v| v[:result] == PASSED }
       @summary[:tests_failure] = @results.select{ |k,v| v[:result] == FAILURE }
       @summary[:tests_error] = @results.select{ |k,v| v[:result] == ERROR }
+      @summary[:tests_skipped] = @results.select{ |k,v| v[:result] == SKIPPED }
+      @summary[:cnt_passed] = @summary[:tests_passed].count
+      @summary[:cnt_failure] = @summary[:tests_failure].count
+      @summary[:cnt_error] = @summary[:tests_error].count
+      @summary[:cnt_skipped] = @summary[:tests_skipped].count
     end
     
     def start_test(test)
@@ -50,10 +53,21 @@ module Moto
 
     def end_test(test)
       # calculate result basing on errors/failures
+      @results[test.name][:finished_at] = Time.now.to_f
       test.result = PASSED
       test.result = FAILURE unless @results[test.name][:failures].empty?
-      test.result = ERROR unless @results[test.name][:error].nil?
-      @results[test.name][:finished_at] = Time.now.to_f
+      unless @results[test.name][:error].nil?
+        if @results[test.name][:error].is_a? Moto::Exceptions::TestSkipped
+          test.result = SKIPPED
+        elsif @results[test.name][:error].is_a? Moto::Exceptions::TestPassed
+          test.result = PASSED
+        elsif @results[test.name][:error].is_a? Moto::Exceptions::TestFailed
+          add_failure(test, @results[test.name][:error].message)
+          test.result = FAILURE
+        else
+          test.result = ERROR
+        end
+      end
       @results[test.name][:duration] = @results[test.name][:finished_at] - @results[test.name][:started_at]
       @results[test.name][:result] = test.result
     end

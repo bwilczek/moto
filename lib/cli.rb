@@ -38,6 +38,10 @@ require_relative './listeners/console'
 require_relative './listeners/console_dots'
 require_relative './listeners/junit_xml'
 require_relative './test_generator'
+require_relative './exceptions/moto'
+require_relative './exceptions/test_skipped'
+require_relative './exceptions/test_failed'
+require_relative './exceptions/test_passed'
 
 module Moto
 
