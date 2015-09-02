@@ -61,6 +61,7 @@ module Moto
       
       # listeners = []
       listeners = [Moto::Listeners::ConsoleDots, Moto::Listeners::JunitXml]
+      # listeners = [Moto::Listeners::Base]
       environments = [:qa, :qa2]
       # handle possible syntax error here
       config = eval(File.read("#{MotoApp::DIR}/config/moto.rb"))

@@ -13,6 +13,7 @@ module Moto
         puts "  Passed:       #{@runner.result.summary[:cnt_passed]}"
         puts "  Failure:      #{@runner.result.summary[:cnt_failure]}"
         puts "  Error:        #{@runner.result.summary[:cnt_error]}"
+        puts "  Skipped:      #{@runner.result.summary[:cnt_skipped]}"
       end
 
       def start_test(test)
