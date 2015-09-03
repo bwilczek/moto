@@ -19,29 +19,30 @@ module Moto
     end
     
     def self.run_parse(argv)   
-      puts Moto::DIR
+      # puts Moto::DIR
       # Default options 
       options = {}
-      options[ :reporter ] = [Moto::Listeners::ConsoleDots, Moto::Listeners::JunitXml] 
-      options[ :config ] = eval(File.read("#{MotoApp::DIR}/config/moto.rb"))  
+      options[:reporters] = [Moto::Listeners::ConsoleDots, Moto::Listeners::JunitXml] 
+      options[:config] = eval(File.read("#{MotoApp::DIR}/config/moto.rb"))
+      options[:environments] = []
          
       # Parse arguments
       # TODO eval ?
       # TODO const 
+      # TODO reporters should be consts - not strings
       OptionParser.new do |opts|       
           opts.on('-t', "--tests Tests", Array) { |v| options[:tests ] = v }
-          opts.on('-r', '--reporter Reporter') { |v| options[ :reporter ] = v }
-          opts.on('-e', '--environment Environment') { |v| options[ :environment ] = v }
-          opts.on('-c', '--const Const') { |v| options[ :const ] = v }
-          opts.on('-cfg', '--config Config') { |v| options[ :config ] = options[ :config ].merge( eval( v ) ) }
+          opts.on('-r', '--reporters Reporters', Array) { |v| options[:reporters] = v }
+          opts.on('-e', '--environments Environment', Array) { |v| options[:environments] = v }
+          opts.on('-c', '--const Const') { |v| options[:const] = v }
+          opts.on('-cfg', '--config Config') { |v| options[:config] = options[:config].merge( eval( v ) ) }
       end.parse!
-      
       return options
     end
     
     def self.generate_parse(argv)
       options = {}
-      options[ :dir ]
+      options[:dir]
     end
     
     def self.show_help
@@ -55,8 +56,6 @@ module Moto
       moto generate app_name -d, --dir = directory. Default is current dir.
       """
     end
-    
-    
     
   end
 end

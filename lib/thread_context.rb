@@ -55,13 +55,18 @@ module Moto
     end
     
     def const(key)
+      key = key.to_s
       key = "#{@current_test.env.to_s}.#{key}" if @current_test.env != :__default
-      code = "@config#{key.split('.').map{|a| "['#{a}']" }.join('')}"
+      code = if key.include? '.'
+        "@config#{key.split('.').map{|a| "['#{a}']" }.join('')}"
+      else
+        "@config['#{key}']"
+      end
       begin
         v = eval code
         raise if v.nil?
       rescue
-        raise "There is no const defined for key: #{key}"
+        raise "There is no const defined for key: #{key}. Environment: #{ (@current_test.env == :__default) ? '<none>' : @current_test.env }"
       end
       v
     end

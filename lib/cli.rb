@@ -49,20 +49,15 @@ module Moto
   
     def self.run(argv)
       tests = []
-      argv[ :tests ].each{ |test_name|
-      test_class_name = test_name
-            
-      tg = TestGenerator.new(MotoApp::DIR)
-      t = tg.generate(test_class_name)      
-      tests << t
-      }
-
-      # TODO empty env
-      argv[ :environments ] = [:qa]
-
-      # handle possible syntax error here
+        argv[ :tests ].each do |test_name|
+        test_class_name = test_name
+              
+        tg = TestGenerator.new(MotoApp::DIR)
+        t = tg.generate(test_class_name)      
+        tests << t
+      end
      
-      runner = Moto::Runner.new(tests, argv[ :reporter ], argv[ :environments ], argv[ :config ])
+      runner = Moto::Runner.new(tests, argv[ :reporters ], argv[ :environments ], argv[ :config ])
       runner.run
     end
   
