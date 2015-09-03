@@ -1,4 +1,3 @@
-require 'trollop'
 require 'optparse'
 require 'yaml'
 
