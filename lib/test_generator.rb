@@ -43,13 +43,25 @@ module Moto
 
       method_body = File.read(test_path) + "\n"
 
+      base = Moto::Test
+      base_class_string = method_body.match( /^#\s*BASE_CLASS:\s(\S+)/ )
+      unless base_class_string.nil?
+        base_class_string = base_class_string[1].strip
+        
+        a = base_class_string.underscore.split('/')
+        base_test_path = a[1..20].join('/')
+        
+        require "#{MotoApp::DIR}/lib/#{base_test_path}" 
+        base = base_class_string.constantize
+      end
+
       # MotoApp::Tests::Login::Short
       consts = full_class_name.split('::')
       class_name = consts.pop
 
       consts.shift 2 # remove Moto::Test as already defined
       m = create_module_tree(MotoApp::Tests, consts)
-      cls = Class.new(Moto::Test)
+      cls = Class.new(base)
       m.const_set(class_name.to_sym, cls)
       
       test_object = cls.new

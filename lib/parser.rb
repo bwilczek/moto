@@ -3,6 +3,7 @@ require 'optparse'
 require 'yaml'
 
 require_relative '../lib/cli'
+require_relative '../lib/app_generator'
 
 module Moto
 
@@ -12,12 +13,13 @@ module Moto
             
       # TODO Generate app / Change the way parsing options goes so it doesnt generate them if they`re not needed
       case argv[0]
-      when 'run' then Moto::Cli.run parse(argv)
+      when 'run' then Moto::Cli.run run_parse(argv)
       when 'help' then show_help
+      when 'generate' then Moto::AppGenerator.run generate_parse(argv)
       end
     end
     
-    def self.parse(argv)   
+    def self.run_parse(argv)   
       puts Moto::DIR
       # Default options 
       options = {}
@@ -38,14 +40,20 @@ module Moto
       return options
     end
     
+    def self.generate_parse(argv)
+      options = {}
+      options[ :dir ]
+    end
+    
     def self.show_help
       puts """
       Moto CLI Help:
-      moto run:
+      moto run:      
        -t, --tests = Tests to be executed. For e.x Tests\Failure\Failure.rb should be passed as Tests::Failure
        -r, --reporter = Reporters to be used. Defaults are Moto::Listeners::ConsoleDots, Moto::Listeners::JunitXml
        -e, --environment etc etc
       moto generate:
+      moto generate app_name -d, --dir = directory. Default is current dir.
       """
     end
     

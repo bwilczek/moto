@@ -38,6 +38,10 @@ require_relative './listeners/console'
 require_relative './listeners/console_dots'
 require_relative './listeners/junit_xml'
 require_relative './test_generator'
+require_relative './exceptions/moto'
+require_relative './exceptions/test_skipped'
+require_relative './exceptions/test_forced_failure'
+require_relative './exceptions/test_forced_passed'
 
 module Moto
 
@@ -52,12 +56,12 @@ module Moto
       t = tg.generate(test_class_name)      
       tests << t
       }
-      
+
       # TODO empty env
       argv[ :environments ] = [:qa]
-      # handle possible syntax error here
 
-      
+      # handle possible syntax error here
+     
       runner = Moto::Runner.new(tests, argv[ :reporter ], argv[ :environments ], argv[ :config ])
       runner.run
     end

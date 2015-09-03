@@ -70,6 +70,7 @@ module Moto
       @tests.each do |test|
         # remove log files from previous execution
         FileUtils.rm_rf Dir.glob("#{test.dir}/*.log")
+        max_attempts = @runner.my_config[:max_attempts] || 1
         @runner.environments.each do |env|
           params_path = "#{test.dir}/#{test.filename}.yml"
           params_all = [{}]
@@ -78,29 +79,35 @@ module Moto
           # params_all = YAML.load_file(params_path).map{|h| Hash[ h.map{|k,v| [ k.to_sym, v ] } ] } if File.exists?(params_path)
           params_all.each do |params|
             # TODO: add filtering out params that are specific to certain envs
-            test.init(env, params)
-            # TODO: log path might be specified (to some extent) by the configuration
-            @log_path = "#{test.dir}/#{test.name.gsub(/\s+/, '_').gsub('::', '_').gsub('/', '_')}.log"
-            @logger = Logger.new(File.open(@log_path, File::WRONLY | File::TRUNC | File::CREAT))
-            # TODO: make logger level configurable
-            @logger.level = @runner.my_config[:log_level]
-            @current_test = test
-            @runner.listeners.each { |l| l.start_test(test) }
-            @clients.each_value { |c| c.start_test(test) }
-            test.before
-            @logger.info "Start: #{test.name}"
-            begin
-              test.run
-            rescue Exception => e  
-              @logger.error("#{e.class.name}: #{e.message}")  
-              @logger.error(e.backtrace.join("\n"))
-              @runner.result.add_error(test, e)
-            end 
-            test.after
-            @clients.each_value { |c| c.end_test(test) }
-            @runner.listeners.each { |l| l.end_test(test) }
-            @logger.info("Result: #{test.result}")
-            @logger.close
+            (1..max_attempts).each do |attempt|
+              test.init(env, params)
+              # TODO: log path might be specified (to some extent) by the configuration
+              @log_path = "#{test.dir}/#{test.name.gsub(/\s+/, '_').gsub('::', '_').gsub('/', '_')}.log"
+              @logger = Logger.new(File.open(@log_path, File::WRONLY | File::TRUNC | File::CREAT))
+              # TODO: make logger level configurable
+              @logger.level = @runner.my_config[:log_level]
+              @current_test = test
+              @runner.listeners.each { |l| l.start_test(test) }
+              @clients.each_value { |c| c.start_test(test) }
+              test.before
+              @logger.info "Start: #{test.name} attempt #{attempt}/#{max_attempts}"
+              begin
+                test.run
+              rescue Exceptions::TestForcedPassed, Exceptions::TestForcedFailure, Exceptions::TestSkipped => e
+                logger.info(e.message)
+                @runner.result.add_error(test, e)
+              rescue Exception => e  
+                @logger.error("#{e.class.name}: #{e.message}")  
+                @logger.error(e.backtrace.join("\n"))
+                @runner.result.add_error(test, e)
+              end 
+              test.after
+              @clients.each_value { |c| c.end_test(test) }
+              @runner.listeners.each { |l| l.end_test(test) }
+              @logger.info("Result: #{test.result}")
+              @logger.close
+              break unless [Result::FAILURE, Result::ERROR].include? test.result
+            end # RETRY
           end
         end
       end
