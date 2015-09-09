@@ -36,18 +36,49 @@ runner, thread_context, test, result
 under construction
 
 ### Test API
-under constuction (access to logger, client, params, own directory, thread_context)
+When in test files the following methods are available:
+
+* `const('key')` - read const value specific for current environment from `config/const.yml` file
+* `logger.info(msg)` - write message to test execution log file. See Ruby Logger class for details.
+* `client('Website')` - access client object instance for given class name.
+* `skip(optional_reason)` - skip this test execution
+* `pass(optional_reason)` - forcibly pass this test and finish execution immediatelly
+* `fail(optional_reason)` - forcibly fail this test and finish execution immediatelly
+* `assert_equal(a, b)` - assertion, see module `Moto::Assert` for more assertion methods
+* `dir` - current test directory
+* `filename` - current test file name with no extension
+
+### `Client` API
+When editing `client` classes the following methods are available:
+
+* `const('key')` - read const value specific for current environment from `config/const.yml` file
+* `context.runner.my_config[:capybara][:default_driver]` - read config values for current class (here: `Moto::Clients::Website`) from `config/moto.rb` file
+* `logger.info(msg)` - write message to test execution log file. See Ruby Logger class for details.
+* `current_test` - reference to currently running test
+* `client('Website')` - access other client object instance for given class name.
 
 ### Creating your own `client`
 under construction 
 
 ### Using `Website` client and creating your own `Pages`
+When editing `page` classes the following methods are available:
+
+* `session` - reference to `Capybara` session
+* `page('Login')` - reference to other `page` object. Here: `MotoApp::Clients::WebsitePages::Login`
+* `const('key')` - read const value specific for current environment from `config/const.yml` file
+* `context.runner.my_config[:capybara][:default_driver]` - read config values for current class (here: `Moto::Clients::Website`) from `config/moto.rb` file
+* `logger.info(msg)` - write message to test execution log file. See Ruby Logger class for details.
+* `current_test` - reference to currently running test
+* `client('Website')` - access other client object instance for given class name.
 
 ### Environments
 under construction
 
 ### Configuration
-under construction
+Configuration is defined on 2 levels:
+
+* Environment specific constants for the application under test stored in `config/const.yml`. Access by `context.const`
+* Configuration for the framework and project classes stored in `config/moto.rb`. Access by `context.runner.my_config`
 
 ### Creating your own `listener`
 under construction
