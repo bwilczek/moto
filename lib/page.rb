@@ -3,17 +3,17 @@ module Moto
   class Page
 
     include Moto::TestLogging
+    include Moto::ForwardContextMethods
     
     ignore_logging :const
     ignore_logging :session
+    
+    attr_reader :website
+    attr_reader :context
 
     def initialize(website)
       @website = website
       @context = @website.context
-    end
-    
-    def const(key)
-      @website.context.const(key)
     end
     
     def session

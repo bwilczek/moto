@@ -23,6 +23,7 @@ module Moto
 end
 
 require_relative './empty_listener'
+require_relative './forward_context_methods'
 require_relative './test_logging'
 require_relative './runner_logging'
 require_relative './runner'

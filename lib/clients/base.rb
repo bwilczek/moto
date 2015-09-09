@@ -3,6 +3,7 @@ module Moto
   
     class Base
       include Moto::EmptyListener
+      include Moto::ForwardContextMethods
 
       # include Moto::RunnerLogging
       include Moto::TestLogging
@@ -16,7 +17,7 @@ module Moto
       def init
         # abstract
       end
-  
+      
     end
   end
 end

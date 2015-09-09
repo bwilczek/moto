@@ -2,6 +2,7 @@ module Moto
   class Test
     
     include Moto::Assert
+    include Moto::ForwardContextMethods
     
     attr_writer :context
     attr_accessor :result
@@ -33,10 +34,6 @@ module Moto
       set_name
     end
 
-    def logger
-      @context.logger
-    end
-
     def set_name
       if @env == :__default 
         return @name = "#{self.class.to_s}" if @params.empty?
@@ -59,10 +56,6 @@ module Moto
       File.basename(path, ".*")
     end
  
-    def const(key)
-      @context.const(key)
-    end
-
     def run
       # abstract
     end
@@ -75,10 +68,6 @@ module Moto
       # abstract
     end
 
-    def client(name)
-      @context.client(name)
-    end
- 
     def skip(msg = nil)
       if msg.nil?
         msg = "Test skipped with no reason given."

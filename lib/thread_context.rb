@@ -49,7 +49,9 @@ module Moto
         instance.start_run
         instance.start_test(@current_test)
         return instance
-      rescue Exception => e  
+      rescue Exception => e 
+        # puts e
+        # puts e.backtrace 
         return nil
       end
     end
