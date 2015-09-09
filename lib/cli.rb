@@ -10,7 +10,6 @@ require 'pp'
 require 'yaml'
 require 'active_support/inflector'
 require 'active_support/core_ext/object/blank'
-require 'fileutils'
 
 require 'bundler/setup'
 Bundler.require

@@ -74,7 +74,7 @@ module Moto
     def run
       @tests.each do |test|
         # remove log files from previous execution
-        FileUtils.rm_rf Dir.glob("#{test.dir}/*.log")
+        Dir.glob("#{test.dir}/*.log").each {|f| File.delete f }
         max_attempts = @runner.my_config[:max_attempts] || 1
         @runner.environments.each do |env|
           params_path = "#{test.dir}/#{test.filename}.yml"

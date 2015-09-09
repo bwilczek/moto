@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = 'moto'
-  s.version     = '0.0.5'
-  s.date        = '2015-09-03'
+  s.version     = '0.0.6'
+  s.date        = '2015-09-09'
   s.summary     = "Moto - yet another web testing framework"
   s.description = "This is a development version of a rails philosophy inspired framework for web applications functional testing. It supports (or will support) threading, scenario parametrization, different test environments and much more. Stay tuned for v.1.0.0 in the near future."
   s.authors     = ['Bartek Wilczek', 'Maciej Stark']
@@ -12,6 +12,5 @@ Gem::Specification.new do |s|
   s.executables << 'moto'
   s.required_ruby_version = '~> 2.0'
   s.add_runtime_dependency 'activesupport', '~> 3.2'
-  s.add_runtime_dependency 'fileutils'
   s.add_runtime_dependency 'nokogiri'
 end
