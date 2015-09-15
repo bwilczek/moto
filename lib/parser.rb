@@ -22,7 +22,7 @@ module Moto
       # puts Moto::DIR
       # Default options 
       options = {}
-      options[:reporters] = [Moto::Listeners::ConsoleDots, Moto::Listeners::JunitXml] 
+      options[:reporters] = [] 
       options[:config] = eval(File.read("#{MotoApp::DIR}/config/moto.rb"))
       options[:environments] = []
          

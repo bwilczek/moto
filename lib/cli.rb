@@ -56,8 +56,13 @@ module Moto
         t = tg.generate(test_class_name)      
         tests << t
       end
-     
-      runner = Moto::Runner.new(tests, argv[ :reporters ], argv[ :environments ], argv[ :config ])
+      
+      listeners = []
+      argv[ :reporters ].each do |r|
+        listeners << r.constantize
+      end
+      
+      runner = Moto::Runner.new(tests, listeners, argv[ :environments ], argv[ :config ])
       runner.run
     end
   

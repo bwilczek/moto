@@ -25,8 +25,14 @@ module Moto
       @environments = environments
       
       @listeners = []
-      listeners.each do |l|
-        @listeners << l.new(self)
+      if listeners.empty?
+        my_config[:default_listeners].each do |l|
+          @listeners << l.new(self)
+        end
+      else
+        listeners.each do |l|
+          @listeners << l.new(self)
+        end
       end
       @listeners.unshift(@result)
     end
