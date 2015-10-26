@@ -22,7 +22,8 @@ module Moto
     def self.run_parse(argv)
       # Default options
       options = {}
-      options[:reporters] = [] 
+      options[:reporters] = []
+      # TODO Mandatory env var in app config
       options[:config] = eval(File.read("#{MotoApp::DIR}/config/moto.rb"))
       options[:environments] = []
          
@@ -33,7 +34,7 @@ module Moto
       OptionParser.new do |opts|       
           opts.on('-t', '--tests Tests', Array) { |v| options[:tests ] = v }
           opts.on('-d', '--dir Directories', Array) { |v| options[:directories ] = v }
-          opts.on('-tags', '--tags Tags', Array) { |v| options[:tags ] = v }
+          opts.on('-g', '--tags Tags', Array) { |v| options[:tags ] = v }
           opts.on('-r', '--reporters Reporters', Array) { |v| options[:reporters] = v }
           opts.on('-e', '--environments Environment', Array) { |v| options[:environments] = v }
           opts.on('-c', '--const Const') { |v| options[:const] = v }

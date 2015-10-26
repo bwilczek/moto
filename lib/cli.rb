@@ -1,7 +1,7 @@
 # TODO: fix this dumb verification of current working directory
 unless File.exists? "#{Dir.pwd}/config/moto.rb"
-  puts "Config file (config/moto.rb) not present."
-  puts "Does current working directory contain Moto application?"
+  puts 'Config file (config/moto.rb) not present.'
+  puts 'Does current working directory contain Moto application?'
   exit 1
 end
 
@@ -55,7 +55,7 @@ module Moto
         argv[ :tests ].each do |test_path_relative|
           test_path_absolute = "#{MotoApp::DIR}/tests/"+test_path_relative.downcase
           a = test_path_absolute.split('/')
-          test_path_absolute = (a+[a[-1]]).join('/') + ".rb"
+          test_path_absolute = (a+[a[-1]]).join('/') +'.rb'
           test_paths_absolute.include?(test_path_absolute) || test_paths_absolute << test_path_absolute
         end
       end
@@ -77,7 +77,7 @@ module Moto
             test_body.each_line do |line|
               line = line.delete(' ')
               if line.include?( '#MOTO_TAGS')
-                if line.include? (tag_name + ",")
+                if line.include? (tag_name + ',')
                   test_paths_absolute.include?(test_dir) || test_paths_absolute << test_dir
                   break
                 else
