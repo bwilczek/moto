@@ -12,15 +12,15 @@ module Moto
             
       # TODO Generate app / Change the way parsing options goes so it doesnt generate them if they`re not needed
       case argv[0]
-      when 'run' then Moto::Cli.run run_parse(argv)
-      when 'help' then show_help
-      when 'generate' then Moto::AppGenerator.run generate_parse(argv)
+        when 'run' then Moto::Cli.run run_parse(argv)
+        when 'help' then show_help
+        when 'generate' then Moto::AppGenerator.run generate_parse(argv)
+        else puts "Command '#{argv[0]}' not recognized. Type help for list of supported commands."
       end
     end
     
-    def self.run_parse(argv)   
-      # puts Moto::DIR
-      # Default options 
+    def self.run_parse(argv)
+      # Default options
       options = {}
       options[:reporters] = [] 
       options[:config] = eval(File.read("#{MotoApp::DIR}/config/moto.rb"))
@@ -31,7 +31,9 @@ module Moto
       # TODO const 
       # TODO reporters should be consts - not strings
       OptionParser.new do |opts|       
-          opts.on('-t', "--tests Tests", Array) { |v| options[:tests ] = v }
+          opts.on('-t', '--tests Tests', Array) { |v| options[:tests ] = v }
+          opts.on('-d', '--dir Directories', Array) { |v| options[:directories ] = v }
+          opts.on('-tags', '--tags Tags', Array) { |v| options[:tags ] = v }
           opts.on('-r', '--reporters Reporters', Array) { |v| options[:reporters] = v }
           opts.on('-e', '--environments Environment', Array) { |v| options[:environments] = v }
           opts.on('-c', '--const Const') { |v| options[:const] = v }

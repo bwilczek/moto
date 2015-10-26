@@ -46,23 +46,60 @@ require_relative './exceptions/test_forced_passed'
 module Moto
 
   class Cli
-  
     def self.run(argv)
-      tests = []
-        argv[ :tests ].each do |test_name|
-        test_class_name = test_name
-              
-        tg = TestGenerator.new(MotoApp::DIR)
-        t = tg.generate(test_class_name)      
-        tests << t
+      test_paths_absolute = []
+      test_classes = []
+
+      #
+      unless argv[ :tests ].nil?
+        argv[ :tests ].each do |test_path_relative|
+          test_path_absolute = "#{MotoApp::DIR}/tests/"+test_path_relative.downcase
+          a = test_path_absolute.split('/')
+          test_path_absolute = (a+[a[-1]]).join('/') + ".rb"
+          test_paths_absolute.include?(test_path_absolute) || test_paths_absolute << test_path_absolute
+        end
       end
-      
+
+      unless argv[ :directories ].nil?
+        argv[ :directories ].each do |dir_name|
+          test_paths = Dir.glob("#{MotoApp::DIR}/tests/#{dir_name}/**/*.rb")
+          test_paths = test_paths - test_paths_absolute
+          test_paths_absolute += test_paths
+        end
+      end
+
+      # TODO Optimization for files without #MOTO_TAGS
+      unless argv[ :tags ].nil?
+        tests_total = Dir.glob("#{MotoApp::DIR}/tests/**/*.rb")
+        argv[ :tags ].each do |tag_name|
+          tests_total.each do |test_dir|
+            test_body = File.read (test_dir)
+            test_body.each_line do |line|
+              line = line.delete(' ')
+              if line.include?( '#MOTO_TAGS')
+                if line.include? (tag_name + ",")
+                  test_paths_absolute.include?(test_dir) || test_paths_absolute << test_dir
+                  break
+                else
+                  break
+                end
+              end
+            end
+          end
+        end
+      end
+
+      tg = TestGenerator.new(MotoApp::DIR)
+      test_paths_absolute.each do |test_path|
+        test_classes << tg.generate(test_path)
+      end
+
       listeners = []
       argv[ :reporters ].each do |r|
         listeners << r.constantize
       end
       
-      runner = Moto::Runner.new(tests, listeners, argv[ :environments ], argv[ :config ])
+      runner = Moto::Runner.new(test_classes, listeners, argv[ :environments ], argv[ :config ])
       runner.run
     end
   
