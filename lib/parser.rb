@@ -33,13 +33,18 @@ module Moto
       # TODO reporters should be consts - not strings
       OptionParser.new do |opts|       
           opts.on('-t', '--tests Tests', Array) { |v| options[:tests ] = v }
-          opts.on('-d', '--dir Directories', Array) { |v| options[:directories ] = v }
           opts.on('-g', '--tags Tags', Array) { |v| options[:tags ] = v }
           opts.on('-r', '--reporters Reporters', Array) { |v| options[:reporters] = v }
           opts.on('-e', '--environments Environment', Array) { |v| options[:environments] = v }
           opts.on('-c', '--const Const') { |v| options[:const] = v }
           opts.on('-cfg', '--config Config') { |v| options[:config] = options[:config].merge( eval( v ) ) }
       end.parse!
+
+      if options[ :config ][ :moto ][ :runner ][ :mandatory_environment ] && options[ :environments ].empty?
+        puts 'Environment is mandatory for this project.'
+        exit 1
+      end
+
       return options
     end
     

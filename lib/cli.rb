@@ -50,20 +50,10 @@ module Moto
       test_paths_absolute = []
       test_classes = []
 
-      #
       unless argv[ :tests ].nil?
-        argv[ :tests ].each do |test_path_relative|
-          test_path_absolute = "#{MotoApp::DIR}/tests/"+test_path_relative.downcase
-          a = test_path_absolute.split('/')
-          test_path_absolute = (a+[a[-1]]).join('/') +'.rb'
-          test_paths_absolute.include?(test_path_absolute) || test_paths_absolute << test_path_absolute
-        end
-      end
-
-      unless argv[ :directories ].nil?
-        argv[ :directories ].each do |dir_name|
+        argv[ :tests ].each do |dir_name|
           test_paths = Dir.glob("#{MotoApp::DIR}/tests/#{dir_name}/**/*.rb")
-          test_paths = test_paths - test_paths_absolute
+          test_paths -= test_paths_absolute
           test_paths_absolute += test_paths
         end
       end
@@ -87,6 +77,12 @@ module Moto
             end
           end
         end
+      end
+
+      #TODO Display criteria used
+      if test_paths_absolute.empty?
+        puts 'No tests found for given arguments'
+        exit 1
       end
 
       tg = TestGenerator.new(MotoApp::DIR)
