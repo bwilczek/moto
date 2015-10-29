@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'moto'
-  s.version     = '0.0.9'
+  s.version     = '0.0.10'
   s.date        = '2015-10-29'
   s.summary     = "Moto - yet another web testing framework"
   s.description = "This is a development version of a rails philosophy inspired framework for web applications functional testing. It supports (or will support) threading, scenario parametrization, different test environments and much more. Stay tuned for v.1.0.0 in the near future."

@@ -16,7 +16,7 @@ module Moto
       end
       @config = {}
       Dir.glob("config/*.yml").each do |f|
-        @config.merge! YAML.load_file(f)
+        @config.deep_merge! YAML.load_file(f)
       end
     end
     
