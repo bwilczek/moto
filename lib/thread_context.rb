@@ -14,8 +14,10 @@ module Moto
       @tests.each do |t|
         t.context = self
       end
-      # TODO: add all *.yml files from that dir
-      @config = YAML.load_file("#{MotoApp::DIR}/config/const.yml")
+      @config = {}
+      Dir.glob("config/*.yml").each do |f|
+        @config.merge! YAML.load_file(f)
+      end
     end
     
     def client(name)
