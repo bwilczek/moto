@@ -7,11 +7,13 @@ module Moto
     attr_reader :environments
     attr_reader :assert
     attr_reader :config
+    attr_reader :name
     
-    def initialize(tests, listeners, environments, config)
+    def initialize(tests, listeners, environments, config, name)
       @tests = tests
       @config = config
       @threads = []
+      @name = name
       
       # TODO: initialize logger from config (yml or just ruby code)
       # @logger = Logger.new(STDOUT)

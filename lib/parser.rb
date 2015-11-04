@@ -26,6 +26,7 @@ module Moto
       # TODO Mandatory env var in app config
       options[:config] = eval(File.read("#{MotoApp::DIR}/config/moto.rb"))
       options[:environments] = []
+      options[:name] = ""
          
       # Parse arguments
       # TODO eval ?
@@ -37,8 +38,13 @@ module Moto
           opts.on('-r', '--reporters Reporters', Array) { |v| options[:reporters] = v }
           opts.on('-e', '--environments Environment', Array) { |v| options[:environments] = v }
           opts.on('-c', '--const Const') { |v| options[:const] = v }
-          opts.on('-cfg', '--config Config') { |v| options[:config] = options[:config].merge( eval( v ) ) }
+          opts.on('-n', '--name Name') { |v| options[:name] = v }
+          opts.on('-f', '--config Config') { |v| options[:config] = options[:config].merge( eval( v ) ) }
       end.parse!
+
+      if options[:name].empty?
+        options[:name] = evaluate_name(options[:tags], options[:tests])
+      end
 
       if options[ :config ][ :moto ][ :runner ][ :mandatory_environment ] && options[ :environments ].empty?
         puts 'Environment is mandatory for this project.'
@@ -46,6 +52,18 @@ module Moto
       end
 
       return options
+    end
+    
+    def self.evaluate_name(tags, tests)
+      tags ||= ""
+      tests ||= ""
+      if !tags.empty? && !tests.empty?
+        return "#{tags.count} tags + #{tests.count} tests"
+      elsif tags.empty?
+        return tests.count == 1 ? "Test: #{tests.first}" : "#{tests.count} tests"
+      elsif tests.empty?
+        return tags.count == 1 ? "Tag: #{tags.first}" : "#{tags.count} tags"
+      end
     end
     
     def self.generate_parse(argv)

@@ -4,7 +4,7 @@ module Moto
     # all resources specific for single thread will be initialized here. E.g. browser session
     attr_reader :runner
     attr_reader :logger
-    attr_reader :log_path
+    # attr_reader :log_path
     attr_reader :current_test
     
     def initialize(runner, tests)
@@ -91,8 +91,8 @@ module Moto
             (1..max_attempts).each do |attempt|
               test.init(env, params)
               # TODO: log path might be specified (to some extent) by the configuration
-              @log_path = "#{test.dir}/#{test.name.gsub(/\s+/, '_').gsub('::', '_').gsub('/', '_')}.log"
-              @logger = Logger.new(File.open(@log_path, File::WRONLY | File::TRUNC | File::CREAT))
+              test.log_path = "#{test.dir}/#{test.name.gsub(/\s+/, '_').gsub('::', '_').gsub('/', '_')}.log"
+              @logger = Logger.new(File.open(test.log_path, File::WRONLY | File::TRUNC | File::CREAT))
               # TODO: make logger level configurable
               @logger.level = @runner.my_config[:log_level]
               @current_test = test
@@ -112,9 +112,11 @@ module Moto
               end 
               test.after
               @clients.each_value { |c| c.end_test(test) }
-              @runner.listeners.each { |l| l.end_test(test) }
+              # HAX: running end_test on results now, on other listeners after logger is closed
+              @runner.listeners.first.end_test(test)
               @logger.info("Result: #{test.result}")
               @logger.close
+              @runner.listeners[1..-1].each { |l| l.end_test(test) }
               break unless [Result::FAILURE, Result::ERROR].include? test.result
             end # RETRY
           end
