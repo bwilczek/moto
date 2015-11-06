@@ -55,7 +55,7 @@ module Moto
       eval "@config#{keys.map{|k| "[:#{k}]" }.join('')}"
     end
 
-    # TODO: slices.count is not needed, for the future, assigning tests to threads dynamically
+    # TODO: assigning tests to threads dynamically
     def run
       @listeners.each { |l| l.start_run }
       test_slices = @tests.each_slice((@tests.size.to_f/my_config[:thread_count]).ceil).to_a
