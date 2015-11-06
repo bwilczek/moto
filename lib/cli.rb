@@ -37,6 +37,7 @@ require_relative './listeners/base'
 require_relative './listeners/console'
 require_relative './listeners/console_dots'
 require_relative './listeners/junit_xml'
+require_relative './listeners/webui'
 require_relative './test_generator'
 require_relative './exceptions/moto'
 require_relative './exceptions/test_skipped'
@@ -63,11 +64,11 @@ module Moto
         tests_total = Dir.glob("#{MotoApp::DIR}/tests/**/*.rb")
         argv[ :tags ].each do |tag_name|
           tests_total.each do |test_dir|
-            test_body = File.read (test_dir)
+            test_body = File.read(test_dir)
             test_body.each_line do |line|
               line = line.delete(' ')
               if line.include?( '#MOTO_TAGS')
-                if line.include? (tag_name + ',')
+                if line.include?(tag_name + ',')
                   test_paths_absolute.include?(test_dir) || test_paths_absolute << test_dir
                   break
                 else
@@ -95,7 +96,7 @@ module Moto
         listeners << r.constantize
       end
       
-      runner = Moto::Runner.new(test_classes, listeners, argv[ :environments ], argv[ :config ])
+      runner = Moto::Runner.new(test_classes, listeners, argv[:environments], argv[:config], argv[:name])
       runner.run
     end
   
