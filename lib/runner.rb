@@ -52,13 +52,14 @@ module Moto
       keys.flatten!
       eval "@config#{keys.map{|k| "[:#{k}]" }.join('')}"
     end
-    
+
+    # TODO: slices.count is not needed, for the future, assigning tests to threads dynamically
     def run
       @listeners.each { |l| l.start_run }
       test_slices = @tests.each_slice((@tests.size.to_f/my_config[:thread_count]).ceil).to_a
-      (0...test_slices.count).each do |i|
+      test_slices.each do |slice|
         @threads << Thread.new do
-          tc = ThreadContext.new(self, test_slices[i])
+          tc = ThreadContext.new(self, slice)
           tc.run
         end
       end
