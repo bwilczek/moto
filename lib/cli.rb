@@ -93,7 +93,8 @@ module Moto
 
       listeners = []
       argv[ :reporters ].each do |r|
-        listeners << r.constantize
+        listener = 'Moto::Listeners::' + r.camelize
+        listeners << listener.constantize
       end
       
       runner = Moto::Runner.new(test_classes, listeners, argv[:environments], argv[:config], argv[:name])
