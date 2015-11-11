@@ -43,6 +43,7 @@ module Moto
           name:  test.name,
           class_name: test.class.name,
           log: nil,
+          run_id: @run['id'],
           env: test.env,
           parameters: test.params.to_s,
           result: Moto::Result::RUNNING,
