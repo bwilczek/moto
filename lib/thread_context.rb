@@ -86,10 +86,10 @@ module Moto
           params_all = YAML.load_file(params_path) if File.exists?(params_path)
           # or convert keys to symbols?
           # params_all = YAML.load_file(params_path).map{|h| Hash[ h.map{|k,v| [ k.to_sym, v ] } ] } if File.exists?(params_path)
-          params_all.each do |params|
+          params_all.each_with_index do |params, params_index|
             # TODO: add filtering out params that are specific to certain envs
             (1..max_attempts).each do |attempt|
-              test.init(env, params)
+              test.init(env, params, params_index)
               # TODO: log path might be specified (to some extent) by the configuration
               test.log_path = "#{test.dir}/#{test.name.gsub(/\s+/, '_').gsub('::', '_').gsub('/', '_')}.log"
               @logger = Logger.new(File.open(test.log_path, File::WRONLY | File::TRUNC | File::CREAT))
