@@ -21,6 +21,7 @@ module Moto
           pid: Process.pid
         }
         @run = JSON.parse( RestClient.post( "#{@url}/api/runs", data.to_json, :content_type => :json, :accept => :json ) )
+        @tests = {}
       end
       
       def end_run
@@ -50,7 +51,7 @@ module Moto
           error: nil,
           failures: nil,
         }
-        @test = JSON.parse( RestClient.post( "#{@url}/api/tests", data.to_json, :content_type => :json, :accept => :json ) )        
+        @tests[test.name] = JSON.parse( RestClient.post( "#{@url}/api/tests", data.to_json, :content_type => :json, :accept => :json ) )        
       end
 
       def end_test(test)
@@ -61,8 +62,8 @@ module Moto
           error: @runner.result[test.name][:error].nil? ? nil : @runner.result[test.name][:error].message,
           failures: @runner.result[test.name][:failures].join("\n\t"),
           duration: @runner.result[test.name][:duration]
-        }        
-        @test = JSON.parse( RestClient.put( "#{@url}/api/tests/#{@test['id']}", data.to_json, :content_type => :json, :accept => :json ) )
+        }
+        @tests[test.name] = JSON.parse( RestClient.put( "#{@url}/api/tests/#{@tests[test.name]['id']}", data.to_json, :content_type => :json, :accept => :json ) )
       end
 
     end
