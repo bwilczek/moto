@@ -1,3 +1,5 @@
+require 'erb'
+
 module Moto
   class ThreadContext
     
@@ -83,7 +85,8 @@ module Moto
         @runner.environments.each do |env|
           params_path = "#{test.dir}/#{test.filename}.yml"
           params_all = [{}]
-          params_all = YAML.load_file(params_path) if File.exists?(params_path)
+          params_all = YAML.load(ERB.new(File.read(params_path)).result) if File.exists?(params_path)
+          #params_all = YAML.load_file(params_path) if File.exists?(params_path)
           # or convert keys to symbols?
           # params_all = YAML.load_file(params_path).map{|h| Hash[ h.map{|k,v| [ k.to_sym, v ] } ] } if File.exists?(params_path)
           params_all.each_with_index do |params, params_index|

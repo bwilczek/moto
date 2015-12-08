@@ -19,7 +19,7 @@ module Moto
       # TODO: check if this path and constant exists
       require "#{MotoApp::DIR}/#{test_path}"
       test_const = class_name.safe_constantize  
-      test_const.new    
+      test_const.new
     end
     
     def create_module_tree(root_module, next_modules)

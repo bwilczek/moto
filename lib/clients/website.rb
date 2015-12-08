@@ -13,6 +13,8 @@ module Moto
   		 		
       def start_run
         # TODO: make session driver configurable
+        context.runner.my_config[:capybara][:default_selector] &&
+            Capybara.default_selector = context.runner.my_config[:capybara][:default_selector]
         @session = Capybara::Session.new(context.runner.my_config[:capybara][:default_driver])
         @pages = {}
       end
@@ -31,7 +33,7 @@ module Moto
       end   
   		
   		def page(p)
-  		  page_class_name = "#{self.class.name}Pages::#{p}"
+  		  page_class_name = "#{self.class.name}::Pages::#{p}"
   		  page_class_name.gsub!('Moto::', 'MotoApp::')
   		  if @pages[page_class_name].nil?
           a = page_class_name.underscore.split('/')
