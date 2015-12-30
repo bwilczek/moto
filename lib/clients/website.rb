@@ -3,7 +3,7 @@ require 'capybara'
 module Moto
   module Clients
 
-  	class Website < Moto::Clients::Base
+    class Website < Moto::Clients::Base
 
       attr_reader :session
 
@@ -12,17 +12,7 @@ module Moto
       ignore_logging(:session)
 
       def init
-        if context.runner.my_config[:grid][:capabilities] == nil
-          capabilities = Selenium::WebDriver::Remote::Capabilities.firefox
-        else
-          capabilities = Selenium::WebDriver::Remote::Capabilities.new(context.runner.my_config[:grid][:capabilities])
-        end
-        Capybara.register_driver :grid do |app|
-          Capybara::Selenium::Driver.new(app,
-                                        :browser => :remote,
-                                        :url => context.runner.my_config[:grid][:url],
-                                        :desired_capabilities => capabilities)
-        end
+        register_grid_driver
       end
 
       def start_run
@@ -46,18 +36,36 @@ module Moto
         @session.reset_session!
       end
 
-  		def page(p)
-  		  page_class_name = "#{self.class.name}::Pages::#{p}"
-  		  page_class_name.gsub!('Moto::', 'MotoApp::')
-  		  if @pages[page_class_name].nil?
+      def page(p)
+        page_class_name = "#{self.class.name}::Pages::#{p}"
+        page_class_name.gsub!('Moto::', 'MotoApp::')
+        if @pages[page_class_name].nil?
           a = page_class_name.underscore.split('/')
-          page_path = a[1..20].join('/')
+          page_path = a[1..-1].join('/')
           require "#{MotoApp::DIR}/lib/#{page_path}"
-  		    @pages[page_class_name] = page_class_name.constantize.new(self)
-  		  end
-  		  @pages[page_class_name]
-  		end
+          @pages[page_class_name] = page_class_name.constantize.new(self)
+        end
+        @pages[page_class_name]
+      end
 
-  	end
+      private
+
+      def register_grid_driver
+        grid_config = context.runner.my_config[:capybara][:grid]
+        return if grid_config == nil
+        if grid_config[:capabilities] == nil
+          capabilities = Selenium::WebDriver::Remote::Capabilities.firefox
+        else
+          capabilities = Selenium::WebDriver::Remote::Capabilities.new(grid_config[:capabilities])
+        end
+        Capybara.register_driver :grid do |app|
+          Capybara::Selenium::Driver.new(app,
+                                        :browser => :remote,
+                                        :url => grid_config[:url],
+                                        :desired_capabilities => capabilities)
+        end
+      end
+
+    end
   end
 end
