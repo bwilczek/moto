@@ -1,18 +1,8 @@
-# TODO: fix this dumb verification of current working directory
-unless File.exists? "#{Dir.pwd}/config/moto.rb"
-  puts 'Config file (config/moto.rb) not present.'
-  puts 'Does current working directory contain Moto application?'
-  exit 1
-end
-
 require 'logger'
 require 'pp'
 require 'yaml'
 require 'active_support/inflector'
 require 'active_support/core_ext/object/blank'
-
-require 'bundler/setup'
-Bundler.require
 
 module MotoApp
   DIR = Dir.pwd
@@ -32,6 +22,7 @@ require_relative './result'
 require_relative './assert'
 require_relative './test'
 require_relative './page'
+require_relative './version'
 require_relative './clients/base'
 require_relative './listeners/base'
 require_relative './listeners/console'

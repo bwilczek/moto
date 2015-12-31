@@ -52,8 +52,8 @@ module Moto
 
       def register_grid_driver
         grid_config = context.runner.my_config[:capybara][:grid]
-        return if grid_config == nil
-        if grid_config[:capabilities] == nil
+        return if grid_config.nil?
+        if grid_config[:capabilities].nil?
           capabilities = Selenium::WebDriver::Remote::Capabilities.firefox
         else
           capabilities = Selenium::WebDriver::Remote::Capabilities.new(grid_config[:capabilities])
