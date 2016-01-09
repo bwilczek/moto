@@ -1,6 +1,6 @@
 module Moto
   class Runner
-    
+
     attr_reader :result
     attr_reader :listeners
     attr_reader :logger
@@ -8,24 +8,24 @@ module Moto
     attr_reader :assert
     attr_reader :config
     attr_reader :name
-    
+
     def initialize(tests, listeners, environments, config, name)
       @tests = tests
       @config = config
-      @threads = []
+      @thread_pool = ThreadPool.new(my_config[:thread_count])
       @name = name
-      
+
       # TODO: initialize logger from config (yml or just ruby code)
       # @logger = Logger.new(STDOUT)
       @logger = Logger.new(File.open("#{MotoApp::DIR}/moto.log", File::WRONLY | File::APPEND | File::CREAT))
       # @logger.level = Logger::WARN
-      
+
       @result = Result.new(self)
-      
+
       # TODO: validate envs, maybe no-env should be supported as well?
       environments << :__default if environments.empty?
       @environments = environments
-      
+
       @listeners = []
       if listeners.empty?
         my_config[:default_listeners].each do |l|
@@ -38,7 +38,7 @@ module Moto
       end
       @listeners.unshift(@result)
     end
-    
+
     def my_config
       caller_path = caller.first.to_s.split(/:\d/)[0]
       keys = []
@@ -55,19 +55,17 @@ module Moto
       eval "@config#{keys.map{|k| "[:#{k}]" }.join('')}"
     end
 
-    # TODO: assigning tests to threads dynamically
     def run
       @listeners.each { |l| l.start_run }
-      test_slices = @tests.each_slice((@tests.size.to_f/my_config[:thread_count]).ceil).to_a
-      test_slices.each do |slice|
-        @threads << Thread.new do
-          tc = ThreadContext.new(self, slice)
+      @tests.each do |test|
+        @thread_pool.schedule do
+          tc = ThreadContext.new(self, test)
           tc.run
         end
       end
-      @threads.each{ |t| t.join }
+      @thread_pool.shutdown
       @listeners.each { |l| l.end_run }
     end
-    
+
   end
 end
