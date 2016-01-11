@@ -23,6 +23,7 @@ module Moto
     end
     
     def create_module_tree(root_module, next_modules)
+      return root_module if next_modules.empty?
       next_module_name = next_modules.shift
       if root_module.const_defined?(next_module_name.to_sym)
         m = root_module.const_get(next_module_name.to_sym)
@@ -30,7 +31,6 @@ module Moto
         m = Module.new
         root_module.const_set(next_module_name.to_sym, m)
       end
-      return m if next_modules.empty?
       create_module_tree(m, next_modules)
     end
     

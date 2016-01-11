@@ -35,7 +35,7 @@ module Moto
       @summary[:duration] = @summary[:finished_at] - @summary[:started_at]
       @summary[:result] = PASSED
       @summary[:result] = FAILURE unless @results.values.select{ |v| v[:failures].count > 0 }.empty?
-      @summary[:result] = ERROR unless @results.values.select{ |v| !v[:error].nil? }.empty?
+      @summary[:result] = ERROR unless @results.values.select{ |v| v[:result] == ERROR }.empty?
       @summary[:cnt_all] = @results.count
       @summary[:tests_passed] = @results.select{ |k,v| v[:result] == PASSED }
       @summary[:tests_failure] = @results.select{ |k,v| v[:result] == FAILURE }

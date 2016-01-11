@@ -1,7 +1,7 @@
 module Moto
   class ThreadPool
 
-    def initialize(size)
+    def initialize(size=1)
       @size = size
       @jobs = Queue.new
       @pool = Array.new(@size) do |i|

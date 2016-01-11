@@ -1,0 +1,19 @@
+-
+  __name: positive
+  a: 2
+  b: 2
+  sum: 4
+-
+  __name: negative
+  __env: dev
+  a: -2
+  b: -4
+  sum: -6
+-
+  __name: zero
+  __env: 
+    - dev
+    - prod
+  a: 2
+  b: -2
+  sum: 0

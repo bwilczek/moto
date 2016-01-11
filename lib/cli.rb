@@ -52,29 +52,21 @@ module Moto
       end
 
       # TODO Optimization for files without #MOTO_TAGS
-      unless argv[ :tags ].nil?
+      unless argv[:tags].nil?
         tests_total = Dir.glob("#{MotoApp::DIR}/tests/**/*.rb")
-        argv[ :tags ].each do |tag_name|
-          tests_total.each do |test_dir|
-            test_body = File.read(test_dir)
-            test_body.each_line do |line|
-              line = line.delete(' ')
-              if line.include?( '#MOTO_TAGS')
-                if line.include?(tag_name + ',')
-                  test_paths_absolute.include?(test_dir) || test_paths_absolute << test_dir
-                  break
-                else
-                  break
-                end
-              end
-            end
+        tests_total.each do |test_path|
+          test_body = File.read(test_path)
+          matches = test_body.match(/^#(\s*)MOTO_TAGS:([^\n\r]+)$/m)
+          if matches
+            test_tags = matches.to_a[2].gsub(/\s*/, '').split(',')
+            test_paths_absolute << test_path unless (argv[:tags]&test_tags).empty?
           end
         end
       end
 
       #TODO Display criteria used
       if test_paths_absolute.empty?
-        puts 'No tests found for given arguments'
+        puts 'No tests found for given arguments.'
         exit 1
       end
 

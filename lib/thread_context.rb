@@ -43,7 +43,7 @@ module Moto
     def try_client(name, dir)
       begin
         a = name.underscore.split('/')
-        client_path = a[1..20].join('/')
+        client_path = a[1..-1].join('/')
         require "#{dir}/#{client_path}"
         client_const = name.constantize
         instance = client_const.new(self)
@@ -84,17 +84,18 @@ module Moto
         params_all = [{}]
         params_all = YAML.load(ERB.new(File.read(params_path)).result) if File.exists?(params_path)
         #params_all = YAML.load_file(params_path) if File.exists?(params_path)
-        # or convert keys to symbols?
-        # params_all = YAML.load_file(params_path).map{|h| Hash[ h.map{|k,v| [ k.to_sym, v ] } ] } if File.exists?(params_path)
         params_all.each_with_index do |params, params_index|
-          # TODO: add filtering out params that are specific to certain envs
+          # Filtering out param sets that are specific to certain envs
+          unless params['__env'].nil?
+            allowed_envs = params['__env'].is_a?(String) ? [params['__env']] : params['__env'] 
+            next unless allowed_envs.include? env
+          end
           (1..max_attempts).each do |attempt|
             @test.init(env, params, params_index)
             # TODO: log path might be specified (to some extent) by the configuration
             @test.log_path = "#{@test.dir}/#{@test.name.gsub(/\s+/, '_').gsub('::', '_').gsub('/', '_')}.log"
             @logger = Logger.new(File.open(@test.log_path, File::WRONLY | File::TRUNC | File::CREAT))
-            # TODO: make logger level configurable
-            @logger.level = @runner.my_config[:log_level]
+            @logger.level = @runner.my_config[:log_level] || Logger::DEBUG
             @current_test = @test
             @runner.listeners.each { |l| l.start_test(@test) }
             @clients.each_value { |c| c.start_test(@test) }

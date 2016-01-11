@@ -12,7 +12,7 @@ module Moto
     def initialize(tests, listeners, environments, config, name)
       @tests = tests
       @config = config
-      @thread_pool = ThreadPool.new(my_config[:thread_count])
+      @thread_pool = ThreadPool.new(my_config[:thread_count] || 1)
       @name = name
 
       # TODO: initialize logger from config (yml or just ruby code)
@@ -56,6 +56,12 @@ module Moto
     end
 
     def run
+      if File.exists?( "#{MotoApp::DIR}/lib/initializer.rb" )
+        require("#{Moto::DIR}/lib/initializer.rb")
+        require("#{MotoApp::DIR}/lib/initializer.rb")
+        initializer = MotoApp::Initializer.new(self)
+        initializer.init
+      end
       @listeners.each { |l| l.start_run }
       @tests.each do |test|
         @thread_pool.schedule do
