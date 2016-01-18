@@ -38,6 +38,25 @@ module Moto
     def generate(test_path_absolute)
       method_body = File.read(test_path_absolute) + "\n"
 
+      full_code = !! method_body.match( /^#\s*FULL_CODE\s+/ )
+
+      if full_code
+        generate_for_full_class_code(test_path_absolute)
+      else
+        generate_for_run_body(test_path_absolute, method_body)
+      end
+    end
+    
+    def generate_for_full_class_code(test_path_absolute)
+      require test_path_absolute
+      class_name = test_path_absolute.gsub("#{MotoApp::DIR}/",'moto_app/').split('/')[0..-2].join('/').camelize
+      test_object = class_name.constantize.new
+      test_object.static_path = test_path_absolute
+      test_object.evaled = false
+      test_object      
+    end
+    
+    def generate_for_run_body(test_path_absolute, method_body)
       base = Moto::Test
       base_class_string = method_body.match( /^#\s*BASE_CLASS:\s(\S+)/ )
       unless base_class_string.nil?
@@ -62,6 +81,7 @@ module Moto
       test_object = cls.new
       test_object.instance_eval( "def run\n  #{method_body} \n end" )
       test_object.static_path = test_path_absolute
+      test_object.evaled = true        
       test_object
     end
     

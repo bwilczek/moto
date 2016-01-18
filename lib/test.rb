@@ -9,8 +9,9 @@ module Moto
     attr_reader :name
     attr_reader :env
     attr_reader :params
-    attr_writer :static_path
+    attr_accessor :static_path
     attr_accessor :log_path
+    attr_accessor :evaled
 
     class << self
       attr_accessor :_path
