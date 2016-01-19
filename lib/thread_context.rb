@@ -79,6 +79,7 @@ module Moto
       # remove log files from previous execution
       Dir.glob("#{@test.dir}/*.log").each {|f| File.delete f }
       max_attempts = @runner.my_config[:max_attempts] || 1
+      sleep_time = @runner.my_config[:sleep_time] || 0
       @runner.environments.each do |env|
         params_path = "#{@test.dir}/#{@test.filename}.yml"
         params_all = [{}]
@@ -119,6 +120,7 @@ module Moto
             @logger.close
             @runner.listeners[1..-1].each { |l| l.end_test(@test) }
             break unless [Result::FAILURE, Result::ERROR].include? @test.result
+            sleep sleep_time
           end # RETRY
         end
       end
