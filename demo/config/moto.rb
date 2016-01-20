@@ -8,7 +8,7 @@
     thread_context: {
       log_level: Logger::DEBUG,
       max_attempts: 1,
-      sleep_time: 120
+      sleep_before_attempt: 120
     },
     listeners: {
       junit_xml: {
