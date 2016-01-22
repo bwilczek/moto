@@ -9,6 +9,10 @@ module Moto
       assert(b, "Logical condition not met, expecting true, given false.")
     end
 
+    def assert_false(b)
+      assert(!b, "Logical condition not met, expecting false, given true.")
+    end
+
     def assert(condition, message)
       unless condition
         
