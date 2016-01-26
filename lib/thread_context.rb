@@ -120,7 +120,7 @@ module Moto
             @logger.close
             @runner.listeners[1..-1].each { |l| l.end_test(@test) }
             break unless [Result::FAILURE, Result::ERROR].include? @test.result
-            sleep sleep_time
+            sleep sleep_time if max_attempts > 1
           end # RETRY
         end
       end
