@@ -54,7 +54,7 @@ module Moto
         opts.on('-e', '--environments Environment', Array) { |v| options[:environments] = v }
         opts.on('-c', '--const Const') { |v| options[:const] = v }
         opts.on('-n', '--name Name') { |v| options[:name] = v }
-        opts.on('-f', '--config Config') { |v| options[:config] = options[:config].merge( eval( v ) ) }
+        opts.on('-f', '--config Config') { |v| options[:config].deep_merge!( eval( File.read(v) ) ) }
       end.parse!
 
       if options[:name].empty?
