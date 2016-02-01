@@ -10,6 +10,8 @@ module Moto
 
       attr_reader :context
 
+      ignore_logging(:handle_test_exception)
+
       def initialize(context)
         @context = context
       end
@@ -18,8 +20,8 @@ module Moto
         # abstract
       end
 
-      def save_screenshot(path)
-        @context.logger.info "Client [#{self.class}] doesn't support screenshots"
+      def handle_test_exception(test, exception)
+        # abstract
       end
 
     end

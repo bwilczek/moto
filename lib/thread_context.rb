@@ -110,7 +110,7 @@ module Moto
             rescue Exception => e
               @logger.error("#{e.class.name}: #{e.message}")
               @logger.error(e.backtrace.join("\n"))
-              @clients.each_value { |c| c.save_screenshot("#{@test.dir}/#{@test.filename}_#{Time.new.strftime('%Y%m%d_%H%M%S')}.png") }
+              @clients.each_value { |c| c.handle_test_exception(@test, e) }
               @runner.result.add_error(@test, e)
             end
             @test.after

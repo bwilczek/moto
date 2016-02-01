@@ -66,8 +66,8 @@ module Moto
         end
       end
 
-      def save_screenshot(path)
-        Thread.current['capybara_session'].save_screenshot path
+      def handle_test_exception(test, exception)
+        Thread.current['capybara_session'].save_screenshot "#{test.dir}/#{test.filename}_#{Time.new.strftime('%Y%m%d_%H%M%S')}.png"
       end
 
     end
