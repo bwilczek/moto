@@ -66,6 +66,10 @@ module Moto
         end
       end
 
+      def save_screenshot(path)
+        Thread.current['capybara_session'].save_screenshot path
+      end
+
     end
   end
 end
