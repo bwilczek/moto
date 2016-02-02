@@ -81,10 +81,16 @@ module Moto
       max_attempts = @runner.my_config[:max_attempts] || 1
       sleep_time = @runner.my_config[:sleep_before_attempt] || 0
       @runner.environments.each do |env|
-        params_path = "#{@test.dir}/#{@test.filename}.yml"
         params_all = [{}]
-        params_all = YAML.load(ERB.new(File.read(params_path)).result) if File.exists?(params_path)
-        #params_all = YAML.load_file(params_path) if File.exists?(params_path)
+
+        # YAML config files
+        #params_path = "#{@test.dir}/#{@test.filename}_params.yml"
+        #params_all = YAML.load(ERB.new(File.read(params_path)).result) if File.exists?(params_path)
+
+        # RB Config files
+        params_path = "#{@test.dir}/#{@test.filename}"
+        params_all = eval(File.read(params_path)) if File.exists?(params_path)
+
         params_all.each_with_index do |params, params_index|
           # Filtering out param sets that are specific to certain envs
           unless params['__env'].nil?
