@@ -19,21 +19,21 @@ module Moto
         # TODO: make session driver configurable
         context.runner.my_config[:capybara][:default_selector] &&
             Capybara.default_selector = context.runner.my_config[:capybara][:default_selector]
-        @session = Capybara::Session.new(context.runner.my_config[:capybara][:default_driver])
+        Thread.current['capybara_session'] = Capybara::Session.new(context.runner.my_config[:capybara][:default_driver])
         @pages = {}
       end
 
       def end_run
-        @session.driver.quit
+        Thread.current['capybara_session'].driver.quit
       end
 
       def start_test(test)
         # @context.current_test.logger.info("Hi mom, I'm opening some pages!")
-        @session.reset_session!
+        Thread.current['capybara_session'].reset_session!
       end
 
       def end_test(test)
-        @session.reset_session!
+        Thread.current['capybara_session'].reset_session!
       end
 
       def page(p)
@@ -64,6 +64,10 @@ module Moto
                                         :url => grid_config[:url],
                                         :desired_capabilities => capabilities)
         end
+      end
+
+      def handle_test_exception(test, exception)
+        Thread.current['capybara_session'].save_screenshot "#{test.dir}/#{test.filename}_#{Time.new.strftime('%Y%m%d_%H%M%S')}.png"
       end
 
     end

@@ -76,8 +76,8 @@ module Moto
     end
 
     def run
-      # remove log files from previous execution
-      Dir.glob("#{@test.dir}/*.log").each {|f| File.delete f }
+      # remove log/screenshot files from previous execution
+      Dir.glob("#{@test.dir}/*.{log,png}").each {|f| File.delete f }
       max_attempts = @runner.my_config[:max_attempts] || 1
       sleep_time = @runner.my_config[:sleep_before_attempt] || 0
       @runner.environments.each do |env|
@@ -110,6 +110,7 @@ module Moto
             rescue Exception => e
               @logger.error("#{e.class.name}: #{e.message}")
               @logger.error(e.backtrace.join("\n"))
+              @clients.each_value { |c| c.handle_test_exception(@test, e) }
               @runner.result.add_error(@test, e)
             end
             @test.after
@@ -120,7 +121,7 @@ module Moto
             @logger.close
             @runner.listeners[1..-1].each { |l| l.end_test(@test) }
             break unless [Result::FAILURE, Result::ERROR].include? @test.result
-            sleep sleep_time if max_attempts > 1
+            sleep sleep_time unless attempt.equal? max_attempts
           end # RETRY
         end
       end
