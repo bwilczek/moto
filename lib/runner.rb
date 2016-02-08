@@ -56,12 +56,6 @@ module Moto
     end
 
     def run
-      if File.exists?( "#{MotoApp::DIR}/lib/initializer.rb" )
-        require("#{Moto::DIR}/lib/initializer.rb")
-        require("#{MotoApp::DIR}/lib/initializer.rb")
-        initializer = MotoApp::Initializer.new(self)
-        initializer.init
-      end
       @listeners.each { |l| l.start_run }
       @tests.each do |test|
         @thread_pool.schedule do

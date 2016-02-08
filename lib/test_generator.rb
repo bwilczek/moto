@@ -46,16 +46,17 @@ module Moto
         generate_for_run_body(test_path_absolute, method_body)
       end
     end
-    
+
+    # Generates objects with tests that are supposed to be executed in this run.
     def generate_for_full_class_code(test_path_absolute)
       require test_path_absolute
-      class_name = test_path_absolute.gsub("#{MotoApp::DIR}/",'moto_app/').split('/')[0..-2].join('/').camelize
-      test_object = class_name.constantize.new
+      class_name = test_path_absolute.gsub("#{MotoApp::DIR}/",'moto_app/').camelize.chomp('.rb').constantize
+      test_object = class_name.new
       test_object.static_path = test_path_absolute
       test_object.evaled = false
-      test_object      
+      test_object
     end
-    
+
     def generate_for_run_body(test_path_absolute, method_body)
       base = Moto::Test
       base_class_string = method_body.match( /^#\s*BASE_CLASS:\s(\S+)/ )
