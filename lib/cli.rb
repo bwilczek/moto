@@ -70,6 +70,14 @@ module Moto
         exit 1
       end
 
+      # Requires custom initializer if provided by application that uses Moto
+      if File.exists?( "#{MotoApp::DIR}/lib/initializer.rb" )
+        require("#{Moto::DIR}/lib/initializer.rb")
+        require("#{MotoApp::DIR}/lib/initializer.rb")
+        initializer = MotoApp::Initializer.new(self)
+        initializer.init
+      end
+
       tg = TestGenerator.new(MotoApp::DIR)
       test_paths_absolute.each do |test_path|
         test_classes << tg.generate(test_path)
@@ -80,10 +88,10 @@ module Moto
         listener = 'Moto::Listeners::' + r.camelize
         listeners << listener.constantize
       end
-      
+
       runner = Moto::Runner.new(test_classes, listeners, argv[:environments], argv[:config], argv[:name])
       runner.run
     end
-  
+
   end
 end
