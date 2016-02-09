@@ -60,7 +60,7 @@ module Moto
       @tests.each do |test|
         @thread_pool.schedule do
           tc = ThreadContext.new(self, test)
-          tc.run
+          tc.rungit
         end
       end
       @thread_pool.shutdown

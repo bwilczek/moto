@@ -88,10 +88,10 @@ module Moto
         listener = 'Moto::Listeners::' + r.camelize
         listeners << listener.constantize
       end
-      
+
       runner = Moto::Runner.new(test_classes, listeners, argv[:environments], argv[:config], argv[:name])
       runner.run
     end
-  
+
   end
 end
