@@ -14,6 +14,9 @@ module Moto
       @test = test
       @clients = {}
       @test.context = self
+      #TODO temporary fix
+      Thread.current['context']= self
+
       @config = {}
       Dir.glob("config/*.yml").each do |f|
         @config.deep_merge! YAML.load_file(f)
