@@ -14,12 +14,10 @@ module Moto
       # Build list of modules basing on the name of the application and subdirectory provided by the user.
       # Second module is always 'tests' since it's where they should be kept.
       modules = [options[:app_name], 'tests'] + options[:dir].split('/')
-      modules.map! do |m|
-        m = m.camelize
-      end
+      modules.map!(&:camelize)
 
       # Name of the class in the template
-      class_name = modules[modules.length - 1]
+      class_name = modules.last
 
       # Evaluate fully qulified name of the class to derive from or, if not specified
       # use Moto's default one
@@ -32,14 +30,14 @@ module Moto
       # Where to put finished template
       test_file = File.basename(options[:dir]) + '.rb'
       test_dir = MotoApp::DIR + '/tests/' + options[:dir]
+      test_path = "#{test_dir}/#{test_file}"
 
-      # Create directory and navigate there
+      # Create directory
       FileUtils.mkdir_p(test_dir)
-      Dir.chdir(test_dir)
 
-      if !File.exist?(test_file) || options[:force]
+      if !File.exist?(test_path) || options[:force]
         # Create new file in specified location and add class' template to it
-        File.open(test_file, 'w+') do |file|
+        File.open(test_path, 'w+') do |file|
 
           indent = 0
 
@@ -52,7 +50,7 @@ module Moto
           end
 
           modules.each do |m|
-            file << (' ' * indent) + "module #{m.camelize} \n"
+            file << (' ' * indent) + "module #{m}\n"
             indent += 2
           end
 
@@ -72,7 +70,7 @@ module Moto
         end
 
         puts 'Result:'
-        puts "  File: #{test_dir}/#{test_file}"
+        puts "  File: #{test_path}"
         puts "  Class: #{class_name} < #{base_class_qualified_name}"
       else
         raise 'File already exists. Use -f or --force to overwrite existing contents.'
