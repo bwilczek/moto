@@ -103,7 +103,7 @@ module Moto
           (1..max_attempts).each do |attempt|
             @test.init(env, params, params_index)
             # TODO: log path might be specified (to some extent) by the configuration
-            @test.log_path = "#{@test.dir}/#{@test.name.gsub(/\s+/, '_').gsub('::', '_').gsub('/', '_')}.log"
+            @test.log_path = "#{@test.dir}/#{@test.name.gsub(/\s+/, '_').gsub(':', '_').gsub('::', '_').gsub('/', '_')}.log"
             @logger = Logger.new(File.open(@test.log_path, File::WRONLY | File::TRUNC | File::CREAT))
             @logger.level = @runner.my_config[:log_level] || Logger::DEBUG
             @current_test = @test
