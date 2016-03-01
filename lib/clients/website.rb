@@ -35,14 +35,14 @@ module Moto
       def end_test(test)
         Thread.current['capybara_session'].reset_session!
       end
-
+      #TODO fix moto to use Lib module
       def page(p)
         page_class_name = "#{self.class.name}::Pages::#{p}"
-        page_class_name.gsub!('Moto::', 'MotoApp::')
+        page_class_name.gsub!('Moto::', 'MotoApp::Lib::')
         if @pages[page_class_name].nil?
           a = page_class_name.underscore.split('/')
           page_path = a[1..-1].join('/')
-          require "#{MotoApp::DIR}/lib/#{page_path}"
+          require "#{MotoApp::DIR}/#{page_path}"
           @pages[page_class_name] = page_class_name.constantize.new(self)
         end
         @pages[page_class_name]

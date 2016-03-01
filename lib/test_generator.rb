@@ -66,7 +66,7 @@ module Moto
         a = base_class_string.underscore.split('/')
         base_test_path = a[1..-1].join('/')
         
-        require "#{MotoApp::DIR}/lib/#{base_test_path}" 
+        require "#{MotoApp::DIR}/#{base_test_path}"
         base = base_class_string.constantize
       end
 

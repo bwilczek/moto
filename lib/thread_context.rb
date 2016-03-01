@@ -26,10 +26,10 @@ module Moto
     def client(name)
       return @clients[name] if @clients.key? name
 
-      name_app = 'MotoApp::Clients::' + name
+      name_app = 'MotoApp::Lib::Clients::' + name
       name_moto = 'Moto::Clients::' + name
 
-      c = try_client(name_app, "#{MotoApp::DIR}/lib")
+      c = try_client(name_app, "#{MotoApp::DIR}/")
       unless c.nil?
         @clients[name] = c
         return c

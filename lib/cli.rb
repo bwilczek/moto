@@ -74,7 +74,7 @@ module Moto
       if File.exists?( "#{MotoApp::DIR}/lib/initializer.rb" )
         require("#{Moto::DIR}/lib/initializer.rb")
         require("#{MotoApp::DIR}/lib/initializer.rb")
-        initializer = MotoApp::Initializer.new(self)
+        initializer = MotoApp::Lib::Initializer.new(self)
         initializer.init
       end
 

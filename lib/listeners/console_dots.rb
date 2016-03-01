@@ -54,7 +54,7 @@ module Moto
         when :passed then "."
         when :failure then "F"
         when :error then "E"
-        when :skipped then "S"
+        when :skipped then "s"
         end 
       end
 
