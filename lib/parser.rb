@@ -10,14 +10,17 @@ module Moto
   
     def self.run(argv)
       begin
-        # TODO Generate app / Change the way parsing options goes so it doesnt generate them if they`re not needed
-        case argv[0]
-          when '--version' then puts Moto::VERSION
-          when 'run' then Moto::Cli.run(run_parse(argv))
-          when 'help' then show_help
-          when 'generate' then Moto::AppGenerator.run(generate_parse(argv))
-          else puts "Command '#{argv[0]}' not recognized. Type help for list of supported commands."
+
+        if argv[0] == '--version'
+          puts Moto::VERSION
+        elsif argv[0] == 'run' && argv.length > 1
+          Moto::Cli.run(run_parse(argv))
+        elsif argv[0] == 'generate' && argv.length > 1
+          Moto::AppGenerator.run(generate_parse(argv))
+        else
+          show_help
         end
+
       rescue Exception => e
         puts e.message
       end
