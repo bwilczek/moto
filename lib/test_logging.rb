@@ -19,7 +19,7 @@ module Moto
         @@ignore_logging << "#{self.name}::new"
         @@ignore_logging << "#{self.name}::initialize"
 
-        return if @added 
+        return if @added
         @added = true # protect from recursion
         original_method = "original_#{name}"
         alias_method original_method, name
@@ -36,14 +36,15 @@ module Moto
               end
             end
           end
-          @context.current_test.logger.debug("ENTER >>> #{self.class.name}::#{__callee__}(#{args})") unless skip_logging 
+          @context.current_test.logger.debug("ENTER >>> #{self.class.name}::#{__callee__}(#{args})") unless skip_logging
           result = send original_method, *args
-          @context.current_test.logger.debug("LEAVE <<< #{self.class.name}::#{__callee__} => #{result} ") unless skip_logging
+          # Below is the hack to properly escape binary data (if any manages to make it to logs)
+          @context.current_test.logger.debug("LEAVE <<< #{self.class.name}::#{__callee__} => #{[result].to_s[1..-2]}") unless skip_logging
           result
         end
         @added = false
       end
-    end    
+    end
 
   end
 end
