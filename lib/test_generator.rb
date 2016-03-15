@@ -50,8 +50,33 @@ module Moto
     # Generates objects with tests that are supposed to be executed in this run.
     def generate_for_full_class_code(test_path_absolute)
       require test_path_absolute
-      class_name = test_path_absolute.gsub("#{MotoApp::DIR}/",'moto_app/').camelize.chomp('.rb').constantize
-      test_object = class_name.new
+
+      test_object = nil
+
+      # Checking if it's possible to create test based on provided path. In case something is wrong with
+      # modules structure in class itself Moto::Test will be instantized with raise injected into its run()
+      # so we can have proper reporting and summary even if the test doesn't execute.
+      begin
+        class_name = test_path_absolute.gsub("#{MotoApp::DIR}/",'moto_app/').camelize.chomp('.rb').constantize
+        test_object = class_name.new
+      rescue NameError
+        class_name = Moto::Test
+        test_object = class_name.new
+
+        class << test_object
+          attr_accessor :custom_name
+        end
+
+        test_object.custom_name = test_path_absolute.gsub("#{MotoApp::DIR}/",'moto_app/').camelize.chomp('.rb')
+
+        class << test_object
+          def run
+            raise "ERROR: Invalid module structure: #{custom_name}"
+          end
+        end
+
+      end
+
       test_object.static_path = test_path_absolute
       test_object.evaled = false
       test_object
