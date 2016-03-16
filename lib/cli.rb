@@ -80,7 +80,14 @@ module Moto
 
       tg = TestGenerator.new(MotoApp::DIR)
       test_paths_absolute.each do |test_path|
-        test_classes << tg.generate(test_path)
+        begin
+          # FIXME: when test has a different path than module structure it raises NameError and stops whole moto.
+          # This is a quick win. Ugly. IMHO such test should be created with an error result and then properly reported.
+          test_classes << tg.generate(test_path)
+        rescue NameError
+          puts "Error loading test [#{test_path}]. Check test path and module tree."
+          next
+        end
       end
 
       listeners = []
