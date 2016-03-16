@@ -36,6 +36,9 @@ module Moto
       set_name(params_index)
     end
 
+    # Sets name of the test based on its properties:
+    #  - number/name of currently executed configuration run
+    #  - env
     def set_name(params_index)
       if @env == :__default 
         return @name = "#{self.class.to_s}" if @params.empty?
@@ -48,6 +51,7 @@ module Moto
       end
       @name = self.class.to_s
     end
+    private :set_name
 
     def dir
       # puts self.class.path

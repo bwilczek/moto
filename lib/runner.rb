@@ -57,12 +57,14 @@ module Moto
 
     def run
       @listeners.each { |l| l.start_run }
+
       @tests.each do |test|
         @thread_pool.schedule do
           tc = ThreadContext.new(self, test)
           tc.run
         end
       end
+
       @thread_pool.shutdown
       @listeners.each { |l| l.end_run }
     end
