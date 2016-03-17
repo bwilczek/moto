@@ -53,7 +53,7 @@ module Moto
       OptionParser.new do |opts|
         opts.on('-t', '--tests Tests', Array) { |v| options[:tests ] = v }
         opts.on('-g', '--tags Tags', Array) { |v| options[:tags ] = v }
-        opts.on('-r', '--listeners Listeners', Array) { |v| options[:listeners] = v }
+        opts.on('-l', '--listeners Listeners', Array) { |v| options[:listeners] = v }
         opts.on('-e', '--environments Environment', Array) { |v| options[:environments] = v }
         opts.on('-c', '--const Const') { |v| options[:const] = v }
         opts.on('-n', '--name Name') { |v| options[:name] = v }

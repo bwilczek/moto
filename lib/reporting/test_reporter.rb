@@ -1,5 +1,7 @@
 module Moto
   module Reporting
+
+    # Manages reporting test and run status' to attached listeners
     class TestReporter
 
       # @return [Hash] Hash of objects which represents status of tests executed in current run

@@ -1,5 +1,7 @@
 module Moto
   module Reporting
+
+    # Value object holding information about whole 'run' of tests.
     class RunStatus
 
       # Number of tests passed in current run
