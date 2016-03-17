@@ -1,10 +1,10 @@
 module Moto
-  module Reporting
+  module Test
 
     # Representation of single test's run status - it's passes, failures etc.
     # Pretty much a value object which's purpose is to be passed as a data provider for listeners.
     # Only methods here are just meant for data preparation. No communication with any external classes.
-    class TestStatus
+    class Status
 
       # Name of the test
       attr_accessor :name

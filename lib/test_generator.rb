@@ -54,27 +54,24 @@ module Moto
       test_object = nil
 
       # Checking if it's possible to create test based on provided path. In case something is wrong with
-      # modules structure in class itself Moto::Test will be instantized with raise injected into its run()
+      # modules structure in class itself Moto::Test::Base will be instantized with raise injected into its run()
       # so we can have proper reporting and summary even if the test doesn't execute.
       begin
         class_name = test_path_absolute.gsub("#{MotoApp::DIR}/",'moto_app/').camelize.chomp('.rb').constantize
         test_object = class_name.new
       rescue NameError
-        class_name = Moto::Test
+        class_name = Moto::Test::Base
         test_object = class_name.new
 
         class << test_object
           attr_accessor :custom_name
-        end
 
-        test_object.custom_name = test_path_absolute.gsub("#{MotoApp::DIR}/",'moto_app/').camelize.chomp('.rb')
-
-        class << test_object
           def run
             raise "ERROR: Invalid module structure: #{custom_name}"
           end
         end
 
+        test_object.custom_name = test_path_absolute.gsub("#{MotoApp::DIR}/",'moto_app/').camelize.chomp('.rb')
       end
 
       test_object.static_path = test_path_absolute
@@ -83,7 +80,7 @@ module Moto
     end
 
     def generate_for_run_body(test_path_absolute, method_body)
-      base = Moto::Test
+      base = Moto::Test::Base
       base_class_string = method_body.match( /^#\s*BASE_CLASS:\s(\S+)/ )
       unless base_class_string.nil?
         base_class_string = base_class_string[1].strip

@@ -1,8 +1,8 @@
 module Moto
-  module Reporting
+  module Test
 
     # Value object representing information about single test run
-    class TestResult
+    class Result
 
       PENDING  = :result_pending   # -2
       RUNNING  = :result_running   # -1

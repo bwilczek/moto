@@ -3,11 +3,11 @@ module Moto
     module Listeners
       class Base
 
-        def start_run(run_status)
+        def start_run
           # abstract
         end
 
-        def end_run(run_status)
+        def end_run
           # abstract
         end
 

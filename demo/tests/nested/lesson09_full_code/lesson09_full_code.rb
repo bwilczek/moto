@@ -4,7 +4,7 @@
 module MotoApp
   module Tests
     module Nested
-      class Lesson09FullCode < Moto::Test
+      class Lesson09FullCode < Moto::Test::Base
         
         def run
           logger.info "It's my party."

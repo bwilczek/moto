@@ -140,13 +140,14 @@ module Moto
 
               test_attempt_exception = e
             ensure
-              @test_reporter.evaluate_status_after_run(@test, test_attempt_exception)
+              # TODO: maybe test should auto-evaluate it's status on events?
+              @test.evaluate_status_after_run(test_attempt_exception)
             end
 
             @test.after
             @clients.each_value { |c| c.end_test(@test) }
 
-            @logger.info("Result: #{@test.status.result}")
+            @logger.info("Result: #{test.status.results.last.result}")
             @logger.close
 
             # stop re-running test when passable (pass, skip) result has been achieved

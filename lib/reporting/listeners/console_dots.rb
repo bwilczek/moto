@@ -3,7 +3,7 @@ module Moto
     module Listeners
       class ConsoleDots < Base
 
-        def end_run(run_status)
+        def end_run
           puts ""
           puts ""
           puts "FINISHED: #{run_status.result}, duration: #{Time.at(run_status.duration).utc.strftime("%H:%M:%S")}"
@@ -47,7 +47,7 @@ module Moto
         def start_test(test_status)
         end
 
-        def end_test(test)
+        def end_test(test_status)
           print case test_status.result
           when :passed then '.'
           when :failure then 'F'
