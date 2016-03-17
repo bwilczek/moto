@@ -25,11 +25,11 @@ require_relative './test'
 require_relative './page'
 require_relative './version'
 require_relative './clients/base'
-require_relative './listeners/base'
-require_relative './listeners/console'
-require_relative './listeners/console_dots'
-require_relative './listeners/junit_xml'
-require_relative './listeners/webui'
+require_relative './reporting/listeners/base'
+require_relative './reporting/listeners/console'
+require_relative './reporting/listeners/console_dots'
+require_relative './reporting/listeners/junit_xml'
+require_relative './reporting/listeners/webui'
 require_relative './test_generator'
 require_relative './exceptions/moto'
 require_relative './exceptions/test_skipped'
@@ -84,8 +84,8 @@ module Moto
       end
 
       listeners = []
-      argv[ :reporters ].each do |r|
-        listener = 'Moto::Listeners::' + r.camelize
+      argv[ :listeners ].each do |r|
+        listener = 'Moto::Reporting::Listeners::' + r.camelize
         listeners << listener.constantize
       end
 
