@@ -1,3 +1,5 @@
+require_relative 'test_result'
+
 module Moto
   module Test
 
@@ -31,43 +33,66 @@ module Moto
       # Test's duration
       attr_accessor :duration
 
+      # Indicates whether test is currently being executed or not
+      # if :is_running == true and :final_result != nil it means that test has executed at least once
+      attr_accessor :is_running
+
       def initialize
+        @is_running = false
         @results = []
       end
 
       # @results[test.name] = { class: test.class, result: RUNNING, env: test.env, params: test.params, name: test.name, error: nil, failures: [], started_at: Time.now.to_f }
 
-      # Evaluates the result after the test has been run (single attempt)
-      # @param [Exception] attempt_exception An optional exception that might have been raised during the execution of the test
-      def evaluate_status_after_run(attempt_exception = nil)
-        @time_end = Time.now.to_f
-        @duration = @time_end - @time_start
+      # Utility function which helps in converting errors, dispatched by Moto during test run, to [Moto::Test::Result]
+      # @param [Exception] exception thrown during test run or nil if test passed properly
+      def exception_to_test_result(exception)
+        new_result = Moto::Test::Result.new
 
-        new_result = Moto::Reporting::TestResult.new
-
-        # Convert exception, or its absence, into a result code that we can store
-        if attempt_exception.nil?
-          new_result.result = Moto::Reporting::TestResult::PASSED
-        elsif attempt_exception.is_a? Moto::Exceptions::TestSkipped
-          new_result.result = Moto::Reporting::TestResult::SKIPPED
-        elsif attempt_exception.is_a? Moto::Exceptions::TestForcedPassed
-          new_result.result = Moto::Reporting::TestResult::PASSED
-        elsif attempt_exception.is_a? Moto::Exceptions::TestForcedFailure
-          new_result.result = Moto::Reporting::TestResult::FAILURE
+        if exception.nil? || exception.is_a?(Moto::Exceptions::TestForcedPassed)
+          new_result.code = Moto::Test::Result::PASSED
+        elsif exception.is_a?(Moto::Exceptions::TestSkipped)
+          new_result.code = Moto::Test::Result::SKIPPED
+        elsif exception.is_a?(Moto::Exceptions::TestForcedFailure)
+          new_result.code = Moto::Test::Result::FAILURE
         else
-          new_result.result = Moto::Reporting::TestResult::ERROR
+          new_result.code = Moto::Test::Result::ERROR
         end
 
         # If there was an exception attach its message to the result object
-        if !attempt_exception.nil?
-          new_result.message = attempt_exception.message
+        if !exception.nil?
+          new_result.message = exception.message
         end
 
-        @results.push(new_result)
-
-        # TODO: Figure out where to use data from this array and evaluate "final result" of the test
-
+        new_result
       end
+
+      # Evaluates the result after the test has been run (single attempt)
+      # @param [Exception] exception An optional exception that might have been raised during the execution of the test
+      def evaluate_status_after_run(exception = nil)
+        @time_end = Time.now.to_f
+        @duration = time_end - time_start
+
+        @results.push(exception_to_test_result(exception))
+      end
+
+      # Analyzes :results collection and decides which one should be used as a final summary of all test runs
+      # Will return first encountered ERROR or, if no [Moto::Test::Result::ERROR] have been spotted, last result in array
+      # @return [Moto::Test::Result]
+      def final_result
+        temp_result = nil
+
+        @results.each do |result|
+          temp_result = result
+
+          if result.code == Moto::Test::Result::ERROR
+            break
+          end
+        end
+
+        temp_result
+      end
+
     end
   end
 end

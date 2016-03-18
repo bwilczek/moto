@@ -4,17 +4,17 @@ module Moto
       class Console < Base
 
         def start_run
-          puts "START"
+          puts 'START'
         end
 
-        def end_run
-          puts ""
-          puts "FINISHED: #{@runner.result.summary[:result]}, duration: #{Time.at(@runner.result.summary[:duration]).utc.strftime("%H:%M:%S")}"
-          puts "Tests executed: #{@runner.result.summary[:cnt_all]}"
-          puts "  Passed:       #{@runner.result.summary[:cnt_passed]}"
-          puts "  Failure:      #{@runner.result.summary[:cnt_failure]}"
-          puts "  Error:        #{@runner.result.summary[:cnt_error]}"
-          puts "  Skipped:      #{@runner.result.summary[:cnt_skipped]}"
+        def end_run(run_status)
+          puts ''
+          puts "FINISHED: #{run_status.result}, duration: #{Time.at(run_status.duration).utc.strftime("%H:%M:%S")}"
+          puts "Tests executed: #{run_status.tests_all.length}"
+          puts "  Passed:       #{run_status.tests_passed.length}"
+          puts "  Failure:      #{run_status.tests_failed.length}"
+          puts "  Error:        #{run_status.tests_error.length}"
+          puts "  Skipped:      #{run_status.tests_skipped.length}"
         end
 
         def start_test(test_status)
@@ -22,7 +22,7 @@ module Moto
         end
 
         def end_test(test_status)
-          puts "\t#{test_status.result}"
+          puts "\t#{test_status.final_result.code}"
         end
 
       end

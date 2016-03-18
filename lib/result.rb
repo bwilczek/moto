@@ -1,12 +1,10 @@
 module Moto
   class Result
-    
-    PENDING = :pending # -2
-    RUNNING = :running # -1
-    PASSED = :passed # 0
-    FAILURE = :failure # 1
-    ERROR = :error # 2
-    SKIPPED = :skipped # 3
+
+    PASSED  = :passed     # 0
+    FAILURE = :failure    # 1
+    ERROR   = :error      # 2
+    SKIPPED = :skipped    # 3
 
     attr_reader :summary
 

@@ -1,15 +1,10 @@
+require_relative 'run_status'
+
 module Moto
   module Reporting
 
     # Manages reporting test and run status' to attached listeners
     class TestReporter
-
-      # @return [Hash] Hash of objects which represents status of tests executed in current run
-      #   keys:  [String] Name property of a [Moto::Test]
-      #   value: [Moto::Reporting::TestStatus]
-      def test_statuses
-        @test_statuses
-      end
 
       def initialize(listeners)
         @listeners = []
@@ -23,14 +18,36 @@ module Moto
         @listeners << listener.new
       end
 
+      # Reports start of the whole run (set of tests) to attached listeners
       def report_start_run
-        @test_statuses = []
+        @run_status = Moto::Reporting::RunStatus.new
 
-        # TODO: report @run_status
+        @listeners.each do |l|
+          l.start_run
+        end
       end
 
+      # Reports end of the whole run (set of tests) to attached listeners
       def report_end_run
-        # TODO: report @run_status
+
+        # @summary[:finished_at] = Time.now.to_f
+        # @summary[:duration] = @summary[:finished_at] - @summary[:started_at]
+        # @summary[:result] = PASSED
+        # @summary[:result] = FAILURE unless @results.values.select{ |v| v[:failures].count > 0 }.empty?
+        # @summary[:result] = ERROR unless @results.values.select{ |v| v[:result] == ERROR }.empty?
+        # @summary[:cnt_all] = @results.count
+        # @summary[:tests_passed] = @results.select{ |k,v| v[:result] == PASSED }
+        # @summary[:tests_failure] = @results.select{ |k,v| v[:result] == FAILURE }
+        # @summary[:tests_error] = @results.select{ |k,v| v[:result] == ERROR }
+        # @summary[:tests_skipped] = @results.select{ |k,v| v[:result] == SKIPPED }
+        # @summary[:cnt_passed] = @summary[:tests_passed].count
+        # @summary[:cnt_failure] = @summary[:tests_failure].count
+        # @summary[:cnt_error] = @summary[:tests_error].count
+        # @summary[:cnt_skipped] = @summary[:tests_skipped].count
+
+        @listeners.each do |l|
+          l.end_run(@run_status)
+        end
       end
 
       # Reports star of a test to all attached listeners
@@ -44,6 +61,8 @@ module Moto
       # Reports end of a test to all attached listeners
       # @param [Moto::Test::Status] test_status of test which's end is to be reported on
       def report_end_test(test_status)
+        @run_status.add_test_status(test_status)
+
         @listeners.each do |l|
           l.end_test(test_status)
         end

@@ -6,7 +6,7 @@ module Moto
     module Listeners
       class Webui < Base
 
-        def start_run(run_status)
+        def start_run
           # POST http://sandbox.dev:3000/api/runs/create
           @url = @runner.my_config[:url]
           data = {

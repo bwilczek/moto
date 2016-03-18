@@ -1,3 +1,5 @@
+require_relative 'test_status'
+
 module Moto
   module Test
     class Base
@@ -12,6 +14,7 @@ module Moto
       attr_accessor :static_path
       attr_accessor :log_path
       attr_accessor :evaled
+      attr_accessor :status
 
       class << self
         attr_accessor :_path
@@ -25,10 +28,17 @@ module Moto
         self.class._path
       end
 
+      def initialize
+        @status = Moto::Test::Status.new
+      end
+
       def init(env, params, params_index)
         @env = env
         @params = params
         @name = generate_name(params_index)
+
+        @status.name = @name
+        @status.class = self.class.to_s
       end
 
       # Generates name of the test based on its properties:
@@ -46,7 +56,6 @@ module Moto
         end
         self.class.to_s
       end
-
       private :generate_name
 
       def dir

@@ -7,7 +7,7 @@ module Moto
           # abstract
         end
 
-        def end_run
+        def end_run(run_status)
           # abstract
         end
 

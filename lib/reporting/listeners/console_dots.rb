@@ -3,7 +3,7 @@ module Moto
     module Listeners
       class ConsoleDots < Base
 
-        def end_run
+        def end_run(run_status)
           puts ""
           puts ""
           puts "FINISHED: #{run_status.result}, duration: #{Time.at(run_status.duration).utc.strftime("%H:%M:%S")}"

@@ -128,6 +128,8 @@ module Moto
             test_attempt_exception = nil
 
             begin
+              # TODO: test should auto-evaluate it's status on events
+              @test.status.time_start = Time.now.to_f
               @test.run
             rescue Exceptions::TestForcedPassed, Exceptions::TestForcedFailure, Exceptions::TestSkipped => e
               logger.info(e.message)
@@ -140,18 +142,19 @@ module Moto
 
               test_attempt_exception = e
             ensure
-              # TODO: maybe test should auto-evaluate it's status on events?
-              @test.evaluate_status_after_run(test_attempt_exception)
+              # TODO: test should auto-evaluate it's status on events
+              @test.status.evaluate_status_after_run(test_attempt_exception)
             end
 
             @test.after
             @clients.each_value { |c| c.end_test(@test) }
 
-            @logger.info("Result: #{test.status.results.last.result}")
+            @logger.info("Result: #{@test.status.final_result.code}")
             @logger.close
 
             # stop re-running test when passable (pass, skip) result has been achieved
-            if @test.status.result != Result::FAILURE && @test.status.result != Result.ERROR
+            if  @test.status.final_result.code != Moto::Test::Result::FAILURE &&
+                @test.status.final_result.code != Moto::Test::Result::ERROR
               break
             end
 
