@@ -65,7 +65,7 @@ module Moto
           return ERROR
         elsif @tests_failed.length > 0
           return FAILURE
-        elsif @tests_all.length == @tests_skipped.length
+        elsif tests_all.length == @tests_skipped.length
           return SKIPPED
         end
 
