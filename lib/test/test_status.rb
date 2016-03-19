@@ -78,7 +78,7 @@ module Moto
       end
 
       # Analyzes :results collection and decides which one should be used as a final summary of all test runs
-      # Will return first encountered ERROR or, if no [Moto::Test::Result::ERROR] have been spotted, last result in array
+      # Will return first encountered ERROR or, if no [Moto::Test::Result::ERROR] have been spotted, last result in the array
       # @return [Moto::Test::Result]
       def final_result
         temp_result = nil
@@ -92,6 +92,17 @@ module Moto
         end
 
         temp_result
+      end
+
+      # Overwritten definition of to string.
+      # @return [String] string with readable form of final_result field
+      def to_s
+        case final_result.code
+          when Moto::Test::Result::PASSED   then return 'PASSED'
+          when Moto::Test::Result::FAILURE  then return 'FAILED'
+          when Moto::Test::Result::ERROR    then return 'ERROR'
+          when Moto::Test::Result::SKIPPED  then return 'SKIPPED'
+        end
       end
 
     end

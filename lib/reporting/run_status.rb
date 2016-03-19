@@ -65,6 +65,8 @@ module Moto
           return ERROR
         elsif @tests_failed.length > 0
           return FAILURE
+        elsif @tests_all.length == @tests_skipped.length
+          return SKIPPED
         end
 
         PASSED
@@ -73,7 +75,6 @@ module Moto
       # Add single test's status to the collection which describes whole run
       # @param [Moto::Test::Status] test_status to be incorporated into final run result
       def add_test_status(test_status)
-
         case test_status.final_result.code
           when Moto::Test::Result::PASSED
             @tests_passed << test_status
@@ -86,7 +87,17 @@ module Moto
           else
             raise 'Incorrect value of field: "code" in [Moto::Test::Status]'
         end
+      end
 
+      # Overwritten definition of to string.
+      # @return [String] string with readable form of result field
+      def to_s
+        case result
+          when PASSED   then return 'PASSED'
+          when FAILURE  then return 'FAILED'
+          when ERROR    then return 'ERROR'
+          when SKIPPED  then return 'SKIPPED'
+        end
       end
     end
   end
