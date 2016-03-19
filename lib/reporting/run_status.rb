@@ -22,12 +22,12 @@ module Moto
       attr_reader :tests_error
 
       def initialize
-        @tests_all = nil
-        @tests_passed = []
-        @tests_skipped = []
-        @tests_failed = []
-        @tests_error = []
-        @duration = 0
+        @tests_all      = nil
+        @tests_passed   = []
+        @tests_skipped  = []
+        @tests_failed   = []
+        @tests_error    = []
+        @duration       = 0
       end
 
       # All [Moto::Test::Status], associated with the run, sorted by their time_start field

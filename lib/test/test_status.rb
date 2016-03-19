@@ -15,7 +15,8 @@ module Moto
       attr_accessor :class
 
       # Array of results, consists of [Moto::Reporting::TestResult]
-      # so each item holds information about result code and message that might accompany it
+      # so each item holds information about result code and message that might accompany it.
+      # *IMPORTANT* To access 'summarized' result refer to method: final_result
       attr_reader :results
 
       # Environment on which test was run

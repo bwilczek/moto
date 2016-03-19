@@ -4,55 +4,53 @@ module Moto
       class ConsoleDots < Base
 
         def end_run(run_status)
-          puts ""
-          puts ""
+          puts ''
+          puts ''
           puts "FINISHED: #{run_status.result}, duration: #{Time.at(run_status.duration).utc.strftime("%H:%M:%S")}"
-          puts "Tests executed: #{@runner.result.summary[:cnt_all]}"
-          puts "  Passed:       #{@runner.result.summary[:cnt_passed]}"
-          puts "  Failure:      #{@runner.result.summary[:cnt_failure]}"
-          puts "  Error:        #{@runner.result.summary[:cnt_error]}"
-          puts "  Skipped:      #{@runner.result.summary[:cnt_skipped]}"
+          puts "Tests executed: #{run_status.tests_all.length}"
+          puts "  Passed:       #{run_status.tests_passed.length}"
+          puts "  Failure:      #{run_status.tests_failed.length}"
+          puts "  Error:        #{run_status.tests_error.length}"
+          puts "  Skipped:      #{run_status.tests_skipped.length}"
 
-          if @runner.result.summary[:cnt_failure] > 0
-            puts ""
-            puts "FAILURES: "
-            @runner.result.summary[:tests_failure].each do |test_name, data|
-              puts test_name
-              puts "\t#{data[:failures].join("\n\t")}"
-              puts ""
-            end
-          end
-
-          if @runner.result.summary[:cnt_error] > 0
-            puts ""
-            puts "ERRORS: "
-            @runner.result.summary[:tests_error].each do |test_name, data|
-              puts test_name
-              puts "\t#{data[:error]}"
-              puts ""
-            end
-          end
-
-          if @runner.result.summary[:cnt_skipped] > 0
+          if run_status.tests_failed.length > 0
             puts ''
-            puts 'SKIPPED: '
-            @runner.result.summary[:tests_skipped].each do |test_name, data|
-              puts test_name
-              puts "\t#{data[:error]}"
+            puts 'FAILURES: '
+            run_status.tests_failed.each do |test_status|
+              puts test_status.name
+              puts test_status.final_result.message
               puts ''
             end
           end
-        end
 
-        def start_test(test_status)
+          if run_status.tests_error.length > 0
+            puts ''
+            puts 'ERRORS: '
+            run_status.tests_error.each do |test_status|
+              puts test_status.name
+              puts test_status.final_result.message
+              puts ''
+            end
+          end
+
+          if run_status.tests_skipped.length > 0
+            puts ''
+            puts 'SKIPPED: '
+            run_status.tests_skipped.each do |test_status|
+              puts test_status.name
+              puts test_status.final_result.message
+              puts ''
+            end
+          end
+
         end
 
         def end_test(test_status)
-          print case test_status.result
-          when :passed then '.'
-          when :failure then 'F'
-          when :error then 'E'
-          when :skipped then 's'
+          print case test_status.final_result.code
+          when Moto::Test::Result::PASSED then '.'
+          when Moto::Test::Result::FAILURE then 'F'
+          when Moto::Test::Result::ERROR then 'E'
+          when Moto::Test::Result::SKIPPED then 's'
           end
         end
 
