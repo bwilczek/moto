@@ -38,7 +38,7 @@ module Moto
         @name = generate_name(params_index)
 
         @status.name = @name
-        @status.class = self.class.to_s
+        @status.class = self.class.name
       end
 
       # Generates name of the test based on its properties:

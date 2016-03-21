@@ -5,6 +5,12 @@ module Moto
       # Base class for listeners that report results of testing 'outside' of the application.
       class Base
 
+        attr_reader :config
+
+        # @param [Hash] config
+        def initialize(config)
+          @config = config
+        end
 
         # Invoked when whole batch of tests starts
         def start_run

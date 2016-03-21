@@ -25,9 +25,11 @@ module Moto
       environments << :__default if environments.empty?
       @environments = environments
 
-      @test_reporter = Moto::Reporting::TestReporter.new( listeners.empty? ? my_config[:default_listeners] : listeners )
+      @test_reporter = Moto::Reporting::TestReporter.new(listeners.empty? ? my_config[:default_listeners] : listeners, my_config)
     end
 
+    # TODO: Remake
+    # @return [Hash] hash with config
     def my_config
       caller_path = caller.first.to_s.split(/:\d/)[0]
       keys = []

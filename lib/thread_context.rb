@@ -113,11 +113,8 @@ module Moto
             @current_test = @test
 
             # Reporting: start_test
-            # New policy: Reporting start_test only on first attempt, rest of the attempts are done "in house"
-            # and after all neccessary attempts are done end_test is reported.
-            # Result of the test itself is calculated in each attempt based on newest result in comparison to previous.
             if attempt == 1
-              @test_reporter.report_start_test(@test)
+              @test_reporter.report_start_test(@test.status)
             end
 
             @clients.each_value { |c| c.start_test(@test) }
