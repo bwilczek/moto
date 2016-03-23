@@ -11,8 +11,8 @@ module Moto
       # Name of the test
       attr_accessor :name
 
-      # Class representing test
-      attr_accessor :class
+      # Name of the class representing test
+      attr_accessor :test_class_name
 
       # Array of results, consists of [Moto::Reporting::TestResult]
       # so each item holds information about result code and message that might accompany it.
@@ -38,12 +38,14 @@ module Moto
       # if :is_running == true and :final_result != nil it means that test has executed at least once
       attr_accessor :is_running
 
+      # TODO: Burn it with fire...
+      # Path to test's log, for purpose of making test logs accessible via listeners
+      attr_accessor :log_path
+
       def initialize
         @is_running = false
         @results = []
       end
-
-      # @results[test.name] = { class: test.class, result: RUNNING, env: test.env, params: test.params, name: test.name, error: nil, failures: [], started_at: Time.now.to_f }
 
       # Utility function which helps in converting errors, dispatched by Moto during test run, to [Moto::Test::Result]
       # @param [Exception] exception thrown during test run or nil if test passed properly

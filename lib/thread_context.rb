@@ -125,9 +125,7 @@ module Moto
             test_attempt_exception = nil
 
             begin
-              # TODO: test should auto-evaluate it's status on events
-              @test.status.time_start = Time.now.to_f
-              @test.run
+              @test.run_with_preparations
             rescue Exceptions::TestForcedPassed, Exceptions::TestForcedFailure, Exceptions::TestSkipped => e
               logger.info(e.message)
 

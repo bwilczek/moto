@@ -88,6 +88,8 @@ module Moto
         listeners << listener.constantize
       end
 
+      # reporter = Moto::Reporting::TestReporter.new(listeners, argv[:config], argv[:name])
+
       runner = Moto::Runner.new(test_classes, listeners, argv[:environments], argv[:config], argv[:name])
       runner.run
     end

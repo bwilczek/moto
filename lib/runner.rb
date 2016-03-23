@@ -25,7 +25,7 @@ module Moto
       environments << :__default if environments.empty?
       @environments = environments
 
-      @test_reporter = Moto::Reporting::TestReporter.new(listeners.empty? ? my_config[:default_listeners] : listeners, my_config)
+      @test_reporter = Moto::Reporting::TestReporter.new(listeners.empty? ? my_config[:default_listeners] : listeners, config, name)
     end
 
     # TODO: Remake

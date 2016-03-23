@@ -6,19 +6,33 @@ module Moto
     # Manages reporting test and run status' to attached listeners
     class TestReporter
 
-      # @param [Array] listeners An array of class names' of listeners to be created
-      # @param [] config to be passed to listeners during creation
-      def initialize(listeners, config)
+      # @param [Array] listeners An array of class names' of listeners to be created, if nil is passed default values will be taken from config[:listeners]
+      # @param [Hash] config to be passed to listeners during creation
+      # @param [String] custom_run_name Optional, to be passed to listeners during creation
+      def initialize(listeners, config, custom_run_name)
+
+        if listeners.nil?
+          listeners = config[:moto][:runner][:default_listeners]
+        end
+
         @listeners = []
         @config = config
+        @custom_run_name = custom_run_name
         listeners.each { |l| add_listener(l) }
       end
 
       # Adds a listener to the list.
       # All listeners on the list will have events reported to them.
-      # @param [Moto::Listener] listener to be added
+      # @param [Moto::Listener::Base] listener class to be added
       def add_listener(listener)
-        @listeners << listener.new(@config)
+        @listeners << listener.new(listener_config(listener), @custom_run_name)
+      end
+
+      # @return [Hash] hash containing part of the config meant for a specific listener
+      # @param [Moto::Listener::Base] listener class for which config is to be retrieved
+      def listener_config(listener)
+        listener_symbol = listener.name.demodulize.underscore.to_sym
+        @config[:moto][:listeners][listener_symbol]
       end
 
       # Reports start of the whole run (set of tests) to attached listeners

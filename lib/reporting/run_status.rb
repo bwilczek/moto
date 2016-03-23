@@ -57,6 +57,11 @@ module Moto
         @duration
       end
 
+      # @return [Float] Returns time of run's start (start of first test in it)
+      def time_start
+        tests_all[0].time_start
+      end
+
       # Result of whole run, takes into account final_result field of all tests in this set
       # @return [String] one of the values defined as constants in this class in cohesion with [Moto::Test::Result]
       def result

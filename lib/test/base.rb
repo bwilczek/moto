@@ -12,7 +12,6 @@ module Moto
       attr_reader   :env
       attr_reader   :params
       attr_accessor :static_path
-      attr_accessor :log_path
       attr_accessor :evaled
       attr_accessor :status
 
@@ -38,7 +37,7 @@ module Moto
         @name = generate_name(params_index)
 
         @status.name = @name
-        @status.class = self.class.name
+        @status.test_class_name = self.class.name
       end
 
       # Generates name of the test based on its properties:
@@ -58,6 +57,20 @@ module Moto
       end
       private :generate_name
 
+      # Setter for :log_path
+      def log_path=(param)
+        @log_path = param
+
+        # I hate myself for doing this, but I have no other idea for now how to pass log to Listeners that
+        # make use of it (for example WebUI)
+        @status.log_path = param
+      end
+
+      # @return [String] string with the path to the test's log
+      def log_path
+        @log_path
+      end
+
       def dir
         return File.dirname(@static_path) unless @static_path.nil?
         File.dirname(self.path)
@@ -68,6 +81,15 @@ module Moto
         File.basename(path, ".*")
       end
 
+      # Use this to run test
+      # This is the place to add any code that has to be executed in test's scope before its run
+      def run_with_preparations
+        status.time_start = Time.now.to_f
+        run
+      end
+
+      # Only to be overwritten by final test execution
+      # Use :run_with_preparations in order to run test
       def run
         # abstract
       end

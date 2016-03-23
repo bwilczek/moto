@@ -10,17 +10,18 @@ module Moto
           # POST http://sandbox.dev:3000/api/runs/create
           @url = config[:url]
           data = {
-            name:  @runner.name,
-            result: Moto::Result::RUNNING,
-            cnt_all: nil,
-            cnt_passed: nil,
-            cnt_failure: nil,
-            cnt_error: nil,
-            cnt_skipped: nil,
-            user: Sys::Uname.sysname.downcase.include?('windows') ? ENV['USERNAME'] : ENV['LOGNAME'],
-            host: Sys::Uname.nodename,
-            pid: Process.pid
+            name:         custom_run_name,
+            result:       'RUNNING',
+            cnt_all:      nil,
+            cnt_passed:   nil,
+            cnt_failure:  nil,
+            cnt_error:    nil,
+            cnt_skipped:  nil,
+            user:         Sys::Uname.sysname.downcase.include?('windows') ? ENV['USERNAME'] : ENV['LOGNAME'],
+            host:         Sys::Uname.nodename,
+            pid:          Process.pid
           }
+
           @run = JSON.parse( RestClient.post( "#{@url}/api/runs", data.to_json, :content_type => :json, :accept => :json ) )
           @tests = {}
         end
@@ -36,6 +37,7 @@ module Moto
             cnt_skipped:  run_status.tests_skipped.length,
             duration:     run_status.duration
           }
+
           @run = JSON.parse( RestClient.put( "#{@url}/api/runs/#{@run['id']}", data.to_json, :content_type => :json, :accept => :json ) )
         end
 
@@ -43,28 +45,42 @@ module Moto
           # POST http://sandbox.dev:3000/api/tests/create
           data = {
             name:       test_status.name,
-            class_name: test_status.class.name,
+            class_name: test_status.test_class_name,
             log:        nil,
             run_id:     @run['id'],
             env:        test_status.env,
             parameters: test_status.params.to_s,
-            result:     Moto::Result::RUNNING,
+            result:     'RUNNING',
             error:      nil,
             failures:   nil
           }
-          # @tests[test.name] = JSON.parse( RestClient.post( "#{@url}/api/tests", data.to_json, :content_type => :json, :accept => :json ) )
+
+          @tests[test.name] = JSON.parse( RestClient.post( "#{@url}/api/tests", data.to_json, :content_type => :json, :accept => :json ) )
         end
 
         def end_test(test_status)
-          log = File.read(test.log_path)
           data = {
-            log: log,
-            result:   test_status.final_result,
-            error:    test_status.final_result == Moto::Test::Result::ERROR ? nil : test_status.final_result.message,
-            failures: @runner.result[test.name][:failures].join("\n\t"),
-            duration: @runner.result[test.name][:duration]
+            log:      File.read(test_status.log_path),
+            result:   test_status.final_result.message,
+            error:    test_status.final_result.code == Moto::Test::Result::ERROR ? nil : test_status.final_result.message,
+            failures: test_failures(test_status),
+            duration: test_status.duration
           }
-          # @tests[test.name] = JSON.parse( RestClient.put( "#{@url}/api/tests/#{@tests[test.name]['id']}", data.to_json, :content_type => :json, :accept => :json ) )
+
+          @tests[test.name] = JSON.parse( RestClient.put( "#{@url}/api/tests/#{@tests[test.name]['id']}", data.to_json, :content_type => :json, :accept => :json ) )
+        end
+
+        # @return [String] string with messages of all failures in a test
+        def test_failures(test_status)
+          failures = ''
+
+          test_status.results.each do |result|
+            if result.code == Moto::Test::Result::FAILURE
+              failures += result.message + "\n\t"
+            end
+          end
+
+          failures
         end
 
       end

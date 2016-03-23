@@ -6,10 +6,13 @@ module Moto
       class Base
 
         attr_reader :config
+        attr_reader :custom_run_name
 
         # @param [Hash] config
-        def initialize(config)
+        # @param [String] custom_run_name Optional run name to be passed to listeners
+        def initialize(config, custom_run_name = '')
           @config = config
+          @custom_run_name = custom_run_name
         end
 
         # Invoked when whole batch of tests starts
