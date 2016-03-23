@@ -9,6 +9,9 @@ module Moto
       ERROR    = :result_error     # 2
       SKIPPED  = :result_skipped   # 3
 
+      # Array of all statuses [Moto::Test:Status] from current run
+      attr_reader :tests_all
+
       # Array of [Moto::Test:Status] with final_result == [Moto::Test::Result::PASSED]
       attr_reader :tests_passed
 
@@ -22,25 +25,12 @@ module Moto
       attr_reader :tests_error
 
       def initialize
-        @tests_all      = nil
+        @tests_all      = []
         @tests_passed   = []
         @tests_skipped  = []
         @tests_failed   = []
         @tests_error    = []
         @duration       = 0
-      end
-
-      # All [Moto::Test::Status], associated with the run, sorted by their time_start field
-      # @param [Boolean] force_evaluation Optional, use when something might have changed between invocations of this method
-      # @return [Array] array of all [Moto::Test:Status] sorted by time_start field
-      def tests_all(force_evaluation = false)
-
-        if @tests_all.nil? || force_evaluation
-          @tests_all = tests_passed + tests_skipped + tests_failed + tests_error
-          @tests_all = @tests_all.sort_by { |test_status| test_status.time_start }
-        end
-
-        @tests_all
       end
 
       # Sum of durations of all tests in this run
@@ -57,8 +47,13 @@ module Moto
         @duration
       end
 
+      # Time of run's start. Available after the first test has been completed.
       # @return [Float] Returns time of run's start (start of first test in it)
       def time_start
+        if tests_all.empty?
+          raise 'Moto::Reporting::RunStatus.time_start: Value not available. Check method description.'
+        end
+
         tests_all[0].time_start
       end
 
@@ -77,9 +72,13 @@ module Moto
         PASSED
       end
 
-      # Add single test's status to the collection which describes whole run
+      # Adds single test's status to the collection which describes whole run
       # @param [Moto::Test::Status] test_status to be incorporated into final run result
       def add_test_status(test_status)
+
+        # Separate collections are kept and data is doubled in order to avoid
+        # calling Array.collect in getter for each type of results
+
         case test_status.final_result.code
           when Moto::Test::Result::PASSED
             @tests_passed << test_status
@@ -92,6 +91,8 @@ module Moto
           else
             raise 'Incorrect value of field: "code" in [Moto::Test::Status]'
         end
+
+        @tests_all << test_status
       end
 
       # Overwritten definition of to string.

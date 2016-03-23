@@ -19,10 +19,10 @@ module Moto
       # Name of the class in the template
       class_name = modules.last
 
-      # Evaluate fully qulified name of the class to derive from or, if not specified
+      # Evaluate fully qualified name of the class to derive from or, if not specified
       # use Moto's default one
       if options[:base_class].nil?
-        base_class_qualified_name = 'Moto::Test'
+        base_class_qualified_name = 'Moto::Test::Base'
       else
         base_class_qualified_name = "#{options[:app_name]}::Lib::Test::#{options[:base_class].split('/').join('::').camelize}"
       end

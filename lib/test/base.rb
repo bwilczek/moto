@@ -1,10 +1,11 @@
 require_relative 'test_status'
+require_relative 'assert'
 
 module Moto
   module Test
     class Base
 
-      include Moto::Assert
+      include Moto::Test::Assert
       include Moto::ForwardContextMethods
 
       attr_reader   :name
@@ -27,15 +28,13 @@ module Moto
         self.class._path
       end
 
-      def initialize
-        @status = Moto::Test::Status.new
-      end
-
+      # Initializes test to be executed with specified params and environment
       def init(env, params, params_index)
         @env = env
         @params = params
         @name = generate_name(params_index)
 
+        @status = Moto::Test::Status.new
         @status.name = @name
         @status.test_class_name = self.class.name
       end

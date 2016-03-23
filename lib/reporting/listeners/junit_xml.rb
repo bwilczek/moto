@@ -22,9 +22,9 @@ module Moto
               run_status.tests_all.each do |test_status|
 
                 test_status_hash = {
-                    name: test_status.name,
-                    time: test_status.duration,
-                    classname: test_status.test_class_name,
+                    name:        test_status.name,
+                    time:        test_status.duration,
+                    classname:   test_status.test_class_name,
                     moto_result: test_status.to_s
                 }
 

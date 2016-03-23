@@ -6,7 +6,6 @@ module Moto
     # all resources specific for single thread will be initialized here. E.g. browser session
     attr_reader :runner
     attr_reader :logger
-    # attr_reader :log_path
     attr_reader :current_test
 
     def initialize(runner, test, test_reporter)
@@ -85,12 +84,9 @@ module Moto
       Dir.glob("#{@test.dir}/*.{log,png}").each { |f| File.delete f }
       max_attempts = @runner.my_config[:max_attempts] || 1
       sleep_time = @runner.my_config[:sleep_before_attempt] || 0
+
       @runner.environments.each do |env|
         params_all = [{}]
-
-        # YAML config files
-        #params_path = "#{@test.dir}/#{@test.filename}_params.yml"
-        #params_all = YAML.load(ERB.new(File.read(params_path)).result) if File.exists?(params_path)
 
         # RB Config files
         params_path = "#{@test.dir}/#{@test.filename}"
@@ -104,13 +100,14 @@ module Moto
             next unless allowed_envs.include? env
           end
 
+          @test.init(env, params, params_index)
+          @test.log_path = "#{@test.dir}/#{@test.name.gsub(/\s+/, '_').gsub(':', '_').gsub('::', '_').gsub('/', '_')}.log"
+          # TODO: log path might be specified (to some extent) by the configuration
+          @logger = Logger.new(File.open(@test.log_path, File::WRONLY | File::TRUNC | File::CREAT))
+          @logger.level = @runner.my_config[:log_level] || Logger::DEBUG
+          @current_test = @test
+
           (1..max_attempts).each do |attempt|
-            @test.init(env, params, params_index)
-            # TODO: log path might be specified (to some extent) by the configuration
-            @test.log_path = "#{@test.dir}/#{@test.name.gsub(/\s+/, '_').gsub(':', '_').gsub('::', '_').gsub('/', '_')}.log"
-            @logger = Logger.new(File.open(@test.log_path, File::WRONLY | File::TRUNC | File::CREAT))
-            @logger.level = @runner.my_config[:log_level] || Logger::DEBUG
-            @current_test = @test
 
             # Reporting: start_test
             if attempt == 1
@@ -126,9 +123,11 @@ module Moto
 
             begin
               @test.run_with_preparations
-            rescue Exceptions::TestForcedPassed, Exceptions::TestForcedFailure, Exceptions::TestSkipped => e
-              logger.info(e.message)
-
+            rescue  Exceptions::TestForcedPassed, Exceptions::TestForcedFailure, Exceptions::TestSkipped => e
+              @logger.info(e.message)
+              test_attempt_exception = e
+            rescue Exceptions::TestAssertionFailed => e
+              @logger.error(e.message)
               test_attempt_exception = e
             rescue Exception => e
               @logger.error("#{e.class.name}: #{e.message}")
@@ -144,12 +143,11 @@ module Moto
             @test.after
             @clients.each_value { |c| c.end_test(@test) }
 
-            @logger.info("Result: #{@test.status.final_result.code}")
-            @logger.close
+            @logger.info("Result: #{@test.status.results.last.code}")
 
             # stop re-running test when passable (pass, skip) result has been achieved
-            if  @test.status.final_result.code != Moto::Test::Result::FAILURE &&
-                @test.status.final_result.code != Moto::Test::Result::ERROR
+            if  @test.status.results.last.code != Moto::Test::Result::FAILURE &&
+                @test.status.results.last.code != Moto::Test::Result::ERROR
               break
             end
 
@@ -159,6 +157,9 @@ module Moto
             end
 
           end # Make another attempt
+
+          # Close and flush stream to file
+          @logger.close
 
           # Reporting: end_test
           @test_reporter.report_end_test(@test.status)

@@ -56,7 +56,7 @@ module Moto
           new_result.code = Moto::Test::Result::PASSED
         elsif exception.is_a?(Moto::Exceptions::TestSkipped)
           new_result.code = Moto::Test::Result::SKIPPED
-        elsif exception.is_a?(Moto::Exceptions::TestForcedFailure)
+        elsif exception.is_a?(Moto::Exceptions::TestForcedFailure) || exception.is_a?(Moto::Exceptions::TestAssertionFailed)
           new_result.code = Moto::Test::Result::FAILURE
         else
           new_result.code = Moto::Test::Result::ERROR
