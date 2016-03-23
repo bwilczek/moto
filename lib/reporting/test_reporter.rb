@@ -5,14 +5,20 @@ module Moto
 
     # Manages reporting test and run status' to attached listeners
     class TestReporter
-
-      # @param [Array] listeners An array of class names' of listeners to be created, if nil is passed default values will be taken from config[:listeners]
+      # @param [Array] listeners An array of strings, which represent qualified names of classes (listeners) that will be instantiated.
+      #                empty array is passed then :default_listeners will be taken from config
       # @param [Hash] config to be passed to listeners during creation
       # @param [String] custom_run_name Optional, to be passed to listeners during creation
       def initialize(listeners, config, custom_run_name)
 
-        if listeners.nil?
-          listeners = config[:moto][:runner][:default_listeners]
+        if listeners.empty?
+          config[:moto][:runner][:default_listeners].each do |listener_class_name|
+            listeners << listener_class_name
+          end
+        else
+          listeners.each_with_index do |listener_class_name, index|
+            listeners[index] = ('Moto::Reporting::Listeners::' + listener_class_name.camelize).constantize
+          end
         end
 
         @listeners = []

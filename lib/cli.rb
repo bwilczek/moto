@@ -82,13 +82,7 @@ module Moto
         test_classes << tg.generate(test_path)
       end
 
-      listeners = []
-      argv[ :listeners ].each do |r|
-        listener = 'Moto::Reporting::Listeners::' + r.camelize
-        listeners << listener.constantize
-      end
-
-      @test_reporter = Moto::Reporting::TestReporter.new(listeners, argv[:config], argv[:name])
+      @test_reporter = Moto::Reporting::TestReporter.new(argv[:listeners], argv[:config], argv[:name])
 
       runner = Moto::Runner.new(test_classes, argv[:environments], argv[:config], @test_reporter)
       runner.run
