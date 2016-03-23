@@ -10,11 +10,11 @@ module Moto
     attr_reader :name
     attr_reader :test_reporter
 
-    def initialize(tests, listeners, environments, config, name)
+    def initialize(tests, environments, config, test_reporter)
       @tests = tests
       @config = config
       @thread_pool = ThreadPool.new(my_config[:thread_count] || 1)
-      @name = name
+      @test_reporter = test_reporter
 
       # TODO: initialize logger from config (yml or just ruby code)
       # @logger = Logger.new(STDOUT)
@@ -24,8 +24,6 @@ module Moto
       # TODO: validate envs, maybe no-env should be supported as well?
       environments << :__default if environments.empty?
       @environments = environments
-
-      @test_reporter = Moto::Reporting::TestReporter.new(listeners.empty? ? my_config[:default_listeners] : listeners, config, name)
     end
 
     # TODO: Remake
