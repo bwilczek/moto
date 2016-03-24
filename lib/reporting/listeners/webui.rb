@@ -61,8 +61,8 @@ module Moto
         def end_test(test_status)
           data = {
             log:      File.read(test_status.log_path),
-            result:   test_status.final_result.code,
-            error:    test_status.final_result.code == Moto::Test::Result::ERROR ? nil : test_status.final_result.message,
+            result:   test_status.results.last.code,
+            error:    test_status.results.last.code == Moto::Test::Result::ERROR ? nil : test_status.results.last.message,
             failures: test_failures(test_status),
             duration: test_status.duration
           }

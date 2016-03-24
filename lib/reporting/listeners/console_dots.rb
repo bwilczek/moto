@@ -18,7 +18,7 @@ module Moto
             puts 'FAILURES: '
             run_status.tests_failed.each do |test_status|
               puts test_status.name
-              puts test_status.final_result.message
+              puts test_status.results.last.message
               puts ''
             end
           end
@@ -28,7 +28,7 @@ module Moto
             puts 'ERRORS: '
             run_status.tests_error.each do |test_status|
               puts test_status.name
-              puts test_status.final_result.message
+              puts test_status.results.last.message
               puts ''
             end
           end
@@ -38,7 +38,7 @@ module Moto
             puts 'SKIPPED: '
             run_status.tests_skipped.each do |test_status|
               puts test_status.name
-              puts test_status.final_result.message
+              puts test_status.results.last.message
               puts ''
             end
           end
@@ -46,7 +46,7 @@ module Moto
         end
 
         def end_test(test_status)
-          print case test_status.final_result.code
+          print case test_status.results.last.code
           when Moto::Test::Result::PASSED then '.'
           when Moto::Test::Result::FAILURE then 'F'
           when Moto::Test::Result::ERROR then 'E'

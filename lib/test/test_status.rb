@@ -16,7 +16,6 @@ module Moto
 
       # Array of results, consists of [Moto::Reporting::TestResult]
       # so each item holds information about result code and message that might accompany it.
-      # *IMPORTANT* To access 'summarized' result refer to method: final_result
       attr_reader :results
 
       # Environment on which test was run
@@ -34,16 +33,11 @@ module Moto
       # Test's duration
       attr_accessor :duration
 
-      # Indicates whether test is currently being executed or not
-      # if :is_running == true and :final_result != nil it means that test has executed at least once
-      attr_accessor :is_running
-
       # TODO: Burn it with fire...
       # Path to test's log, for purpose of making test logs accessible via listeners
       attr_accessor :log_path
 
       def initialize
-        @is_running = false
         @results = []
       end
 
@@ -79,29 +73,10 @@ module Moto
         @results.push(exception_to_test_result(exception))
       end
 
-      # Analyzes :results collection and decides which one should be used as a final summary of all test runs
-      # Will return first encountered ERROR or, if no [Moto::Test::Result::ERROR] have been spotted, last result in the array
-      # @return [Moto::Test::Result]
-      def final_result
-        @results.last
-
-        # temp_result = nil
-        #
-        # @results.each do |result|
-        #   temp_result = result
-        #
-        #   if result.code == Moto::Test::Result::ERROR
-        #     break
-        #   end
-        # end
-        #
-        # temp_result
-      end
-
       # Overwritten definition of to string.
-      # @return [String] string with readable form of final_result field
+      # @return [String] string with readable form of @results.last.code
       def to_s
-        case final_result.code
+        case @results.last.code
           when Moto::Test::Result::PASSED   then return 'PASSED'
           when Moto::Test::Result::FAILURE  then return 'FAILED'
           when Moto::Test::Result::ERROR    then return 'ERROR'

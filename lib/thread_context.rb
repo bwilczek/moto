@@ -145,9 +145,9 @@ module Moto
 
             @logger.info("Result: #{@test.status.results.last.code}")
 
-            # stop re-running test when passable (pass, skip) result has been achieved
-            if  @test.status.results.last.code != Moto::Test::Result::FAILURE &&
-                @test.status.results.last.code != Moto::Test::Result::ERROR
+            # test should have another attempt only in case of an error
+            # pass, skip and fail statuses end attempts
+            if @test.status.results.last.code != Moto::Test::Result::ERROR
               break
             end
 

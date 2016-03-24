@@ -29,10 +29,10 @@ module Moto
                 }
 
                 xml.testcase(test_status_hash) do
-                  if test_status.final_result.code == Moto::Test::Result::ERROR
-                    xml.error(message: test_status.final_result.message)
-                  elsif test_status.final_result.code == Moto::Test::Result::FAILURE
-                    xml.failure(message: test_status.final_result.message)
+                  if test_status.results.last.code == Moto::Test::Result::ERROR
+                    xml.error(message: test_status.results.last.message)
+                  elsif test_status.results.last.code == Moto::Test::Result::FAILURE
+                    xml.failure(message: test_status.results.last.message)
                   end
                 end
               end

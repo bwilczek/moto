@@ -12,16 +12,16 @@ module Moto
       # Array of all statuses [Moto::Test:Status] from current run
       attr_reader :tests_all
 
-      # Array of [Moto::Test:Status] with final_result == [Moto::Test::Result::PASSED]
+      # Array of [Moto::Test:Status] with @results.last.code == [Moto::Test::Result::PASSED]
       attr_reader :tests_passed
 
-      # Array of [Moto::Test:Status] with final_result == [Moto::Test::Result::SKIPPED]
+      # Array of [Moto::Test:Status] with @results.last.code == [Moto::Test::Result::SKIPPED]
       attr_reader :tests_skipped
 
-      # Array of [Moto::Test:Status] with final_result == [Moto::Test::Result::FAILURE]
+      # Array of [Moto::Test:Status] with @results.last.code == [Moto::Test::Result::FAILURE]
       attr_reader :tests_failed
 
-      # Array of [Moto::Test:Status] with final_result == [Moto::Test::Result::ERROR]
+      # Array of [Moto::Test:Status] with @results.last.code == [Moto::Test::Result::ERROR]
       attr_reader :tests_error
 
       def initialize
@@ -57,7 +57,7 @@ module Moto
         tests_all[0].time_start
       end
 
-      # Result of whole run, takes into account final_result field of all tests in this set
+      # Summarized result of whole run
       # @return [String] one of the values defined as constants in this class in cohesion with [Moto::Test::Result]
       def result
 
@@ -79,7 +79,7 @@ module Moto
         # Separate collections are kept and data is doubled in order to avoid
         # calling Array.collect in getter for each type of results
 
-        case test_status.final_result.code
+        case test_status.results.last.code
           when Moto::Test::Result::PASSED
             @tests_passed << test_status
           when Moto::Test::Result::SKIPPED
