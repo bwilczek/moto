@@ -22,6 +22,7 @@ module Moto
         end
 
       rescue Exception => e
+        print e.backtrace.join("\n")
         puts e.message
       end
     end

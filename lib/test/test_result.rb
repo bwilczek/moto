@@ -4,10 +4,10 @@ module Moto
     # Value object representing information about single test run
     class Result
 
-      PASSED   = :result_passed    # 0
-      FAILURE  = :result_failure   # 1
-      ERROR    = :result_error     # 2
-      SKIPPED  = :result_skipped   # 3
+      PASSED   = :passed    # 0
+      FAILURE  = :failure   # 1
+      ERROR    = :error     # 2
+      SKIPPED  = :skipped   # 3
 
       # Result code of a single test run
       attr_accessor :code

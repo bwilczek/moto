@@ -11,7 +11,7 @@ module Moto
           @url = config[:url]
           data = {
             name:         custom_run_name,
-            result:       'RUNNING',
+            result:       :running,
             cnt_all:      nil,
             cnt_passed:   nil,
             cnt_failure:  nil,
@@ -29,7 +29,7 @@ module Moto
         def end_run(run_status)
           # PUT http://sandbox.dev:3000/api/runs/1
           data = {
-            result:       run_status.to_s,
+            result:       run_status.result,
             cnt_all:      run_status.tests_all.length,
             cnt_passed:   run_status.tests_passed.length,
             cnt_failure:  run_status.tests_failed.length,
@@ -50,24 +50,24 @@ module Moto
             run_id:     @run['id'],
             env:        test_status.env,
             parameters: test_status.params.to_s,
-            result:     'RUNNING',
+            result:     :running,
             error:      nil,
             failures:   nil
           }
 
-          @tests[test.name] = JSON.parse( RestClient.post( "#{@url}/api/tests", data.to_json, :content_type => :json, :accept => :json ) )
+          @tests[test_status.name] = JSON.parse( RestClient.post( "#{@url}/api/tests", data.to_json, :content_type => :json, :accept => :json ) )
         end
 
         def end_test(test_status)
           data = {
             log:      File.read(test_status.log_path),
-            result:   test_status.final_result.message,
+            result:   test_status.final_result.code,
             error:    test_status.final_result.code == Moto::Test::Result::ERROR ? nil : test_status.final_result.message,
             failures: test_failures(test_status),
             duration: test_status.duration
           }
 
-          @tests[test.name] = JSON.parse( RestClient.put( "#{@url}/api/tests/#{@tests[test.name]['id']}", data.to_json, :content_type => :json, :accept => :json ) )
+          @tests[test_status.name] = JSON.parse( RestClient.put( "#{@url}/api/tests/#{@tests[test_status.name]['id']}", data.to_json, :content_type => :json, :accept => :json ) )
         end
 
         # @return [String] string with messages of all failures in a test

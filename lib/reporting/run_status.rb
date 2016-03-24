@@ -4,10 +4,10 @@ module Moto
     # Value object holding information about whole 'run' of tests.
     class RunStatus
 
-      PASSED   = :result_passed    # 0
-      FAILURE  = :result_failure   # 1
-      ERROR    = :result_error     # 2
-      SKIPPED  = :result_skipped   # 3
+      PASSED   = :passed    # 0
+      FAILURE  = :failure   # 1
+      ERROR    = :error     # 2
+      SKIPPED  = :skipped   # 3
 
       # Array of all statuses [Moto::Test:Status] from current run
       attr_reader :tests_all

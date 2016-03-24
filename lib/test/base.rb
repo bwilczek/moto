@@ -37,6 +37,8 @@ module Moto
         @status = Moto::Test::Status.new
         @status.name = @name
         @status.test_class_name = self.class.name
+        @status.env = @env
+        @status.params = @params
       end
 
       # Generates name of the test based on its properties:

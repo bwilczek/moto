@@ -31,15 +31,8 @@ module Moto
                 xml.testcase(test_status_hash) do
                   if test_status.final_result.code == Moto::Test::Result::ERROR
                     xml.error(message: test_status.final_result.message)
-                  else
-                    failures = test_failures(test_status)
-
-                    if failures.length > 0
-                      failures.each do |test_result|
-                        xml.failure(message: test_result.message)
-                      end
-                    end
-
+                  elsif test_status.final_result.code == Moto::Test::Result::FAILURE
+                    xml.failure(message: test_status.final_result.message)
                   end
                 end
               end

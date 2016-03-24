@@ -83,17 +83,19 @@ module Moto
       # Will return first encountered ERROR or, if no [Moto::Test::Result::ERROR] have been spotted, last result in the array
       # @return [Moto::Test::Result]
       def final_result
-        temp_result = nil
+        @results.last
 
-        @results.each do |result|
-          temp_result = result
-
-          if result.code == Moto::Test::Result::ERROR
-            break
-          end
-        end
-
-        temp_result
+        # temp_result = nil
+        #
+        # @results.each do |result|
+        #   temp_result = result
+        #
+        #   if result.code == Moto::Test::Result::ERROR
+        #     break
+        #   end
+        # end
+        #
+        # temp_result
       end
 
       # Overwritten definition of to string.
