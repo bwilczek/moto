@@ -22,7 +22,8 @@ module Moto
         end
 
       rescue Exception => e
-        puts e.message
+        puts e.message + "\n\n"
+        puts e.backtrace.join("\n")
       end
     end
     
@@ -40,7 +41,7 @@ module Moto
       
       # Default options
       options = {}
-      options[:reporters] = []
+      options[:listeners] = []
       # TODO Mandatory env var in app config
       options[:config] = eval(File.read("#{MotoApp::DIR}/config/moto.rb"))
       options[:environments] = []
@@ -53,7 +54,7 @@ module Moto
       OptionParser.new do |opts|
         opts.on('-t', '--tests Tests', Array) { |v| options[:tests ] = v }
         opts.on('-g', '--tags Tags', Array) { |v| options[:tags ] = v }
-        opts.on('-r', '--reporters Reporters', Array) { |v| options[:reporters] = v }
+        opts.on('-l', '--listeners Listeners', Array) { |v| options[:listeners] = v }
         opts.on('-e', '--environments Environment', Array) { |v| options[:environments] = v }
         opts.on('-c', '--const Const') { |v| options[:const] = v }
         opts.on('-n', '--name Name') { |v| options[:name] = v }
