@@ -72,15 +72,7 @@ module Moto
 
         # @return [String] string with messages of all failures in a test
         def test_failures(test_status)
-          failures = ''
-
-          test_status.results.each do |result|
-            if result.code == Moto::Test::Result::FAILURE
-              failures += result.message + "\n\t"
-            end
-          end
-
-          failures
+          test_status.results.last.failures.join("\n\t")
         end
 
       end

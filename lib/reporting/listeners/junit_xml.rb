@@ -32,7 +32,11 @@ module Moto
                   if test_status.results.last.code == Moto::Test::Result::ERROR
                     xml.error(message: test_status.results.last.message)
                   elsif test_status.results.last.code == Moto::Test::Result::FAILURE
-                    xml.failure(message: test_status.results.last.message)
+
+                    test_status.results.last.failures.each do |failure_message|
+                      xml.failure(message: failure_message)
+                    end
+
                   end
                 end
               end
@@ -42,10 +46,6 @@ module Moto
           File.open(path, 'w') {|f| f.write(builder.to_xml) }
         end
 
-        # @return [Array] array with [Moto::Test::Result] of all failures in a test
-        def test_failures(test_status)
-          test_status.results.select { |result| result.code == Moto::Test::Result::FAILURE }
-        end
       end
     end
   end

@@ -4,11 +4,6 @@ module Moto
     # Value object holding information about whole 'run' of tests.
     class RunStatus
 
-      PASSED   = :passed    # 0
-      FAILURE  = :failure   # 1
-      ERROR    = :error     # 2
-      SKIPPED  = :skipped   # 3
-
       # Array of all statuses [Moto::Test:Status] from current run
       attr_reader :tests_all
 
@@ -24,37 +19,30 @@ module Moto
       # Array of [Moto::Test:Status] with @results.last.code == [Moto::Test::Result::ERROR]
       attr_reader :tests_error
 
+      # Time of run's start
+      attr_reader :time_start
+
+      # Time of run's end
+      attr_reader :time_end
+
+      # Run's duration
+      attr_reader :duration
+
       def initialize
         @tests_all      = []
         @tests_passed   = []
         @tests_skipped  = []
         @tests_failed   = []
         @tests_error    = []
-        @duration       = 0
       end
 
-      # Sum of durations of all tests in this run
-      # @param [Boolean] force_evaluation Optional, use when something might have changed between invocations of this method
-      # @return [Float] summed up duration of whole run
-      def duration(force_evaluation = false)
-
-        if @duration == 0 || force_evaluation
-          tests_all.each do |test_status|
-            @duration += test_status.duration
-          end
-        end
-
-        @duration
+      def initialize_run
+        @time_start = Time.now.to_f
       end
 
-      # Time of run's start. Available after the first test has been completed.
-      # @return [Float] Returns time of run's start (start of first test in it)
-      def time_start
-        if tests_all.empty?
-          raise 'Moto::Reporting::RunStatus.time_start: Value not available. Check method description.'
-        end
-
-        tests_all[0].time_start
+      def finalize_run
+        @time_end = Time.now.to_f
+        @duration = @time_end - @time_start
       end
 
       # Summarized result of whole run
@@ -62,14 +50,14 @@ module Moto
       def result
 
         if @tests_error.length > 0
-          return ERROR
+          return Moto::Test::Result::ERROR
         elsif @tests_failed.length > 0
-          return FAILURE
+          return Moto::Test::Result::FAILURE
         elsif tests_all.length == @tests_skipped.length
-          return SKIPPED
+          return Moto::Test::Result::SKIPPED
         end
 
-        PASSED
+        Moto::Test::Result::PASSED
       end
 
       # Adds single test's status to the collection which describes whole run
@@ -99,10 +87,10 @@ module Moto
       # @return [String] string with readable form of result field
       def to_s
         case result
-          when PASSED   then return 'PASSED'
-          when FAILURE  then return 'FAILED'
-          when ERROR    then return 'ERROR'
-          when SKIPPED  then return 'SKIPPED'
+          when Moto::Test::Result::PASSED   then return 'PASSED'
+          when Moto::Test::Result::FAILURE  then return 'FAILED'
+          when Moto::Test::Result::ERROR    then return 'ERROR'
+          when Moto::Test::Result::SKIPPED  then return 'SKIPPED'
         end
       end
     end

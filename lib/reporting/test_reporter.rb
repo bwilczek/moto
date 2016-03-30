@@ -44,6 +44,7 @@ module Moto
       # Reports start of the whole run (set of tests) to attached listeners
       def report_start_run
         @run_status = Moto::Reporting::RunStatus.new
+        @run_status.initialize_run
 
         @listeners.each do |l|
           l.start_run
@@ -52,6 +53,8 @@ module Moto
 
       # Reports end of the whole run (set of tests) to attached listeners
       def report_end_run
+        @run_status.finalize_run
+
         @listeners.each do |l|
           l.end_run(@run_status)
         end

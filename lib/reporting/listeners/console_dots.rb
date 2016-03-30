@@ -18,7 +18,7 @@ module Moto
             puts 'FAILURES: '
             run_status.tests_failed.each do |test_status|
               puts test_status.name
-              puts test_status.results.last.message
+              puts "\t" + test_status.results.last.failures.join("\n\t")
               puts ''
             end
           end

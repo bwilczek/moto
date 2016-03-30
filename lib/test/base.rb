@@ -1,11 +1,9 @@
-require_relative 'test_status'
-require_relative 'assert'
+require_relative 'status'
 
 module Moto
   module Test
     class Base
 
-      include Moto::Test::Assert
       include Moto::ForwardContextMethods
 
       attr_reader   :name
@@ -73,24 +71,33 @@ module Moto
       end
 
       def dir
-        return File.dirname(@static_path) unless @static_path.nil?
+        return File.dirname(static_path) unless static_path.nil?
         File.dirname(self.path)
       end
 
       def filename
-        return File.basename(@static_path, ".*") unless @static_path.nil?
-        File.basename(path, ".*")
+        return File.basename(static_path, '.*') unless static_path.nil?
+        File.basename(path, '.*')
       end
 
       # Use this to run test
-      # This is the place to add any code that has to be executed in test's scope before its run
-      def run_with_preparations
-        status.time_start = Time.now.to_f
-        run
+      # Initializes status, runs test, handles exceptions, finalizes status after run completion
+      def run_test
+        status.initialize_run
+
+        begin
+          run
+        rescue Exception => exception
+          status.log_exception(exception)
+          raise
+        ensure
+          status.finalize_run
+        end
+
       end
 
       # Only to be overwritten by final test execution
-      # Use :run_with_preparations in order to run test
+      # Use :run_test in order to run test
       def run
         # abstract
       end
@@ -104,12 +111,7 @@ module Moto
       end
 
       def skip(msg = nil)
-        if msg.nil?
-          msg = 'Test skipped with no reason given.'
-        else
-          msg = "Skip reason: #{msg}"
-        end
-        raise Exceptions::TestSkipped.new msg
+        raise Exceptions::TestSkipped.new(msg.nil? ? 'Test skipped with no reason given.' : "Skip reason: #{msg}")
       end
 
       def fail(msg = nil)
@@ -128,6 +130,37 @@ module Moto
           msg = "Forced passed, reason: #{msg}"
         end
         raise Exceptions::TestForcedPassed.new msg
+      end
+
+
+      # Checks for equality of both arguments
+      def assert_equal(a, b)
+        assert(a == b, "Arguments should be equal: #{a} != #{b}.")
+      end
+
+      # Checks if passed value is equal to True
+      def assert_true(value)
+        assert(value, 'Logical condition not met, expecting true, given false.')
+      end
+
+      # Checks if passed value is equal to False
+      def assert_false(value)
+        assert(!value, 'Logical condition not met, expecting false, given true.')
+      end
+
+      # Checks if result of condition equals to True
+      def assert(condition, message)
+        if !condition
+          if evaled
+            # -1 because of added method header in generated class
+            line_number = caller.select { |l| l.match(/\(eval\):\d*:in `run'/) }.first[/\d+/].to_i - 1
+          else
+            line_number = caller.select { |l| l.match(/#{static_path}:\d*:in `run'/) }.first[/\d+/].to_i - 1
+          end
+
+          status.log_failure("ASSERTION FAILED in line #{line_number}: #{message}")
+          logger.error(message)
+        end
       end
 
     end

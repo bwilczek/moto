@@ -118,26 +118,14 @@ module Moto
             @test.before
             @logger.info "Start: #{@test.name} attempt #{attempt}/#{max_attempts}"
 
-            # Any exceptions caught during the execution of the test in this run will be saved to this variable
-            test_attempt_exception = nil
-
             begin
-              @test.run_with_preparations
+              @test.run_test
             rescue  Exceptions::TestForcedPassed, Exceptions::TestForcedFailure, Exceptions::TestSkipped => e
               @logger.info(e.message)
-              test_attempt_exception = e
-            rescue Exceptions::TestAssertionFailed => e
-              @logger.error(e.message)
-              test_attempt_exception = e
             rescue Exception => e
               @logger.error("#{e.class.name}: #{e.message}")
               @logger.error(e.backtrace.join("\n"))
               @clients.each_value { |c| c.handle_test_exception(@test, e) }
-
-              test_attempt_exception = e
-            ensure
-              # TODO: test should auto-evaluate it's status on events
-              @test.status.evaluate_status_after_run(test_attempt_exception)
             end
 
             @test.after
