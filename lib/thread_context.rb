@@ -101,7 +101,8 @@ module Moto
           end
 
           @test.init(env, params, params_index)
-          @test.log_path = "#{@test.dir}/#{@test.name.gsub(/\s+/, '_').gsub(':', '_').gsub('::', '_').gsub('/', '_')}.log"
+          # @test.log_path = "#{@test.dir}/#{@test.name.gsub(/\s+/, '_').gsub(':', '_').gsub('::', '_').gsub('/', '_')}.log"
+          @test.log_path = "#{@test.dir}/#{@test.name.demodulize.gsub('/', '_')}.log"
           # TODO: log path might be specified (to some extent) by the configuration
           @logger = Logger.new(File.open(@test.log_path, File::WRONLY | File::TRUNC | File::CREAT))
           @logger.level = @runner.my_config[:log_level] || Logger::DEBUG
