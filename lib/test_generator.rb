@@ -5,35 +5,17 @@ end
 
 module Moto
   class TestGenerator
-    
-    def initialize(app_dir)
-      @app_dir = app_dir
+
+    def initialize(test_paths_absolute)
+      @test_paths_absolute = test_paths_absolute
     end
-    
-    # assuming that target file includes full valid ruby class
-    def create(class_name)
-      class_name = 'MotoApp::Tests::'+class_name
-      a = class_name.underscore.split('/')
-      test_path = (a[1..20]+[a[-1]]).join('/')
-      
-      # TODO: check if this path and constant exists
-      require "#{MotoApp::DIR}/#{test_path}"
-      test_const = class_name.safe_constantize  
-      test_const.new
+
+    # Grab a test from the queue
+    def get_test
+      test_path = @test_paths_absolute.shift
+      test_path.nil? ? nil : generate(test_path)
     end
-    
-    def create_module_tree(root_module, next_modules)
-      return root_module if next_modules.empty?
-      next_module_name = next_modules.shift
-      if root_module.const_defined?(next_module_name.to_sym)
-        m = root_module.const_get(next_module_name.to_sym)
-      else
-        m = Module.new
-        root_module.const_set(next_module_name.to_sym, m)
-      end
-      create_module_tree(m, next_modules)
-    end
-    
+
     # assuming that target file includes only content of method 'run' and some magic comments
     def generate(test_path_absolute)
       method_body = File.read(test_path_absolute) + "\n"
@@ -47,7 +29,8 @@ module Moto
       end
     end
 
-    # Generates objects with tests that are supposed to be executed in this run.
+    # Generates test instances, based on fully defined class file
+    # @return [Moto::Test::Base]
     def generate_for_full_class_code(test_path_absolute)
       require test_path_absolute
 
@@ -78,7 +61,23 @@ module Moto
       test_object.evaled = false
       test_object
     end
+    private :generate_for_full_class_code
 
+    def create_module_tree(root_module, next_modules)
+      return root_module if next_modules.empty?
+      next_module_name = next_modules.shift
+      if root_module.const_defined?(next_module_name.to_sym)
+        m = root_module.const_get(next_module_name.to_sym)
+      else
+        m = Module.new
+        root_module.const_set(next_module_name.to_sym, m)
+      end
+      create_module_tree(m, next_modules)
+    end
+    private :create_module_tree
+
+    # Generates test instances, based on a text file with ruby code that has to be injected into run() method
+    # @return [Moto::Test::Base]
     def generate_for_run_body(test_path_absolute, method_body)
       base = Moto::Test::Base
       base_class_string = method_body.match( /^#\s*BASE_CLASS:\s(\S+)/ )
@@ -107,6 +106,7 @@ module Moto
       test_object.evaled = true        
       test_object
     end
-    
+    private :generate_for_run_body
+
   end
 end

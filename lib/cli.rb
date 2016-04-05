@@ -76,7 +76,8 @@ module Moto
         initializer.init
       end
 
-      tg = TestGenerator.new(MotoApp::DIR)
+      tg = TestGenerator.new(test_paths_absolute)
+
       test_paths_absolute.each do |test_path|
         test_classes << tg.generate(test_path)
       end
