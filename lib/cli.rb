@@ -18,7 +18,6 @@ require_relative './test_logging'
 require_relative './runner_logging'
 require_relative './runner'
 require_relative './thread_context'
-require_relative './thread_pool'
 require_relative './test/base'
 require_relative './page'
 require_relative './version'
@@ -39,7 +38,6 @@ module Moto
   class Cli
     def self.run(argv)
       test_paths_absolute = []
-      test_classes = []
 
       unless argv[ :tests ].nil?
         argv[ :tests ].each do |dir_name|
@@ -76,15 +74,9 @@ module Moto
         initializer.init
       end
 
-      tg = TestGenerator.new(test_paths_absolute)
+      test_reporter = Moto::Reporting::TestReporter.new(argv[:listeners], argv[:config], argv[:name])
 
-      test_paths_absolute.each do |test_path|
-        test_classes << tg.generate(test_path)
-      end
-
-      @test_reporter = Moto::Reporting::TestReporter.new(argv[:listeners], argv[:config], argv[:name])
-
-      runner = Moto::Runner.new(test_classes, argv[:environments], argv[:config], @test_reporter)
+      runner = Moto::Runner.new(test_paths_absolute, argv[:environments], argv[:config], test_reporter)
       runner.run
     end
 

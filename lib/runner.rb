@@ -1,19 +1,16 @@
 require_relative './reporting/test_reporter'
-
+require_relative './tests_queue'
 module Moto
   class Runner
 
     attr_reader :logger
     attr_reader :environments
-    attr_reader :assert
     attr_reader :config
-    attr_reader :name
     attr_reader :test_reporter
 
-    def initialize(tests, environments, config, test_reporter)
-      @tests = tests
+    def initialize(test_paths_absolute, environments, config, test_reporter)
+      @test_paths_absolute = test_paths_absolute
       @config = config
-      @thread_pool = ThreadPool.new(my_config[:thread_count] || 1)
       @test_reporter = test_reporter
 
       # TODO: initialize logger from config (yml or just ruby code)
@@ -45,16 +42,26 @@ module Moto
     end
 
     def run
+      tests_queue = TestsQueue.new(@test_paths_absolute)
+      threads_max = my_config[:thread_count] || 1
+
       @test_reporter.report_start_run
 
-      @tests.each do |test|
-        @thread_pool.schedule do
-          tc = ThreadContext.new(self, test, @test_reporter)
-          tc.run
+      (1..threads_max).each do |index|
+        Thread.new do
+          Thread.current[:id] = index
+          loop do
+            tc = ThreadContext.new(self, tests_queue.get_test, @test_reporter)
+            tc.run
+          end
         end
       end
 
-      @thread_pool.shutdown
+      loop do
+        break if tests_queue.num_waiting == threads_max
+        sleep 1
+      end
+
       @test_reporter.report_end_run
     end
 

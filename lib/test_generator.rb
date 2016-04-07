@@ -10,10 +10,12 @@ module Moto
       @test_paths_absolute = test_paths_absolute
     end
 
-    # Grab a test from the queue
-    def get_test
+    # @return [Array] An array of [Moto::Test::Base] decendants
+    #                 each entry is a Test with set of Parameters injected
+    def get_test_with_variants
       test_path = @test_paths_absolute.shift
-      test_path.nil? ? nil : generate(test_path)
+      # TODO: Generate test + params variants once params are removed from ThreadContext
+      test_path.nil? ? nil : [generate(test_path)]
     end
 
     # assuming that target file includes only content of method 'run' and some magic comments
@@ -28,6 +30,7 @@ module Moto
         generate_for_run_body(test_path_absolute, method_body)
       end
     end
+    private :generate
 
     # Generates test instances, based on fully defined class file
     # @return [Moto::Test::Base]
