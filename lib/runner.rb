@@ -23,31 +23,13 @@ module Moto
       @environments = environments
     end
 
-    # TODO: Remake
-    # @return [Hash] hash with config
-    def my_config
-      caller_path = caller.first.to_s.split(/:\d/)[0]
-      keys = []
-      if caller_path.include? MotoApp::DIR
-        caller_path.sub!( "#{MotoApp::DIR}/lib/", '' )
-        keys << 'moto_app'
-      elsif caller_path.include? Moto::DIR
-        caller_path.sub!( "#{Moto::DIR}/lib/", '' )
-        keys << 'moto'
-      end
-      caller_path.sub!('.rb', '')
-      keys << caller_path.split('/')
-      keys.flatten!
-      eval "@config#{keys.map{|k| "[:#{k}]" }.join('')}"
-    end
-
     def run
       tests_queue = TestsQueue.new(@test_paths_absolute)
-      threads_max = my_config[:thread_count] || 1
+      thread_count = @config[:moto][:runner][:thread_count] || 1
 
       @test_reporter.report_start_run
 
-      (1..threads_max).each do |index|
+      (1..thread_count).each do |index|
         Thread.new do
           Thread.current[:id] = index
           loop do

@@ -1,6 +1,8 @@
 require 'thread'
 
 module Moto
+
+  # Thread safe queue of tests
   class TestsQueue < Queue
 
     def initialize(test_paths_absolute)
@@ -8,6 +10,8 @@ module Moto
       @test_generator = Moto::TestGenerator.new(test_paths_absolute)
     end
 
+    # Thread safe way of requesting Test object creation.
+    # @return [Moto::Test::Base]
     def get_test
       if self.empty?
 
