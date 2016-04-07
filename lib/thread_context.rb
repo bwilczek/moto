@@ -16,7 +16,7 @@ module Moto
       @test_reporter = test_reporter
 
       #TODO temporary fix
-      Thread.current['context']= self
+      Thread.current['context'] = self
 
       @config = {}
       Dir.glob("config/*.yml").each do |f|
