@@ -15,10 +15,10 @@ module Moto
         @test.context = self
         @test_reporter = test_reporter
 
-        #TODO temporary fix
+        # TODO: temporary fix
         Thread.current['context'] = self
 
-        # TODO: Oh jesus it burns...
+        # TODO: temporary fix
         @moto_app_config = {}
         Dir.glob('config/*.yml').each do |f|
           @moto_app_config.deep_merge! YAML.load_file(f)
@@ -133,7 +133,6 @@ module Moto
         # Reporting: end_test
         @test_reporter.report_end_test(@test.status)
 
-        # TODO: Not sure if right place.
         @clients.each_value { |c| c.end_run }
 
       end

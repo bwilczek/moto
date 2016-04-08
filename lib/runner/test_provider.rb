@@ -3,7 +3,7 @@ require_relative 'test_generator'
 
 module Moto
   module Runner
-    # Thread safe queue of tests
+    # Thread safe provider of test instances
     class TestProvider
 
       def initialize(test_paths_absolute, environments)

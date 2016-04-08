@@ -19,7 +19,6 @@ module Moto
       # @return [Array] An array of [Moto::Test::Base] decendants
       #                 each entry is a Test with set of parameters injected
       def get_test_with_variants(test_path_absolute)
-        # TODO: Generate test + params variants once params are removed from ThreadContext
         test_path_absolute ? variantize(test_path_absolute) : nil
       end
 

@@ -49,6 +49,9 @@ module Moto
 
         @test_reporter.report_start_run
 
+        # Create as many threads as we're allowed by the config file.
+        # test_provider.get_test - will invoke Queue.pop thus putting the thread to sleep
+        # once there is no more work.
         (1..threads_max).each do |index|
           Thread.new do
             Thread.current[:id] = index
@@ -59,6 +62,7 @@ module Moto
           end
         end
 
+        # Waiting for all threads to run out of work so we can end the application
         loop do
           break if test_provider.num_waiting == threads_max
           sleep 1
