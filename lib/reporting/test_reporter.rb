@@ -12,7 +12,7 @@ module Moto
       def initialize(listeners, config, custom_run_name)
 
         if listeners.empty?
-          config[:moto][:runner][:default_listeners].each do |listener_class_name|
+          config[:moto][:test_runner][:default_listeners].each do |listener_class_name|
             listeners << listener_class_name
           end
         else

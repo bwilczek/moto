@@ -16,8 +16,9 @@ require_relative './empty_listener'
 require_relative './forward_context_methods'
 require_relative './test_logging'
 require_relative './runner_logging'
-require_relative './runner'
-require_relative './thread_context'
+require_relative './runner/test_runner'
+require_relative './runner/thread_context'
+require_relative './runner/test_generator'
 require_relative './test/base'
 require_relative './page'
 require_relative './version'
@@ -27,7 +28,6 @@ require_relative './reporting/listeners/console'
 require_relative './reporting/listeners/console_dots'
 require_relative './reporting/listeners/junit_xml'
 require_relative './reporting/listeners/webui'
-require_relative './test_generator'
 require_relative './exceptions/moto'
 require_relative './exceptions/test_skipped'
 require_relative './exceptions/test_forced_failure'
@@ -76,7 +76,7 @@ module Moto
 
       test_reporter = Moto::Reporting::TestReporter.new(argv[:listeners], argv[:config], argv[:name])
 
-      runner = Moto::Runner.new(test_paths_absolute, argv[:environments], argv[:config], test_reporter)
+      runner = Moto::Runner::TestRunner.new(test_paths_absolute, argv[:environments], argv[:config], test_reporter)
       runner.run
     end
 

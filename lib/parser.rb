@@ -65,7 +65,7 @@ module Moto
         options[:name] = evaluate_name(options[:tags], options[:tests])
       end
 
-      if options[ :config ][ :moto ][ :runner ][ :mandatory_environment ] && options[ :environments ].empty?
+      if options[ :config ][ :moto ][ :test_runner ][ :mandatory_environment ] && options[ :environments ].empty?
         puts 'Environment is mandatory for this project.'
         exit 1
       end
