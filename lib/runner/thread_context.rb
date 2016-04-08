@@ -18,11 +18,11 @@ module Moto
         #TODO temporary fix
         Thread.current['context'] = self
 
-        # TODO: Rework Const !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        # @config = {}
-        # Dir.glob("config/*.yml").each do |f|
-        #   @config.deep_merge! YAML.load_file(f)
-        # end
+        # TODO: Oh jesus it burns...
+        @moto_app_config = {}
+        Dir.glob('config/*.yml').each do |f|
+          @moto_app_config.deep_merge! YAML.load_file(f)
+        end
       end
 
       def client(name)
@@ -67,9 +67,9 @@ module Moto
         key = key.to_s
         key = "#{@test.env.to_s}.#{key}" if @test.env != :__default
         code = if key.include? '.'
-                 "@config#{key.split('.').map { |a| "['#{a}']" }.join('')}"
+                 "@moto_app_config#{key.split('.').map { |a| "['#{a}']" }.join('')}"
                else
-                 "@config['#{key}']"
+                 "@moto_app_config['#{key}']"
                end
         begin
           v = eval code
@@ -83,7 +83,8 @@ module Moto
       def run
         # TODO: this has to be moved somewhere else !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         # remove log/screenshot files from previous execution
-        Dir.glob("#{@test.dir}/*.{log,png}").each { |f| File.delete f }
+        #Dir.glob("#{@test.dir}/*.{log,png}").each { |f| File.delete f }
+
         max_attempts = @config[:moto][:thread_context][:max_attempts] || 1
         sleep_time = @config[:moto][:thread_context][:sleep_before_attempt] || 0
 

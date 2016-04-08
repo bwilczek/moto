@@ -24,6 +24,11 @@ module Moto
       end
 
       # Converts test's path to an array of Moto::Base::Test instances that represent all test variants (params, envs)
+      #
+      # *IMPORTANT*
+      # Config files with ruby code will be evaluated thus if you use any classes in them
+      # they must be required prior to that. That might be done in overloaded app's initialzer.
+      #
       # @param [String] test_path_absolute Path to the file with test
       # @return [Array] array of already initialized test's variants
       def variantize(test_path_absolute)
@@ -34,7 +39,11 @@ module Moto
           params_path = test_path_absolute.sub(/\.rb\z/, '')
 
           if File.exists?(params_path)
-            params_all = eval(File.read(params_path))
+            begin
+              params_all = eval(File.read(params_path))
+            rescue Exception => e
+              puts "Parameters error:\n\t File:  #{params_path}\n\t Error: #{e.message}\n\n"
+            end
           else
             params_all = [{}]
           end

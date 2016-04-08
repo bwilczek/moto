@@ -13,8 +13,8 @@ module Moto
         @context.const(key)
       end
       
-      def current_test
-        @context.current_test
+      def test
+        @context.test
       end
    
   end
