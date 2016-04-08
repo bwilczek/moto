@@ -81,10 +81,6 @@ module Moto
       end
 
       def run
-        # TODO: this has to be moved somewhere else !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        # remove log/screenshot files from previous execution
-        #Dir.glob("#{@test.dir}/*.{log,png}").each { |f| File.delete f }
-
         max_attempts = @config[:moto][:thread_context][:max_attempts] || 1
         sleep_time = @config[:moto][:thread_context][:sleep_before_attempt] || 0
 

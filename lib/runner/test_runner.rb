@@ -42,6 +42,11 @@ module Moto
         test_provider = TestProvider.new(@test_paths_absolute, @environments)
         threads_max = @config[:moto][:test_runner][:thread_count] || 1
 
+        # remove log/screenshot files from previous execution
+        @test_paths_absolute.each do |test_path|
+          Dir.glob("#{File.dirname(test_path)}/*.{log,png}").each { |f| File.delete(f) }
+        end
+
         @test_reporter.report_start_run
 
         (1..threads_max).each do |index|
