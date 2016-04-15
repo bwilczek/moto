@@ -17,11 +17,11 @@ module Moto
 
       def start_run
         # TODO: make session driver configurable
-        if context.runner.my_config[:capybara][:default_selector]
-          Capybara.default_selector = context.runner.my_config[:capybara][:default_selector]
+        if context.moto_app_config[:capybara][:default_selector]
+          Capybara.default_selector = context.moto_app_config[:capybara][:default_selector]
         end
 
-        Thread.current['capybara_session'] = Capybara::Session.new(context.runner.my_config[:capybara][:default_driver])
+        Thread.current['capybara_session'] = Capybara::Session.new(context.moto_app_config[:capybara][:default_driver])
         @pages = {}
       end
 
@@ -53,7 +53,7 @@ module Moto
       private
 
       def register_grid_driver
-        grid_config = context.runner.my_config[:capybara][:grid]
+        grid_config = context.moto_app_config[:capybara][:grid]
         return if grid_config.nil?
         if grid_config[:capabilities].nil?
           capabilities = Selenium::WebDriver::Remote::Capabilities.firefox

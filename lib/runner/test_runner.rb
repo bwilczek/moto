@@ -20,31 +20,17 @@ module Moto
         @environments = environments.empty? ? environments << :__default : environments
       end
 
-      # TODO: Remake
-      # @return [Hash] hash with config
-      def my_config
-        caller_path = caller.first.to_s.split(/:\d/)[0]
-        keys = []
-        if caller_path.include? MotoApp::DIR
-          caller_path.sub!("#{MotoApp::DIR}/lib/", '')
-          keys << 'moto_app'
-        elsif caller_path.include? Moto::DIR
-          caller_path.sub!("#{Moto::DIR}/lib/", '')
-          keys << 'moto'
-        end
-        caller_path.sub!('.rb', '')
-        keys << caller_path.split('/')
-        keys.flatten!
-        eval "@config#{keys.map { |k| "[:#{k}]" }.join('')}"
+      def running_thread_count
+        Thread.list.select {|thread| thread.status == "run"}.count
       end
 
       def run
-        test_provider = TestProvider.new(@test_paths_absolute, @environments)
+        test_provider = TestProvider.new(@test_paths_absolute, @environments, @config[:moto][:test_runner][:test_repeats])
         threads_max = @config[:moto][:test_runner][:thread_count] || 1
 
         # remove log/screenshot files from previous execution
         @test_paths_absolute.each do |test_path|
-          Dir.glob("#{File.dirname(test_path)}/*.{log,png}").each { |f| File.delete(f) }
+          FileUtils.rm_rf("#{File.dirname(test_path)}/logs")
         end
 
         @test_reporter.report_start_run
@@ -64,7 +50,10 @@ module Moto
 
         # Waiting for all threads to run out of work so we can end the application
         loop do
-          break if test_provider.num_waiting == threads_max
+          if test_provider.num_waiting == threads_max
+            break
+          end
+
           sleep 1
         end
 

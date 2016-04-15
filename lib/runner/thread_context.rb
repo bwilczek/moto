@@ -1,4 +1,5 @@
 require 'erb'
+require 'fileutils'
 
 module Moto
   module Runner
@@ -7,6 +8,7 @@ module Moto
       # all resources specific for single thread will be initialized here. E.g. browser session
       attr_reader :logger
       attr_reader :test
+      attr_reader :moto_app_config
 
       def initialize(config, test, test_reporter)
         @config = config
@@ -84,16 +86,18 @@ module Moto
         max_attempts = @config[:moto][:thread_context][:max_attempts] || 1
         sleep_time = @config[:moto][:thread_context][:sleep_before_attempt] || 0
 
-        # TODO: log path might be specified (to some extent) by the configuration
+        log_directory = File.dirname(@test.log_path)
+        if !File.directory?(log_directory)
+          FileUtils.mkdir_p(log_directory)
+        end
+
         @logger = Logger.new(File.open(@test.log_path, File::WRONLY | File::TRUNC | File::CREAT))
         @logger.level = @config[:moto][:thread_context][:log_level] || Logger::DEBUG
 
-        (1..max_attempts).each do |attempt|
+        # Reporting: start_test
+        @test_reporter.report_start_test(@test.status)
 
-          # Reporting: start_test
-          if attempt == 1
-            @test_reporter.report_start_test(@test.status)
-          end
+        (1..max_attempts).each do |attempt|
 
           @clients.each_value { |c| c.start_test(@test) }
           @test.before

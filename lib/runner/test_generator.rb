@@ -8,6 +8,7 @@ module Moto
     class TestGenerator
 
       def initialize(environments)
+        @internal_counter = 0
         @environments = environments
       end
 
@@ -26,41 +27,41 @@ module Moto
       #
       # *IMPORTANT*
       # Config files with ruby code will be evaluated thus if you use any classes in them
-      # they must be required prior to that. That might be done in overloaded app's initialzer.
+      # they must be required prior to that. That might be done in overloaded app's initializer.
       #
       # @param [String] test_path_absolute Path to the file with test
       # @return [Array] array of already initialized test's variants
       def variantize(test_path_absolute)
         variants = []
 
-        @environments.each do |env|
+          @environments.each do |env|
+            params_path = test_path_absolute.sub(/\.rb\z/, '')
 
-          params_path = test_path_absolute.sub(/\.rb\z/, '')
-
-          if File.exists?(params_path)
-            begin
-              params_all = eval(File.read(params_path))
-            rescue Exception => e
-              puts "Parameters error:\n\t File:  #{params_path}\n\t Error: #{e.message}\n\n"
-            end
-          else
-            params_all = [{}]
-          end
-
-          params_all.each_with_index do |params, params_index|
-
-            # Filtering out param sets that are specific to certain envs
-            unless params['__env'].nil?
-              allowed_envs = params['__env'].is_a?(String) ? [params['__env']] : params['__env']
-              next unless allowed_envs.include? env
+            if File.exists?(params_path)
+              begin
+                params_all = eval(File.read(params_path))
+              rescue Exception => e
+                puts "Parameters error:\n\t File:  #{params_path}\n\t Error: #{e.message}\n\n"
+              end
+            else
+              params_all = [{}]
             end
 
-            test = generate(test_path_absolute)
-            test.init(env, params, params_index)
-            test.log_path = "#{test.dir}/#{test.name.demodulize.gsub('/', '_')}.log"
-            variants << test
+            params_all.each_with_index do |params, params_index|
+
+              # Filtering out param sets that are specific to certain envs
+              unless params['__env'].nil?
+                allowed_envs = params['__env'].is_a?(String) ? [params['__env']] : params['__env']
+                next unless allowed_envs.include? env
+              end
+
+              test = generate(test_path_absolute)
+              test.init(env, params, params_index)
+              test.log_path = "#{test.dir}/logs/#{test.name}__#{@internal_counter}.log"
+              @internal_counter += 1
+              variants << test
+            end
           end
-        end
 
         variants
       end

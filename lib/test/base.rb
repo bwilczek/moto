@@ -44,13 +44,13 @@ module Moto
       #  - env
       def generate_name(params_index)
         if @env == :__default
-          return "#{self.class.to_s}" if @params.empty?
-          return "#{self.class.to_s}/#{@params[:__name]}" if @params.key?(:__name)
-          return "#{self.class.to_s}/params_#{params_index}" unless @params.key?(:__name)
+          return 'default' if @params.empty?
+          return "#{@params[:__name]}" if @params.key?(:__name)
+          return "params_#{params_index}" unless @params.key?(:__name)
         else
-          return "#{self.class.to_s}/#{@env}" if @params.empty?
-          return "#{self.class.to_s}/#{@env}/#{@params[:__name]}" if @params.key?(:__name)
-          return "#{self.class.to_s}/#{@env}/params_#{params_index}" unless @params.key?(:__name)
+          return "#{@env}" if @params.empty?
+          return "#{@env}_#{@params[:__name]}" if @params.key?(:__name)
+          return "#{@env}_params_#{params_index}" unless @params.key?(:__name)
         end
         self.class.to_s
       end
