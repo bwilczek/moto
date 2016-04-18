@@ -57,7 +57,7 @@ module Moto
 
               test = generate(test_path_absolute)
               test.init(env, params, params_index, @internal_counter)
-              test.log_path = "#{test.dir}/logs/#{test.name}.log"
+              test.log_path = "#{test.dir}/logs/#{test.name.gsub(/[^0-9A-Za-z.\-]/, '_')}.log"
               @internal_counter += 1
               variants << test
             end
