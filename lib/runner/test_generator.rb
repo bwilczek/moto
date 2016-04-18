@@ -56,8 +56,8 @@ module Moto
               end
 
               test = generate(test_path_absolute)
-              test.init(env, params, params_index)
-              test.log_path = "#{test.dir}/logs/#{test.name}__#{@internal_counter}.log"
+              test.init(env, params, params_index, @internal_counter)
+              test.log_path = "#{test.dir}/logs/#{test.name}.log"
               @internal_counter += 1
               variants << test
             end

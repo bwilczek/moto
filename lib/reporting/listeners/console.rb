@@ -18,7 +18,7 @@ module Moto
         end
 
         def start_test(test_status)
-          print test_status.name
+          puts test_status.name
         end
 
         def end_test(test_status)

@@ -28,7 +28,7 @@ module Moto
             puts 'ERRORS: '
             run_status.tests_error.each do |test_status|
               puts test_status.name
-              puts test_status.results.last.message
+              puts "\t" + test_status.results.last.message
               puts ''
             end
           end
@@ -38,7 +38,7 @@ module Moto
             puts 'SKIPPED: '
             run_status.tests_skipped.each do |test_status|
               puts test_status.name
-              puts test_status.results.last.message
+              puts "\t" + test_status.results.last.message
               puts ''
             end
           end
