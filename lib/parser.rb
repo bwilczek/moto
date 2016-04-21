@@ -7,7 +7,7 @@ require_relative '../lib/app_generator'
 module Moto
 
   class Parser
-  
+
     def self.run(argv)
       begin
 
@@ -26,7 +26,7 @@ module Moto
         puts e.backtrace.join("\n")
       end
     end
-    
+
     def self.run_parse(argv)
 
       # TODO: fix this dumb verification of current working directory.
@@ -34,11 +34,11 @@ module Moto
         msg = "Config file (config/moto.rb) not present.\n"
         msg << 'Does current working directory contain Moto application?'
         raise msg
-      end    
+      end
 
       require 'bundler/setup'
       Bundler.require
-      
+
       # Default options
       options = {}
       options[:listeners] = []
@@ -46,33 +46,33 @@ module Moto
       options[:config] = eval(File.read("#{MotoApp::DIR}/config/moto.rb"))
       options[:environments] = []
       options[:name] = ''
-         
+
       # Parse arguments
       # TODO eval ?
       # TODO const 
-      # TODO reporters should be consts - not strings
+      # TODO listeners should be consts - not strings
       OptionParser.new do |opts|
-        opts.on('-t', '--tests Tests', Array) { |v| options[:tests ] = v }
-        opts.on('-g', '--tags Tags', Array) { |v| options[:tags ] = v }
-        opts.on('-l', '--listeners Listeners', Array) { |v| options[:listeners] = v }
+        opts.on('-t', '--tests Tests', Array)              { |v| options[:tests ] = v }
+        opts.on('-g', '--tags Tags', Array)                { |v| options[:tags ] = v }
+        opts.on('-l', '--listeners Listeners', Array)      { |v| options[:listeners] = v }
         opts.on('-e', '--environments Environment', Array) { |v| options[:environments] = v }
-        opts.on('-c', '--const Const') { |v| options[:const] = v }
-        opts.on('-n', '--name Name') { |v| options[:name] = v }
-        opts.on('-f', '--config Config') { |v| options[:config].deep_merge!( eval( File.read(v) ) ) }
+        opts.on('-c', '--const Const')                     { |v| options[:const] = v }
+        opts.on('-n', '--name Name')                       { |v| options[:name] = v }
+        opts.on('-f', '--config Config')                   { |v| options[:config].deep_merge!( eval( File.read(v) ) ) }
       end.parse!
 
       if options[:name].empty?
         options[:name] = evaluate_name(options[:tags], options[:tests])
       end
 
-      if options[ :config ][ :moto ][ :runner ][ :mandatory_environment ] && options[ :environments ].empty?
+      if options[ :config ][ :moto ][ :test_runner ][ :mandatory_environment ] && options[ :environments ].empty?
         puts 'Environment is mandatory for this project.'
         exit 1
       end
 
       return options
     end
-    
+
     def self.evaluate_name(tags, tests)
       tags ||= ''
       tests ||= ''
@@ -104,18 +104,19 @@ module Moto
 
       return options
     end
-    
+
     def self.show_help
       puts """
       Moto (#{Moto::VERSION}) CLI Help:
       moto --version Display current version
 
       moto run:      
-       -t, --tests    = Tests to be executed.
-                        For eg. Tests\Failure\Failure.rb should be passed as Tests::Failure
-       -r, --reporter = Reporters to be used.
-                        Defaults are Moto::Listeners::ConsoleDots, Moto::Listeners::JunitXml
+       -t, --tests     = Tests to be executed.
+                         For eg. Tests\Failure\Failure.rb should be passed as Tests::Failure
+       -l, --listeners = Reporters to be used.
+                         Defaults are Moto::Listeners::ConsoleDots, Moto::Listeners::JunitXml
        -e, --environment etc etc
+
 
       moto generate:
        -t, --test      = Path and name of the test to be created.
@@ -133,6 +134,6 @@ module Moto
                          You have been warned.
       """
     end
-    
+
   end
 end

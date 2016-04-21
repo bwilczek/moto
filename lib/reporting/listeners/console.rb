@@ -4,7 +4,7 @@ module Moto
       class Console < Base
 
         def start_run
-          puts 'START'
+         # puts 'START'
         end
 
         def end_run(run_status)
@@ -18,11 +18,11 @@ module Moto
         end
 
         def start_test(test_status)
-          print test_status.name
+         # puts test_status.name
         end
 
         def end_test(test_status)
-          puts "\t#{test_status.to_s}"
+          puts "\n#{test_status.name}\n\t#{test_status.results.last.message}"
         end
 
       end

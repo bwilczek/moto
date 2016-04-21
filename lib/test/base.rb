@@ -27,10 +27,10 @@ module Moto
       end
 
       # Initializes test to be executed with specified params and environment
-      def init(env, params, params_index)
+      def init(env, params, params_index, global_index)
         @env = env
         @params = params
-        @name = generate_name(params_index)
+        @name = generate_name(params_index, global_index)
 
         @status = Moto::Test::Status.new
         @status.name = @name
@@ -42,16 +42,19 @@ module Moto
       # Generates name of the test based on its properties:
       #  - number/name of currently executed configuration run
       #  - env
-      def generate_name(params_index)
+      def generate_name(params_index, global_index)
+        simple_class_name = self.class.to_s.demodulize
+
         if @env == :__default
-          return "#{self.class.to_s}" if @params.empty?
-          return "#{self.class.to_s}/#{@params[:__name]}" if @params.key?(:__name)
-          return "#{self.class.to_s}/params_#{params_index}" unless @params.key?(:__name)
+          return "#{simple_class_name}_#{global_index}" if @params.empty?
+          return "#{simple_class_name}_#{@params[:__name]}_#{global_index}" if @params.key?(:__name)
+          return "#{simple_class_name}_P#{params_index}_#{global_index}" unless @params.key?(:__name)
         else
-          return "#{self.class.to_s}/#{@env}" if @params.empty?
-          return "#{self.class.to_s}/#{@env}/#{@params[:__name]}" if @params.key?(:__name)
-          return "#{self.class.to_s}/#{@env}/params_#{params_index}" unless @params.key?(:__name)
+          return "#{simple_class_name}_#{@env}_##{global_index}" if @params.empty?
+          return "#{simple_class_name}_#{@env}_#{@params[:__name]}_#{global_index}" if @params.key?(:__name)
+          return "#{simple_class_name}_#{@env}_P#{params_index}_#{global_index}" unless @params.key?(:__name)
         end
+
         self.class.to_s
       end
       private :generate_name

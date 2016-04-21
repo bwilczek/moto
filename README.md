@@ -5,7 +5,7 @@
 
 ## Basic concepts
 ### Tests are an application
-`moto` tests project is a separate application, which follows some standards in file naming and location. Following few simple rules can significantly reduce amount of code that has to be written in order to run the tests. `moto` will generate the scaffodling of the application as well an empty test scripts.
+`moto` tests project is a separate application, which follows some standards in file naming and location. Following a few simple rules can significantly reduce amount of code that has to be written in order to run the tests. `moto` will generate the scaffodling of the application as well an empty test scripts.
 
 ### Test script contains only test logic
 No need to declare test class inheriting from some parent, or declare any `_test` methods - `moto` will do this for you. 
@@ -44,7 +44,7 @@ When in test files the following methods are available:
 * `skip(optional_reason)` - skip this test execution
 * `pass(optional_reason)` - forcibly pass this test and finish execution immediatelly
 * `fail(optional_reason)` - forcibly fail this test and finish execution immediatelly
-* `assert_equal(a, b)` - assertion, see module `Moto::Assert` for more assertion methods
+* `assert_equal(a, b)` - assertion, see class `Moto::Test::Base` for more assertion methods
 * `dir` - current test directory
 * `filename` - current test file name with no extension
 
@@ -66,7 +66,7 @@ When editing `page` classes the following methods are available:
 * `session` - reference to `Capybara` session
 * `page('Login')` - reference to other `page` object. Here: `MotoApp::Clients::WebsitePages::Login`
 * `const('key')` - read const value specific for current environment from `config/const.yml` file
-* `context.runner.my_config[:capybara][:default_driver]` - read config values for current class (here: `Moto::Clients::Website`) from `config/moto.rb` file
+* `context.moto_app_config` - read config from `config/moto.rb` file
 * `logger.info(msg)` - write message to test execution log file. See Ruby Logger class for details.
 * `current_test` - reference to currently running test
 * `client('Website')` - access other client object instance for given class name.
