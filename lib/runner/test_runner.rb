@@ -20,10 +20,6 @@ module Moto
         @environments = environments.empty? ? environments << :__default : environments
       end
 
-      def running_thread_count
-        Thread.list.select {|thread| thread.status == "run"}.count
-      end
-
       def run
         test_provider = TestProvider.new(@test_paths_absolute, @environments, @config[:moto][:test_runner][:test_repeats])
         threads_max = @config[:moto][:test_runner][:thread_count] || 1

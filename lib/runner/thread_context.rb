@@ -8,7 +8,8 @@ module Moto
       # all resources specific for single thread will be initialized here. E.g. browser session
       attr_reader :logger
       attr_reader :test
-      attr_reader :moto_app_config
+      attr_reader :moto_app_config_yml
+      attr_reader :moto_app_config_rb
 
       def initialize(config, test, test_reporter)
         @config = config
@@ -20,11 +21,14 @@ module Moto
         # TODO: temporary fix
         Thread.current['context'] = self
 
-        # TODO: temporary fix
-        @moto_app_config = {}
+        # TODO: temporary fix (Configs rework incoming)
+        @moto_app_config_yml = {}
         Dir.glob('config/*.yml').each do |f|
-          @moto_app_config.deep_merge! YAML.load_file(f)
+          @moto_app_config_yml.deep_merge! YAML.load_file(f)
         end
+
+        # TODO: temporary fix (Configs rework incoming)
+        @moto_app_config_rb = eval(File.read("#{MotoApp::DIR}/config/moto.rb"))
       end
 
       def client(name)
@@ -69,9 +73,9 @@ module Moto
         key = key.to_s
         key = "#{@test.env.to_s}.#{key}" if @test.env != :__default
         code = if key.include? '.'
-                 "@moto_app_config#{key.split('.').map { |a| "['#{a}']" }.join('')}"
+                 "@moto_app_config_yml#{key.split('.').map { |a| "['#{a}']" }.join('')}"
                else
-                 "@moto_app_config['#{key}']"
+                 "@moto_app_config_yml['#{key}']"
                end
         begin
           v = eval code
