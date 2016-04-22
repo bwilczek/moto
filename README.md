@@ -66,7 +66,7 @@ When editing `page` classes the following methods are available:
 * `session` - reference to `Capybara` session
 * `page('Login')` - reference to other `page` object. Here: `MotoApp::Clients::WebsitePages::Login`
 * `const('key')` - read const value specific for current environment from `config/const.yml` file
-* `context.moto_app_config` - read config from `config/moto.rb` file
+* `context.moto_app_config` - read config from YAML files in ./config
 * `logger.info(msg)` - write message to test execution log file. See Ruby Logger class for details.
 * `current_test` - reference to currently running test
 * `client('Website')` - access other client object instance for given class name.
