@@ -87,7 +87,7 @@ module Moto
 
         begin
           require test_path_absolute
-        rescue NameError
+        rescue Exception
           # will catch an error with non existent base class in test and stop it from breaking whole batch of tests
           # no need to handle it here, next begin/rescue clause in this function will finish the job
         end
