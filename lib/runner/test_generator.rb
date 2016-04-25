@@ -84,7 +84,13 @@ module Moto
       # Generates test instances, based on fully defined class file
       # @return [Moto::Test::Base]
       def generate_for_full_class_code(test_path_absolute)
-        require test_path_absolute
+
+        begin
+          require test_path_absolute
+        rescue NameError
+          # will catch an error with non existent base class in test and stop it from breaking whole batch of tests
+          # no need to handle it here, next begin/rescue clause in this function will finish the job
+        end
 
         test_object = nil
 
