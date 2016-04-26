@@ -41,7 +41,9 @@ module Moto
               begin
                 params_all = eval(File.read(params_path))
               rescue Exception => e
-                puts "Parameters error:\n\t File:  #{params_path}\n\t Error: #{e.message}\n\n"
+                # Error will be injected into test.run after test is created
+                params_error = e.message
+                params_all = [{}]
               end
             else
               params_all = [{}]
@@ -59,8 +61,18 @@ module Moto
               test.init(env, params, params_index, @internal_counter)
               test.log_path = "#{test.dir}/logs/#{test.name.gsub(/[^0-9A-Za-z.\-]/, '_')}.log"
               @internal_counter += 1
+
+              # Error handling, test.run() contents will be swapped with raised exception
+              # so there is an indication in reporters/logs that something went wrong
+              if params_error
+                error_message = "ERROR: Invalid parameters file: #{test.dir}.\n\tMESSAGE: #{params_error}"
+                inject_error_to_test(test, error_message)
+              end
+
               variants << test
             end
+
+
           end
 
         variants
@@ -92,8 +104,6 @@ module Moto
           # no need to handle it here, next begin/rescue clause in this function will finish the job
         end
 
-        test_object = nil
-
         # Checking if it's possible to create test based on provided path. In case something is wrong with
         # modules structure in class itself Moto::Test::Base will be instantized with raise injected into its run()
         # so we can have proper reporting and summary even if the test doesn't execute.
@@ -104,15 +114,8 @@ module Moto
           class_name = Moto::Test::Base
           test_object = class_name.new
 
-          class << test_object
-            attr_accessor :custom_name
-
-            def run
-              raise "ERROR: Invalid module structure: #{custom_name}"
-            end
-          end
-
-          test_object.custom_name = test_path_absolute.gsub("#{MotoApp::DIR}/", 'moto_app/').camelize.chomp('.rb')
+          error_message = "ERROR: Invalid module structure: #{test_path_absolute.gsub("#{MotoApp::DIR}/", 'moto_app/').camelize.chomp('.rb')}"
+          inject_error_to_test(test_object, error_message)
         end
 
         test_object.static_path = test_path_absolute
@@ -165,6 +168,21 @@ module Moto
         test_object
       end
       private :generate_for_run_body
+
+      # Injects raise into test.run so it will report an error when executed
+      # @param [Moto::Test::Base] test An instance of test that is supposed to be modified
+      # @param [String] error_message Message to be attached to the raised exception
+      def inject_error_to_test(test, error_message)
+        class << test
+          attr_accessor :injected_error_message
+
+          def run
+            raise injected_error_message
+          end
+        end
+
+        test.injected_error_message = error_message
+      end
 
     end
   end
