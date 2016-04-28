@@ -8,10 +8,9 @@ module Moto
 
       # @param [Array] test_paths_absolute
       # @param [Array] environments Array
-      # @param [Integer] test_repeats
-      def initialize(test_paths_absolute, environments, test_repeats)
+      def initialize(test_paths_absolute, environments)
         super()
-        @test_repeats = test_repeats
+        @test_repeats = Moto::Lib::Config.moto[:test_runner][:test_repeats]
         @current_test_repeat = 1
         @queue = Queue.new
         @test_paths_absolute = test_paths_absolute

@@ -1,4 +1,5 @@
 require 'capybara'
+require_relative '../../lib/config'
 
 module Moto
   module Clients
@@ -15,13 +16,19 @@ module Moto
         register_grid_driver
       end
 
+      # @return [Hash] Config section for Capybara driver.
+      def config
+        Moto::Lib::Config.moto[:clients][:website][:capybara]
+      end
+      private :config
+
       def start_run
         # TODO: make session driver configurable
-        if context.moto_app_config_rb[:moto][:clients][:website][:capybara][:default_selector]
-          Capybara.default_selector = context.moto_app_config_rb[:moto][:clients][:website][:capybara][:default_selector]
+        if config[:default_selector]
+          Capybara.default_selector = config[:default_selector]
         end
 
-        Thread.current['capybara_session'] = Capybara::Session.new(context.moto_app_config_rb[:moto][:clients][:website][:capybara][:default_driver])
+        Thread.current['capybara_session'] = Capybara::Session.new(config[:default_driver])
         @pages = {}
       end
 
@@ -30,7 +37,6 @@ module Moto
       end
 
       def start_test(test)
-        # @context.current_test.logger.info("Hi mom, I'm opening some pages!")
         Thread.current['capybara_session'].reset_session!
       end
 
@@ -53,7 +59,7 @@ module Moto
       private
 
       def register_grid_driver
-        grid_config = context.moto_app_config_rb[:moto][:clients][:website][:capybara][:grid]
+        grid_config = config[:grid]
         return if grid_config.nil?
         if grid_config[:capabilities].nil?
           capabilities = Selenium::WebDriver::Remote::Capabilities.firefox

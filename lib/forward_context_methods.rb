@@ -10,11 +10,6 @@ module Moto
         @context.logger
       end
 
-      # Read const value specific for current environment from `config/const.yml` file
-      def const(key)
-        @context.const(key)
-      end
-
       # Access currently executed test
       def test
         @context.test

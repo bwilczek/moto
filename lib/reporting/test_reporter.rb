@@ -7,12 +7,11 @@ module Moto
     class TestReporter
       # @param [Array] listeners An array of strings, which represent qualified names of classes (listeners) that will be instantiated.
       #                empty array is passed then :default_listeners will be taken from config
-      # @param [Hash] config to be passed to listeners during creation
       # @param [String] custom_run_name Optional, to be passed to listeners during creation
-      def initialize(listeners, config, custom_run_name)
+      def initialize(listeners, custom_run_name)
 
         if listeners.empty?
-          config[:moto][:test_runner][:default_listeners].each do |listener_class_name|
+          config[:default_listeners].each do |listener_class_name|
             listeners << listener_class_name
           end
         else
@@ -22,7 +21,6 @@ module Moto
         end
 
         @listeners = []
-        @config = config
         @custom_run_name = custom_run_name
         listeners.each { |l| add_listener(l) }
       end
@@ -31,14 +29,7 @@ module Moto
       # All listeners on the list will have events reported to them.
       # @param [Moto::Listener::Base] listener class to be added
       def add_listener(listener)
-        @listeners << listener.new(listener_config(listener), @custom_run_name)
-      end
-
-      # @return [Hash] hash containing part of the config meant for a specific listener
-      # @param [Moto::Listener::Base] listener class for which config is to be retrieved
-      def listener_config(listener)
-        listener_symbol = listener.name.demodulize.underscore.to_sym
-        @config[:moto][:listeners][listener_symbol]
+        @listeners << listener.new(@custom_run_name)
       end
 
       # Reports start of the whole run (set of tests) to attached listeners
@@ -77,6 +68,12 @@ module Moto
           l.end_test(test_status)
         end
       end
+
+      # @return [Hash] Hash with config for TestReporter
+      def config
+        Moto::Lib::Config.moto[:test_reporter]
+      end
+      private :config
 
     end
   end

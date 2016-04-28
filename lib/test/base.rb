@@ -166,6 +166,13 @@ module Moto
         end
       end
 
+      # Read a constants value from YML configuration files while taking the current execution environment into the account.
+      # @param [String] key Key to be searched for.
+      # @return [String] Value of the key or nil if not found
+      def const(key)
+        Moto::Lib::Config.environment_const(key)
+      end
+
     end
   end
 end

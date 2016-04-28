@@ -24,6 +24,13 @@ module Moto
         # abstract
       end
 
+      # Retrieves specified key's value for current test environment
+      # @param [String] key Key which's value will be returned from merged config files
+      # @return [String] key's value
+      def const(key)
+        Moto::Lib::Config.environment_const(key)
+      end
+
     end
   end
 end

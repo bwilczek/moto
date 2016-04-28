@@ -6,7 +6,8 @@ module Moto
       class JunitXml < Base
 
         def end_run(run_status)
-          path = config[:output_file]
+
+          path =  Moto::Lib::Config.moto[:test_reporter][:listeners][:junit_xml][:output_file]
 
           run_status_hash = {
               errors:     run_status.tests_error.length,

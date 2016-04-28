@@ -1,5 +1,6 @@
 require 'erb'
 require 'fileutils'
+require_relative '../../lib/config'
 
 module Moto
   module Runner
@@ -8,11 +9,8 @@ module Moto
       # all resources specific for single thread will be initialized here. E.g. browser session
       attr_reader :logger
       attr_reader :test
-      attr_reader :moto_app_config_yml
-      attr_reader :moto_app_config_rb
 
-      def initialize(config, test, test_reporter)
-        @config = config
+      def initialize(test, test_reporter)
         @test = test
         @clients = {}
         @test.context = self
@@ -20,15 +18,7 @@ module Moto
 
         # TODO: temporary fix
         Thread.current['context'] = self
-
-        # TODO: temporary fix (Configs rework incoming)
-        @moto_app_config_yml = {}
-        Dir.glob('config/*.yml').each do |f|
-          @moto_app_config_yml.deep_merge! YAML.load_file(f)
-        end
-
-        # TODO: temporary fix (Configs rework incoming)
-        @moto_app_config_rb = eval(File.read("#{MotoApp::DIR}/config/moto.rb"))
+        Thread.current['test_environment'] = @test.env
       end
 
       def client(name)
@@ -69,26 +59,10 @@ module Moto
         end
       end
 
-      def const(key)
-        key = key.to_s
-        key = "#{@test.env.to_s}.#{key}" if @test.env != :__default
-        code = if key.include? '.'
-                 "@moto_app_config_yml#{key.split('.').map { |a| "['#{a}']" }.join('')}"
-               else
-                 "@moto_app_config_yml['#{key}']"
-               end
-        begin
-          v = eval code
-          raise if v.nil?
-        rescue
-          raise "There is no const defined for key: #{key}. Environment: #{ (@test.env == :__default) ? '<none>' : @test.env }"
-        end
-        v
-      end
-
+      #
       def run
-        max_attempts = @config[:moto][:thread_context][:max_attempts] || 1
-        sleep_time = @config[:moto][:thread_context][:sleep_before_attempt] || 0
+        max_attempts = config[:test_attempt_max]   || 1
+        sleep_time   = config[:test_attempt_sleep] || 0
 
         log_directory = File.dirname(@test.log_path)
         if !File.directory?(log_directory)
@@ -96,7 +70,7 @@ module Moto
         end
 
         @logger = Logger.new(File.open(@test.log_path, File::WRONLY | File::TRUNC | File::CREAT))
-        @logger.level = @config[:moto][:thread_context][:log_level] || Logger::DEBUG
+        @logger.level = config[:test_log_level] || Logger::DEBUG
 
         # Reporting: start_test
         @test_reporter.report_start_test(@test.status)
@@ -144,6 +118,12 @@ module Moto
         @clients.each_value { |c| c.end_run }
 
       end
+
+      # @return [Hash] Hash with config for ThreadContext
+      def config
+        Moto::Lib::Config.moto[:test_runner]
+      end
+      private :config
 
     end
   end

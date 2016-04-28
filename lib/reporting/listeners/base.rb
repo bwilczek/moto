@@ -5,13 +5,10 @@ module Moto
       # Base class for listeners that report results of testing 'outside' of the application.
       class Base
 
-        attr_reader :config
         attr_reader :custom_run_name
 
-        # @param [Hash] config
         # @param [String] custom_run_name Optional run name to be passed to listeners
-        def initialize(config, custom_run_name = '')
-          @config = config
+        def initialize(custom_run_name = '')
           @custom_run_name = custom_run_name
         end
 
