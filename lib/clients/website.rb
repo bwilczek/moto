@@ -57,8 +57,6 @@ module Moto
         @pages[page_class_name]
       end
 
-      private
-
       def register_grid_driver
         grid_config = config[:grid]
         return if grid_config.nil?
@@ -74,6 +72,7 @@ module Moto
                                         :desired_capabilities => capabilities)
         end
       end
+      private :register_grid_driver
 
       def register_chrome_driver
         Capybara.register_driver :chrome do |app|
@@ -81,9 +80,11 @@ module Moto
           Capybara::Selenium::Driver.new(app, browser: :chrome, http_client: client)
         end
       end
+      private :register_chrome_driver
+
 
       def handle_test_exception(test, exception)
-        Thread.current['capybara_session'].save_screenshot "#{test.dir}/#{test.filename}_#{Time.new.strftime('%Y%m%d_%H%M%S')}.png"
+        #Thread.current['capybara_session'].save_screenshot "#{test.dir}/#{test.filename}_#{Time.new.strftime('%Y%m%d_%H%M%S')}.png"
       end
 
     end
