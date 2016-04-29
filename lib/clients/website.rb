@@ -13,6 +13,7 @@ module Moto
 
       def init
         register_grid_driver
+        register_chrome_driver
       end
 
       def start_run
@@ -68,8 +69,15 @@ module Moto
         end
       end
 
+      def register_chrome_driver
+        Capybara.register_driver :chrome do |app|
+          client = Selenium::WebDriver::Remote::Http::Default.new
+          Capybara::Selenium::Driver.new(app, browser: :chrome, http_client: client)
+        end
+      end
+
       def handle_test_exception(test, exception)
-        #Thread.current['capybara_session'].save_screenshot "#{test.dir}/#{test.filename}_#{Time.new.strftime('%Y%m%d_%H%M%S')}.png"
+        Thread.current['capybara_session'].save_screenshot "#{test.dir}/#{test.filename}_#{Time.new.strftime('%Y%m%d_%H%M%S')}.png"
       end
 
     end
