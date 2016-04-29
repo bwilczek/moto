@@ -1,32 +1,26 @@
 {
-  moto: {
-    runner: {
-      thread_count: 3,
-      default_listeners: [Moto::Listeners::ConsoleDots],
-      mandatory_environment: false,
+    test_runner: {
+        thread_count: 5,
+        test_repeats: 1,
+        test_log_level: Logger::DEBUG,
+        test_attempt_max: 3,
+        test_attempt_sleep: 1,
+        mandatory_environment: 1,
     },
-    thread_context: {
-      log_level: Logger::DEBUG,
-      max_attempts: 1,
-      sleep_before_attempt: 120
-    },
-    listeners: {
-      junit_xml: {
-        # output_file: "junit_#{DateTime.now.strftime("%Y-%m-%d_%H%M%S")}.xml",
-        output_file: "junit_report.xml"
-      },
-      webui: {
-        # url: "http://your_address:3000"
-      }
+    test_reporter: {
+        default_listeners: [Moto::Reporting::Listeners::ConsoleDots, Moto::Reporting::Listeners::JunitXml],
+        listeners: {
+            junit_xml: { output_file: "junit_report.xml" },
+            webui: { url: "http://your.address.com:3000" }
+        }
     },
     clients: {
-      website: {
-        capybara: {
-          default_driver: :selenium,
-          default_selector: :css,
-          polling_interval: 0.2,
+        website: {
+            capybara: {
+                default_driver: :selenium,
+                default_selector: :css,
+                polling_interval: 0.2,
+            }
         }
-      }
     }
-  }
 }

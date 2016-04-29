@@ -32,6 +32,7 @@ require_relative './exceptions/moto'
 require_relative './exceptions/test_skipped'
 require_relative './exceptions/test_forced_failure'
 require_relative './exceptions/test_forced_passed'
+require_relative 'config'
 
 module Moto
 
@@ -74,9 +75,9 @@ module Moto
         initializer.init
       end
 
-      test_reporter = Moto::Reporting::TestReporter.new(argv[:listeners], argv[:config], argv[:name])
+      test_reporter = Moto::Reporting::TestReporter.new(argv[:listeners], argv[:name])
 
-      runner = Moto::Runner::TestRunner.new(test_paths_absolute, argv[:environments], argv[:config], test_reporter)
+      runner = Moto::Runner::TestRunner.new(test_paths_absolute, argv[:environments], test_reporter)
       runner.run
     end
 

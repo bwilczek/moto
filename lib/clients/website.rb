@@ -1,4 +1,5 @@
 require 'capybara'
+require_relative '../../lib/config'
 
 module Moto
   module Clients
@@ -16,13 +17,19 @@ module Moto
         register_chrome_driver
       end
 
+      # @return [Hash] Config section for Capybara driver.
+      def config
+        Moto::Lib::Config.moto[:clients][:website][:capybara]
+      end
+      private :config
+
       def start_run
         # TODO: make session driver configurable
-        if context.moto_app_config_rb[:moto][:clients][:website][:capybara][:default_selector]
-          Capybara.default_selector = context.moto_app_config_rb[:moto][:clients][:website][:capybara][:default_selector]
+        if config[:default_selector]
+          Capybara.default_selector = config[:default_selector]
         end
 
-        Thread.current['capybara_session'] = Capybara::Session.new(context.moto_app_config_rb[:moto][:clients][:website][:capybara][:default_driver])
+        Thread.current['capybara_session'] = Capybara::Session.new(config[:default_driver])
         @pages = {}
       end
 
@@ -31,7 +38,6 @@ module Moto
       end
 
       def start_test(test)
-        # @context.current_test.logger.info("Hi mom, I'm opening some pages!")
         Thread.current['capybara_session'].reset_session!
       end
 
@@ -51,10 +57,8 @@ module Moto
         @pages[page_class_name]
       end
 
-      private
-
       def register_grid_driver
-        grid_config = context.moto_app_config_rb[:moto][:clients][:website][:capybara][:grid]
+        grid_config = config[:grid]
         return if grid_config.nil?
         if grid_config[:capabilities].nil?
           capabilities = Selenium::WebDriver::Remote::Capabilities.firefox
@@ -68,6 +72,7 @@ module Moto
                                         :desired_capabilities => capabilities)
         end
       end
+      private :register_grid_driver
 
       def register_chrome_driver
         Capybara.register_driver :chrome do |app|
@@ -75,9 +80,11 @@ module Moto
           Capybara::Selenium::Driver.new(app, browser: :chrome, http_client: client)
         end
       end
+      private :register_chrome_driver
+
 
       def handle_test_exception(test, exception)
-        Thread.current['capybara_session'].save_screenshot "#{test.dir}/#{test.filename}_#{Time.new.strftime('%Y%m%d_%H%M%S')}.png"
+        #Thread.current['capybara_session'].save_screenshot "#{test.dir}/#{test.filename}_#{Time.new.strftime('%Y%m%d_%H%M%S')}.png"
       end
 
     end

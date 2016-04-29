@@ -3,7 +3,7 @@ require 'yaml'
 
 require_relative '../lib/cli'
 require_relative '../lib/app_generator'
-
+require_relative '../lib/config'
 module Moto
 
   class Parser
@@ -29,12 +29,7 @@ module Moto
 
     def self.run_parse(argv)
 
-      # TODO: fix this dumb verification of current working directory.
-      if !File.exists? "#{MotoApp::DIR}/config/moto.rb"
-        msg = "Config file (config/moto.rb) not present.\n"
-        msg << 'Does current working directory contain Moto application?'
-        raise msg
-      end
+      Moto::Lib::Config.load_configuration
 
       require 'bundler/setup'
       Bundler.require
@@ -43,29 +38,24 @@ module Moto
       options = {}
       options[:listeners] = []
       # TODO Mandatory env var in app config
-      options[:config] = eval(File.read("#{MotoApp::DIR}/config/moto.rb"))
       options[:environments] = []
       options[:name] = ''
 
       # Parse arguments
-      # TODO eval ?
-      # TODO const 
-      # TODO listeners should be consts - not strings
       OptionParser.new do |opts|
         opts.on('-t', '--tests Tests', Array)              { |v| options[:tests ] = v }
         opts.on('-g', '--tags Tags', Array)                { |v| options[:tags ] = v }
         opts.on('-l', '--listeners Listeners', Array)      { |v| options[:listeners] = v }
         opts.on('-e', '--environments Environment', Array) { |v| options[:environments] = v }
-        opts.on('-c', '--const Const')                     { |v| options[:const] = v }
         opts.on('-n', '--name Name')                       { |v| options[:name] = v }
-        opts.on('-f', '--config Config')                   { |v| options[:config].deep_merge!( eval( File.read(v) ) ) }
+        # opts.on('-f', '--config Config')                   { |v| options[:config].deep_merge!( eval( File.read(v) ) ) }
       end.parse!
 
       if options[:name].empty?
         options[:name] = evaluate_name(options[:tags], options[:tests])
       end
 
-      if options[ :config ][ :moto ][ :test_runner ][ :mandatory_environment ] && options[ :environments ].empty?
+      if Moto::Lib::Config.moto[:test_runner][:mandatory_environment] && options[:environments].empty?
         puts 'Environment is mandatory for this project.'
         exit 1
       end

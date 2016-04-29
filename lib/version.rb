@@ -1,3 +1,3 @@
 module Moto
-  VERSION = '0.0.45'
+  VERSION = '0.0.50'
 end

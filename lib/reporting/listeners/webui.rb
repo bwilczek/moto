@@ -7,8 +7,9 @@ module Moto
       class Webui < Base
 
         def start_run
-          # POST http://sandbox.dev:3000/api/runs/create
-          @url = config[:url]
+
+          @url = Moto::Lib::Config.moto[:test_reporter][:listeners][:webui][:url]
+
           data = {
             name:         custom_run_name,
             result:       :running,
