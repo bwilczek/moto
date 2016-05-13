@@ -72,7 +72,6 @@ module Moto
               variants << test
             end
 
-
           end
 
         variants
