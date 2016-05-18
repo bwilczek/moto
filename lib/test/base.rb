@@ -27,15 +27,15 @@ module Moto
       end
 
       # Initializes test to be executed with specified params and environment
-      def init(env, params, params_index, global_index)
-        @env = env
+      def init(params, params_index, global_index)
+        @env = Moto::Lib::Config.environment
         @params = params
         @name = generate_name(params_index, global_index)
 
         @status = Moto::Test::Status.new
         @status.name = @name
         @status.test_class_name = self.class.name
-        @status.env = @env
+        @status.env = Moto::Lib::Config.environment
         @status.params = @params
       end
 
@@ -45,15 +45,9 @@ module Moto
       def generate_name(params_index, global_index)
         simple_class_name = self.class.to_s.demodulize
 
-        if @env == :__default
-          return "#{simple_class_name}_#{global_index}" if @params.empty?
-          return "#{simple_class_name}_#{@params[:__name]}_#{global_index}" if @params.key?(:__name)
-          return "#{simple_class_name}_P#{params_index}_#{global_index}" unless @params.key?(:__name)
-        else
-          return "#{simple_class_name}_#{@env}_##{global_index}" if @params.empty?
-          return "#{simple_class_name}_#{@env}_#{@params[:__name]}_#{global_index}" if @params.key?(:__name)
-          return "#{simple_class_name}_#{@env}_P#{params_index}_#{global_index}" unless @params.key?(:__name)
-        end
+        return "#{simple_class_name}_#{@env}_##{global_index}" if @params.empty?
+        return "#{simple_class_name}_#{@env}_#{@params[:__name]}_#{global_index}" if @params.key?(:__name)
+        return "#{simple_class_name}_#{@env}_P#{params_index}_#{global_index}" unless @params.key?(:__name)
 
         self.class.to_s
       end
@@ -156,9 +150,9 @@ module Moto
         if !condition
           if evaled
             # -1 because of added method header in generated class
-            line_number = caller.select { |l| l.match(/\(eval\):\d*:in `run'/) }.first[/\d+/].to_i - 1
+            line_number = caller.select { |l| l.match(/\(eval\):\d*:in `run'/) }.first[/\d+/].to_i
           else
-            line_number = caller.select { |l| l.match(/#{static_path}:\d*:in `run'/) }.first[/\d+/].to_i - 1
+            line_number = caller.select { |l| l.match(/#{static_path}:\d*:in `run'/) }.first[/\d+/].to_i
           end
 
           status.log_failure("ASSERTION FAILED in line #{line_number}: #{message}")
@@ -166,7 +160,7 @@ module Moto
         end
       end
 
-      # Read a constants value from YML configuration files while taking the current execution environment into the account.
+      # Read a constants value from configuration files while taking the execution environment into the account.
       # @param [String] key Key to be searched for.
       # @return [String] Value of the key or nil if not found
       def const(key)

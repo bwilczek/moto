@@ -7,14 +7,13 @@ module Moto
     class TestProvider
 
       # @param [Array] test_paths_absolute
-      # @param [Array] environments Array
-      def initialize(test_paths_absolute, environments)
+      def initialize(test_paths_absolute)
         super()
         @test_repeats = Moto::Lib::Config.moto[:test_runner][:test_repeats]
         @current_test_repeat = 1
         @queue = Queue.new
         @test_paths_absolute = test_paths_absolute
-        @test_generator = TestGenerator.new(environments)
+        @test_generator = TestGenerator.new
       end
 
       # Use this to retrieve tests safely in multithreaded environment

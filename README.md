@@ -71,14 +71,23 @@ When editing `page` classes the following methods are available:
 * `current_test` - reference to currently running test
 * `client('Website')` - access other client object instance for given class name.
 
-### Environments
-under construction
+### Environment
+
+* Environment specific constants for the application under test are stored in two types of files:
+* `config/environments/common.rb` -  constants common for all the environments
+* `config/environments/ENVNAME.rb` - constants specific for environment specified with -e ENVNAME when running moto
+*
+* Both types of files should contain just ruby hashes with keys and values. They will be automatically deep merged by
+* moto and can be accessed by `Moto::Lib::Config.environment_const(key)`
+*
+* Please refer to rdoc in appropriate class for further information.
 
 ### Configuration
-Configuration is defined on 2 levels:
 
-* Environment specific constants for the application under test stored in `config/const.yml`. Access by `context.const`
-* Configuration for the framework and project classes stored in `config/moto.rb`. Access by `context.runner.my_config`
+* Configuration for the framework and project classes stored in `config/moto.rb`.
+* File should contain only hash with appropriate key/value pairs.
+*
+* Access by `Moto::Lib::Config.moto`
 
 ### Creating your own `listener`
 under construction
