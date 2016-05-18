@@ -28,17 +28,12 @@ module Moto
     end
 
     def self.run_parse(argv)
-
-      Moto::Lib::Config.load_configuration
-
       require 'bundler/setup'
       Bundler.require
 
       # Default options
       options = {}
       options[:listeners] = []
-      # TODO Mandatory env var in app config
-      options[:environments] = []
       options[:name] = ''
 
       # Parse arguments
@@ -46,7 +41,7 @@ module Moto
         opts.on('-t', '--tests Tests', Array)              { |v| options[:tests ] = v }
         opts.on('-g', '--tags Tags', Array)                { |v| options[:tags ] = v }
         opts.on('-l', '--listeners Listeners', Array)      { |v| options[:listeners] = v }
-        opts.on('-e', '--environments Environment', Array) { |v| options[:environments] = v }
+        opts.on('-e', '--environment Environment')         { |v| options[:environment] = v }
         opts.on('-n', '--name Name')                       { |v| options[:name] = v }
         # opts.on('-f', '--config Config')                   { |v| options[:config].deep_merge!( eval( File.read(v) ) ) }
       end.parse!
@@ -55,10 +50,14 @@ module Moto
         options[:name] = evaluate_name(options[:tags], options[:tests])
       end
 
-      if Moto::Lib::Config.moto[:test_runner][:mandatory_environment] && options[:environments].empty?
-        puts 'Environment is mandatory for this project.'
+      if !options[:environment]
+        puts 'ERROR: Environment is mandatory.'
         exit 1
+      else
+        Moto::Lib::Config.environment = options[:environment]
+        Moto::Lib::Config.load_configuration
       end
+
 
       return options
     end
@@ -105,7 +104,7 @@ module Moto
                          For eg. Tests\Failure\Failure.rb should be passed as Tests::Failure
        -l, --listeners = Reporters to be used.
                          Defaults are Moto::Listeners::ConsoleDots, Moto::Listeners::JunitXml
-       -e, --environment etc etc
+       -e, --environment Mandatory environment. Environment constants and tests parametrized in certain way depend on this.
 
 
       moto generate:

@@ -7,9 +7,8 @@ module Moto
   module Runner
     class TestGenerator
 
-      def initialize(environments)
+      def initialize
         @internal_counter = 0
-        @environments = environments
       end
 
       # Method returns an array of test instances that represent all variants (parameter sets from test's config).
@@ -23,7 +22,7 @@ module Moto
         test_path_absolute ? variantize(test_path_absolute) : nil
       end
 
-      # Converts test's path to an array of Moto::Base::Test instances that represent all test variants (params, envs)
+      # Converts test's path to an array of Moto::Base::Test instances that represent all test variants (params)
       #
       # *IMPORTANT*
       # Config files with ruby code will be evaluated thus if you use any classes in them
@@ -34,44 +33,41 @@ module Moto
       def variantize(test_path_absolute)
         variants = []
 
-          @environments.each do |env|
-            params_path = test_path_absolute.sub(/\.rb\z/, '')
+          params_path = test_path_absolute.sub(/\.rb\z/, '')
 
-            if File.exists?(params_path)
-              begin
-                params_all = eval(File.read(params_path))
-              rescue Exception => e
-                # Error will be injected into test.run after test is created
-                params_error = e.message
-                params_all = [{}]
-              end
-            else
+          if File.exists?(params_path)
+            begin
+              params_all = eval(File.read(params_path))
+            rescue Exception => e
+              # Error will be injected into test.run after test is created
+              params_error = e.message
               params_all = [{}]
             end
+          else
+            params_all = [{}]
+          end
 
-            params_all.each_with_index do |params, params_index|
+          params_all.each_with_index do |params, params_index|
 
-              # Filtering out param sets that are specific to certain envs
-              unless params['__env'].nil?
-                allowed_envs = params['__env'].is_a?(String) ? [params['__env']] : params['__env']
-                next unless allowed_envs.include? env
-              end
-
-              test = generate(test_path_absolute)
-              test.init(env, params, params_index, @internal_counter)
-              test.log_path = "#{test.dir}/logs/#{test.name.gsub(/[^0-9A-Za-z.\-]/, '_')}.log"
-              @internal_counter += 1
-
-              # Error handling, test.run() contents will be swapped with raised exception
-              # so there is an indication in reporters/logs that something went wrong
-              if params_error
-                error_message = "ERROR: Invalid parameters file: #{test.dir}.\n\tMESSAGE: #{params_error}"
-                inject_error_to_test(test, error_message)
-              end
-
-              variants << test
+            # Filtering out param sets that are specific to certain envs
+            unless params['__env'].nil?
+              allowed_envs = params['__env'].is_a?(String) ? [params['__env']] : params['__env']
+              next unless allowed_envs.include?(Moto::Lib::Config.environment)
             end
 
+            test = generate(test_path_absolute)
+            test.init(params, params_index, @internal_counter)
+            test.log_path = "#{test.dir}/logs/#{test.name.gsub(/[^0-9A-Za-z.\-]/, '_')}.log"
+            @internal_counter += 1
+
+            # Error handling, test.run() contents will be swapped with raised exception
+            # so there is an indication in reporters/logs that something went wrong
+            if params_error
+              error_message = "ERROR: Invalid parameters file: #{test.dir}.\n\tMESSAGE: #{params_error}"
+              inject_error_to_test(test, error_message)
+            end
+
+            variants << test
           end
 
         variants
