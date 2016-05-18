@@ -18,7 +18,6 @@ module Moto
 
         # TODO: temporary fix
         Thread.current['context'] = self
-        Thread.current['test_environment'] = @test.env
       end
 
       def client(name)
