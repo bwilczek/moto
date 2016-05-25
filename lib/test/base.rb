@@ -153,7 +153,7 @@ module Moto
           end
 
           status.log_failure("ASSERTION FAILED in line #{line_number}: #{message}")
-          logger.error(message)
+          Thread.current['logger'].error(message)
         end
       end
 
