@@ -3,22 +3,11 @@ module Moto
 
     class Base
       include Moto::EmptyListener
-      include Moto::ForwardContextMethods
 
       # include Moto::RunnerLogging
       include Moto::TestLogging
 
-      attr_reader :context
-
       ignore_logging(:handle_test_exception)
-
-      def initialize(context)
-        @context = context
-      end
-
-      def init
-        # abstract
-      end
 
       def handle_test_exception(test, exception)
         # abstract
@@ -29,6 +18,11 @@ module Moto
       # @return [String] key's value
       def const(key)
         Moto::Lib::Config.environment_const(key)
+      end
+
+      # Access client defined in Moto or MotoApp via it's name
+      def client(name)
+        Thread.current['clients_manager'].client(name)
       end
 
     end

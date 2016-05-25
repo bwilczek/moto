@@ -4,10 +4,7 @@ module Moto
   module Test
     class Base
 
-      include Moto::ForwardContextMethods
-
       attr_reader   :name
-      attr_writer   :context
       attr_reader   :env
       attr_reader   :params
       attr_accessor :static_path
@@ -165,6 +162,14 @@ module Moto
       # @return [String] Value of the key or nil if not found
       def const(key)
         Moto::Lib::Config.environment_const(key)
+      end
+
+      def client(name)
+        Thread.current['clients_manager'].client(name)
+      end
+
+      def session
+        client('Website').session
       end
 
     end

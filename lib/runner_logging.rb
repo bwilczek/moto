@@ -1,7 +1,6 @@
 module Moto
   module RunnerLogging
 
-
     # TODO: merge it somehow with TestLogging. Parametrize logger object?
     def self.included(cls)
       def cls.method_added(name)
@@ -14,9 +13,9 @@ module Moto
         original_method = "original_#{name}"
         alias_method original_method, name
         define_method(name) do |*args|
-          @context.runner.logger.debug("#{self.class.name}::#{__callee__} ENTER >>> #{args}") unless excluded_methods.include? name 
+          Thread.current['logger'].debug("#{self.class.name}::#{__callee__} ENTER >>> #{args}") unless excluded_methods.include? name
           result = send original_method, *args
-          @context.runner.logger.debug("#{self.class.name}::#{__callee__} LEAVE <<< #{result} ") unless excluded_methods.include? name
+          Thread.current['logger'].debug("#{self.class.name}::#{__callee__} LEAVE <<< #{result} ") unless excluded_methods.include? name
           result
         end
         @added = false
