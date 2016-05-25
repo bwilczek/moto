@@ -1,3 +1,8 @@
+module MotoApp
+  module Tests
+  end
+end
+
 module Moto
   module Runner
     class TestGenerator
