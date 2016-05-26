@@ -4,7 +4,9 @@
         test_repeats: 1,
         test_log_level: Logger::DEBUG,
         test_attempt_max: 3,
-        test_attempt_sleep: 1
+        test_attempt_sleep: 1,
+        test_reattempt_on_error: false,
+        test_reattempt_on_fail: false
     },
     test_reporter: {
         default_listeners: [Moto::Reporting::Listeners::ConsoleDots, Moto::Reporting::Listeners::JunitXml],

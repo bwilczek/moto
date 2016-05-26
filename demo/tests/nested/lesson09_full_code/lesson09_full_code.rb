@@ -7,7 +7,6 @@ module MotoApp
       class Lesson09FullCode < Moto::Test::Base
         
         def run
-          logger.info "It's my party."
           assert_equal(2+2, 4)
         end
         

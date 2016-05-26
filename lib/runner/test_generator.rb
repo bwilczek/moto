@@ -91,25 +91,18 @@ module Moto
       # Generates test instances, based on fully defined class file
       # @return [Moto::Test::Base]
       def generate_for_full_class_code(test_path_absolute)
-
-        begin
-          require test_path_absolute
-        rescue Exception
-          # will catch an error with non existent base class in test and stop it from breaking whole batch of tests
-          # no need to handle it here, next begin/rescue clause in this function will finish the job
-        end
-
         # Checking if it's possible to create test based on provided path. In case something is wrong with
         # modules structure in class itself Moto::Test::Base will be instantized with raise injected into its run()
         # so we can have proper reporting and summary even if the test doesn't execute.
         begin
+          require test_path_absolute
           class_name = test_path_absolute.gsub("#{MotoApp::DIR}/", 'moto_app/').camelize.chomp('.rb').constantize
           test_object = class_name.new
-        rescue NameError
+        rescue NameError => e
           class_name = Moto::Test::Base
           test_object = class_name.new
 
-          error_message = "ERROR: Invalid module structure: #{test_path_absolute.gsub("#{MotoApp::DIR}/", 'moto_app/').camelize.chomp('.rb')}"
+          error_message = "ERROR: Invalid test: #{test_path_absolute.gsub("#{MotoApp::DIR}/", 'moto_app/').camelize.chomp('.rb')}.\nMESSAGE: #{e}"
           inject_error_to_test(test_object, error_message)
         end
 

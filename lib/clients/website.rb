@@ -6,15 +6,25 @@ module Moto
 
     class Website < Moto::Clients::Base
 
-      attr_reader :session
-
-      ignore_logging(:page)
-      ignore_logging(:context)
       ignore_logging(:session)
 
-      def init
+      def initialize
         register_grid_driver
         register_chrome_driver
+
+        if config[:default_selector]
+          Capybara.default_selector = config[:default_selector]
+        end
+      end
+
+      # Returns Capybara session, if none was available for this thread it will create one.
+      def session
+        if Thread.current['capybara_session'].nil?
+          Thread.current['capybara_session'] = Capybara::Session.new(config[:default_driver])
+          Thread.current['capybara_session'].driver.browser.manage.window.maximize
+        end
+
+        Thread.current['capybara_session']
       end
 
       # @return [Hash] Config section for Capybara driver.
@@ -24,13 +34,7 @@ module Moto
       private :config
 
       def start_run
-        # TODO: make session driver configurable
-        if config[:default_selector]
-          Capybara.default_selector = config[:default_selector]
-        end
 
-        Thread.current['capybara_session'] = Capybara::Session.new(config[:default_driver])
-        @pages = {}
       end
 
       def end_run
@@ -43,18 +47,6 @@ module Moto
 
       def end_test(test)
         Thread.current['capybara_session'].reset_session!
-      end
-      #TODO fix moto to use Lib module
-      def page(p)
-        page_class_name = "#{self.class.name}::Pages::#{p}"
-        page_class_name.gsub!('Moto::', 'MotoApp::Lib::')
-        if @pages[page_class_name].nil?
-          a = page_class_name.underscore.split('/')
-          page_path = a[1..-1].join('/')
-          require "#{MotoApp::DIR}/#{page_path}"
-          @pages[page_class_name] = page_class_name.constantize.new(self)
-        end
-        @pages[page_class_name]
       end
 
       def register_grid_driver

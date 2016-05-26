@@ -36,10 +36,10 @@ module Moto
               end
             end
           end
-          @context.test.logger.debug("ENTER >>> #{self.class.name}::#{__callee__}(#{args})") unless skip_logging
+          Thread.current['logger'].debug("ENTER >>> #{self.class.name}::#{__callee__}(#{args})") unless skip_logging
           result = send original_method, *args
           # Below is the hack to properly escape binary data (if any manages to make it to logs)
-          @context.test.logger.debug("LEAVE <<< #{self.class.name}::#{__callee__} => #{[result].to_s[1..-2]}") unless skip_logging
+          Thread.current['logger'].debug("LEAVE <<< #{self.class.name}::#{__callee__} => #{[result].to_s[1..-2]}") unless skip_logging
           result
         end
         @added = false

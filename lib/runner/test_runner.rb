@@ -5,15 +5,11 @@ module Moto
   module Runner
     class TestRunner
 
-      attr_reader :logger
       attr_reader :test_reporter
 
       def initialize(test_paths_absolute, test_reporter)
         @test_paths_absolute = test_paths_absolute
         @test_reporter = test_reporter
-
-        # TODO: initialize logger from config (yml or just ruby code)
-        @logger = Logger.new(File.open("#{MotoApp::DIR}/moto.log", File::WRONLY | File::APPEND | File::CREAT))
       end
 
       def run
@@ -30,10 +26,15 @@ module Moto
         # Create as many threads as we're allowed by the config file.
         # test_provider.get_test - will invoke Queue.pop thus putting the thread to sleep
         # once there is no more work.
+
+        Thread.abort_on_exception = true
+
         (1..threads_max).each do |index|
           Thread.new do
             Thread.current[:id] = index
             loop do
+              Thread.current['clients_manager'] = Moto::Lib::Clients::ClientsManager.new
+
               tc = ThreadContext.new(test_provider.get_test, @test_reporter)
               tc.run
             end

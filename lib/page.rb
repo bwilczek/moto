@@ -1,23 +1,14 @@
 module Moto
-
   class Page
 
     include Moto::TestLogging
-    include Moto::ForwardContextMethods
 
     ignore_logging :const
     ignore_logging :session
 
-    attr_reader :website
-    attr_reader :context
-
-    def initialize(website)
-      @website = website
-      @context = @website.context
-    end
-
-    def page(p)
-      @context.client(@website.class.name.split('::').pop).page(p)
+    # Returns Capybara's session by means of on-the-fly client&session creation.
+    def session
+      Thread.current['clients_manager'].client('Website').session
     end
 
     def raise_unless_loaded
