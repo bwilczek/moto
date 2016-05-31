@@ -51,8 +51,8 @@ module Moto
           Thread.current['logger'].info("Result: #{@test.status.results.last.code}")
 
           # test should have another attempt in case of an error / failure / none at all
-          if (@test.status.results.last.code == Moto::Test::Result::ERROR   && !Moto::Lib::Config.moto[:test_reattempt_on_error]) ||
-             (@test.status.results.last.code == Moto::Test::Result::FAILURE && !Moto::Lib::Config.moto[:test_reattempt_on_fail] )
+          if !(@test.status.results.last.code == Moto::Test::Result::ERROR   && config[:test_reattempt_on_error]) &&
+             !(@test.status.results.last.code == Moto::Test::Result::FAILURE && config[:test_reattempt_on_fail] )
             break
           end
 
