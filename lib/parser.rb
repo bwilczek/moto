@@ -43,19 +43,19 @@ module Moto
         opts.on('-l', '--listeners Listeners', Array)      { |v| options[:listeners] = v }
         opts.on('-e', '--environment Environment')         { |v| options[:environment] = v }
         opts.on('-n', '--name Name')                       { |v| options[:name] = v }
-        # opts.on('-f', '--config Config')                   { |v| options[:config].deep_merge!( eval( File.read(v) ) ) }
+        opts.on('-c', '--config Config')                   { |v| options[:config_name] = v}
       end.parse!
 
       if options[:name].empty?
         options[:name] = evaluate_name(options[:tags], options[:tests])
       end
 
-      if !options[:environment]
+      if options[:environment]
+        Moto::Lib::Config.environment = options[:environment]
+        Moto::Lib::Config.load_configuration(options[:config_name] ? options[:config_name] : 'moto')
+      else
         puts 'ERROR: Environment is mandatory.'
         exit 1
-      else
-        Moto::Lib::Config.environment = options[:environment]
-        Moto::Lib::Config.load_configuration
       end
 
 
@@ -105,6 +105,8 @@ module Moto
        -l, --listeners = Reporters to be used.
                          Defaults are Moto::Listeners::ConsoleDots, Moto::Listeners::JunitXml
        -e, --environment Mandatory environment. Environment constants and tests parametrized in certain way depend on this.
+       -c, --config      Name of the config, without extension, to be loaded from MotoApp/config/CONFIG_NAME.rb
+                         Default: moto (which loads: MotoApp/config/moto.rb)
 
 
       moto generate:
@@ -114,7 +116,7 @@ module Moto
                          -tdir/test_name      will create MotoApp/tests/dir/test_name/test_name.rb
        -a, --appname   = Name of the application. Will be also used as topmost module in test file.
                          Default: MotoApp
-       -b, --baseclass = File (WITHOUT EXTENSION) with base class from which test will derive. Assumes one class per file.
+       -b, --baseclass = File, without extension, with base class from which test will derive. Assumes one class per file.
                          Examples:
                          -btest_base          will use the file in MotoApp/lib/test/test_base.rb
                          -bsubdir/test_base   will use the file in MotoApp/lib/test/subdir/test_base.rb

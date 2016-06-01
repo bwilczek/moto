@@ -16,9 +16,12 @@ module Moto
       end
 
       # Loads configuration for whole test run and files responsible for environmental constants.
-      def self.load_configuration
-        if File.exists? "#{MotoApp::DIR}/config/moto.rb"
-          @@moto = eval(File.read("#{MotoApp::DIR}/config/moto.rb"))
+      # @param [String] config_name Name of the main Moto/MotoApp config to be loaded. Without extension.
+      def self.load_configuration(config_name)
+        config_path = "#{MotoApp::DIR}/config/#{config_name}.rb"
+
+        if File.exists?(config_path)
+          @@moto = eval(File.read(config_path))
 
           # Try reading constants that are common for all environments
           begin
@@ -35,9 +38,8 @@ module Moto
           end
 
           @@env_consts = common_constants.deep_merge(environment_constants)
-
         else
-          raise "Config file (config/moto.rb) not present.\nDoes current working directory contain Moto application?"
+          raise "Config file: #{config_path} does not exist.\nDoes current working directory contain Moto application?"
         end
       end
 
