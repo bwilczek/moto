@@ -100,9 +100,9 @@ module Moto
       moto --version Display current version
 
       moto run:      
-       -t, --tests     = Tests to be executed.
+       -t, --tests       Tests to be executed.
                          For eg. Tests\Failure\Failure.rb should be passed as Tests::Failure
-       -l, --listeners = Reporters to be used.
+       -l, --listeners   Reporters to be used.
                          Defaults are Moto::Listeners::ConsoleDots, Moto::Listeners::JunitXml
        -e, --environment Mandatory environment. Environment constants and tests parametrized in certain way depend on this.
        -c, --config      Name of the config, without extension, to be loaded from MotoApp/config/CONFIG_NAME.rb
@@ -110,18 +110,18 @@ module Moto
 
 
       moto generate:
-       -t, --test      = Path and name of the test to be created.
+       -t, --test        Path and name of the test to be created.
                          Examples:
                          -ttest_name          will create MotoApp/tests/test_name/test_name.rb
                          -tdir/test_name      will create MotoApp/tests/dir/test_name/test_name.rb
-       -a, --appname   = Name of the application. Will be also used as topmost module in test file.
+       -a, --appname     Name of the application. Will be also used as topmost module in test file.
                          Default: MotoApp
-       -b, --baseclass = File, without extension, with base class from which test will derive. Assumes one class per file.
+       -b, --baseclass   File, without extension, with base class from which test will derive. Assumes one class per file.
                          Examples:
                          -btest_base          will use the file in MotoApp/lib/test/test_base.rb
                          -bsubdir/test_base   will use the file in MotoApp/lib/test/subdir/test_base.rb
                          By default class will derive from Moto::Test
-       -f, --force     = Forces generator to overwrite previously existing class file in specified location.
+       -f, --force       Forces generator to overwrite previously existing class file in specified location.
                          You have been warned.
       """
     end
