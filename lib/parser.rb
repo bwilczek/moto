@@ -101,7 +101,8 @@ module Moto
 
       moto run:      
        -t, --tests       Tests to be executed.
-                         For eg. Tests\Failure\Failure.rb should be passed as Tests::Failure
+       -g, --tags        Tags of tests to be executed.
+                         Use # MOTO_TAGS: TAGNAME in test to assign tag.
        -l, --listeners   Reporters to be used.
                          Defaults are Moto::Listeners::ConsoleDots, Moto::Listeners::JunitXml
        -e, --environment Mandatory environment. Environment constants and tests parametrized in certain way depend on this.

@@ -1,12 +1,12 @@
-$:.push File.expand_path("../lib", __FILE__)
+$:.push File.expand_path('../lib', __FILE__)
 
 require 'version'
 
 Gem::Specification.new do |s|
   s.name        = 'moto'
   s.version     = Moto::VERSION
-  s.summary     = "Moto - yet another web testing framework"
-  s.description = "This is a development version of a rails philosophy inspired framework for web applications functional testing. It supports (or will support) threading, scenario parametrization, different test environments and much more. Stay tuned for v.1.0.0 in the near future."
+  s.summary     = 'Moto - yet another web testing framework'
+  s.description = 'This is a development version of a rails philosophy inspired framework for web applications functional testing. It supports (or will support) threading, scenario parametrization, different test environments and much more. Stay tuned for v.1.0.0 in the near future.'
   s.authors     = ['Bartek Wilczek', 'Maciej Stark', 'Radosław Sporny', 'Michał Kujawski']
   s.email       = ['bwilczek@gmail.com', 'stark.maciej@gmail.com', 'r.sporny@gmail.com','michal.kujawski@gmail.com']
   s.files       = Dir['lib/*.rb'] + Dir['lib/**/*.rb'] + Dir['bin/*']
