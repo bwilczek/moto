@@ -18,8 +18,8 @@ module Moto
       # @param [String] test_path_absolute Path to the test that is about to be instantiated.
       # @return [Array] An array of [Moto::Test::Base] decendants
       #                 each entry is a Test with set of parameters injected
-      def get_test_with_variants(test_path_absolute)
-        test_path_absolute ? variantize(test_path_absolute) : nil
+      def get_test_with_variants(test_path_absolute, test_params)
+        test_path_absolute ? variantize(test_path_absolute, test_params) : nil
       end
 
       # Converts test's path to an array of Moto::Base::Test instances that represent all test variants (params)
@@ -30,10 +30,10 @@ module Moto
       #
       # @param [String] test_path_absolute Path to the file with test
       # @return [Array] array of already initialized test's variants
-      def variantize(test_path_absolute)
+      def variantize(test_path_absolute, test_params)
         variants = []
 
-          params_path = test_path_absolute.sub(/\.rb\z/, '')
+          params_path = test_params ? test_params : test_path_absolute.sub(/\.rb\z/, '')
 
           if File.exists?(params_path)
             begin
