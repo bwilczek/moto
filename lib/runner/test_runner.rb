@@ -7,14 +7,14 @@ module Moto
 
       attr_reader :test_reporter
 
-      def initialize(test_paths_absolute, test_reporter, test_params)
+      def initialize(test_paths_absolute, test_reporter, test_path_params)
         @test_paths_absolute = test_paths_absolute
         @test_reporter = test_reporter
-        @test_params = test_params
+        @test_path_params = test_path_params
       end
 
       def run
-        test_provider = TestProvider.new(@test_paths_absolute, @test_params)
+        test_provider = TestProvider.new(@test_paths_absolute, @test_path_params)
         threads_max = Moto::Lib::Config.moto[:test_runner][:thread_count] || 1
 
         # remove log/screenshot files from previous execution
