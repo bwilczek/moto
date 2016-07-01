@@ -75,8 +75,9 @@ module Moto
       end
 
       test_reporter = Moto::Reporting::TestReporter.new(argv[:listeners], argv[:name])
+      test_path_params = argv[:params]
 
-      runner = Moto::Runner::TestRunner.new(test_paths_absolute, test_reporter)
+      runner = Moto::Runner::TestRunner.new(test_paths_absolute, test_reporter, test_path_params)
       runner.run
     end
 

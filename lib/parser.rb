@@ -44,6 +44,7 @@ module Moto
         opts.on('-e', '--environment Environment')         { |v| options[:environment] = v }
         opts.on('-n', '--name Name')                       { |v| options[:name] = v }
         opts.on('-c', '--config Config')                   { |v| options[:config_name] = v}
+        opts.on('-p', '--params Params')                   { |v| options[:params] = v}
       end.parse!
 
       if options[:name].empty?
@@ -108,6 +109,8 @@ module Moto
        -e, --environment Mandatory environment. Environment constants and tests parametrized in certain way depend on this.
        -c, --config      Name of the config, without extension, to be loaded from MotoApp/config/CONFIG_NAME.rb
                          Default: moto (which loads: MotoApp/config/moto.rb)
+       -p, --params      Path to file with params for test execution
+                         Default: empty (which loads: MotoApp/<path_to_test>/<test_name_without_extention>)
 
 
       moto generate:
