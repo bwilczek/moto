@@ -33,39 +33,27 @@ module Moto
       def variantize(test_path_absolute)
         variants = []
 
-          params_path = test_path_absolute.sub(/\.rb\z/, '')
+          # TODO CHANGED TEMPORARY
+          #params_path = test_path_absolute.sub(/\.rb\z/, '')
+          params_directory = File.dirname(test_path_absolute).to_s + '/params/**'
+          param_files_paths = Dir.glob(params_directory)
+          param_files_paths = [nil] if param_files_paths.empty?
 
-          if File.exists?(params_path)
-            begin
-              params_all = eval(File.read(params_path))
-            rescue Exception => e
-              # Error will be injected into test.run after test is created
-              params_error = e.message
-              params_all = [{}]
-            end
-          else
-            params_all = [{}]
-          end
+          #TODO Fix
+          param_files_paths.each_with_index do |params_path, params_index|
 
-          params_all.each_with_index do |params, params_index|
-
+            #TODO environment support
             # Filtering out param sets that are specific to certain envs
-            unless params['__env'].nil?
-              allowed_envs = params['__env'].is_a?(String) ? [params['__env']] : params['__env']
-              next unless allowed_envs.include?(Moto::Lib::Config.environment)
-            end
+            # unless params['__env'].nil?
+            #   allowed_envs = params['__env'].is_a?(String) ? [params['__env']] : params['__env']
+            #   next unless allowed_envs.include?(Moto::Lib::Config.environment)
+            # end
 
+            #TODO Name/logname/displayname
             test = generate(test_path_absolute)
-            test.init(params, params_index, @internal_counter)
-            test.log_path = "#{test.dir}/logs/#{test.name.gsub(/[^0-9A-Za-z.\-]/, '_')}.log"
+            test.init(params_path, params_index, @internal_counter)
+            test.log_path = "#{File.dirname(test_path_absolute).to_s}/logs/#{test.name.gsub(/[^0-9A-Za-z.\-]/, '_')}.log"
             @internal_counter += 1
-
-            # Error handling, test.run() contents will be swapped with raised exception
-            # so there is an indication in reporters/logs that something went wrong
-            if params_error
-              error_message = "ERROR: Invalid parameters file: #{test.dir}.\n\tMESSAGE: #{params_error}"
-              inject_error_to_test(test, error_message)
-            end
 
             variants << test
           end
@@ -156,21 +144,6 @@ module Moto
         test_object
       end
       private :generate_for_run_body
-
-      # Injects raise into test.run so it will report an error when executed
-      # @param [Moto::Test::Base] test An instance of test that is supposed to be modified
-      # @param [String] error_message Message to be attached to the raised exception
-      def inject_error_to_test(test, error_message)
-        class << test
-          attr_accessor :injected_error_message
-
-          def run
-            raise injected_error_message
-          end
-        end
-
-        test.injected_error_message = error_message
-      end
 
     end
   end

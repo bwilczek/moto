@@ -24,31 +24,18 @@ module Moto
       end
 
       # Initializes test to be executed with specified params and environment
-      def init(params, params_index, global_index)
+      def init(params_path, params_index, global_index)
         @env = Moto::Lib::Config.environment
-        @params = params
-        @name = generate_name(params_index, global_index)
-
+        @params = []
+        @params_path = params_path
+        #TODO Display name
+        @name = self.class.to_s.demodulize
+        @name += "_#{@params_path.split("/")[-1].chomp('.param')}" if @params_path
         @status = Moto::Test::Status.new
         @status.name = @name
         @status.test_class_name = self.class.name
         @status.env = Moto::Lib::Config.environment
-        @status.params = @params
       end
-
-      # Generates name of the test based on its properties:
-      #  - number/name of currently executed configuration run
-      #  - env
-      def generate_name(params_index, global_index)
-        simple_class_name = self.class.to_s.demodulize
-
-        return "#{simple_class_name}_#{@env}_##{global_index}" if @params.empty?
-        return "#{simple_class_name}_#{@env}_#{@params[:__name]}_#{global_index}" if @params.key?(:__name)
-        return "#{simple_class_name}_#{@env}_P#{params_index}_#{global_index}" unless @params.key?(:__name)
-
-        self.class.to_s
-      end
-      private :generate_name
 
       # Setter for :log_path
       def log_path=(param)
@@ -64,20 +51,29 @@ module Moto
         @log_path
       end
 
-      def dir
-        return File.dirname(static_path) unless static_path.nil?
-        File.dirname(self.path)
-      end
-
-      def filename
-        return File.basename(static_path, '.*') unless static_path.nil?
-        File.basename(path, '.*')
-      end
+      #TODO Remove possibly?
+      # def dir
+      #   return File.dirname(static_path) unless static_path.nil?
+      #   File.dirname(self.path)
+      # end
+      #
+      # def filename
+      #   return File.basename(static_path, '.*') unless static_path.nil?
+      #   File.basename(path, '.*')
+      # end
 
       # Use this to run test
       # Initializes status, runs test, handles exceptions, finalizes status after run completion
       def run_test
         status.initialize_run
+
+        #TODO Formatting/optimization
+        begin
+          @params = eval(File.read(@params_path)) if File.exists?(@params_path.to_s)
+          @status.params = @params
+        rescue Exception => exception
+          raise "ERROR: Invalid parameters file: #{@params_path}.\n\tMESSAGE: #{exception.message}"
+        end
 
         begin
           run

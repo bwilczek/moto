@@ -39,6 +39,7 @@ module Moto
     def self.run(argv)
       test_paths_absolute = []
 
+      #TODO Remove providing an array ?
       unless argv[ :tests ].nil?
         argv[ :tests ].each do |dir_name|
           test_paths = Dir.glob("#{MotoApp::DIR}/tests/#{dir_name}/**/*.rb")
@@ -47,7 +48,7 @@ module Moto
         end
       end
 
-      # TODO Optimization for files without #MOTO_TAGS
+      # TODO Optimization for files without #MOTO_TAGS - add support for tags in params (not here)
       unless argv[:tags].nil?
         tests_total = Dir.glob("#{MotoApp::DIR}/tests/**/*.rb")
         tests_total.each do |test_path|
