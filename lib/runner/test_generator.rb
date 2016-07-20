@@ -145,6 +145,21 @@ module Moto
       end
       private :generate_for_run_body
 
+      # Injects raise into test.run so it will report an error when executed
+      # @param [Moto::Test::Base] test An instance of test that is supposed to be modified
+      # @param [String] error_message Message to be attached to the raised exception
+      def inject_error_to_test(test, error_message)
+        class << test
+          attr_accessor :injected_error_message
+
+          def run
+            raise injected_error_message
+          end
+        end
+
+        test.injected_error_message = error_message
+      end
+
     end
   end
 end
