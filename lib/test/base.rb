@@ -117,7 +117,7 @@ module Moto
         if msg.nil?
           msg = 'Test forcibly passed with no reason given.'
         else
-          msg = "Forced passed, reason: #{msg}"
+          msg = "Forced passed: #{msg}"
         end
         raise Exceptions::TestForcedPassed.new msg
       end
