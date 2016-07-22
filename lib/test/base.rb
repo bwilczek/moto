@@ -101,7 +101,7 @@ module Moto
       end
 
       def skip(msg = nil)
-        raise Exceptions::TestSkipped.new(msg.nil? ? 'Test skipped with no reason given.' : "Skip reason: #{msg}")
+        raise Exceptions::TestSkipped.new(msg.nil? ? 'Test skipped with no reason given.' : "Skipped: #{msg}")
       end
 
       def fail(msg = nil)
