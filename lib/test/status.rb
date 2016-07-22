@@ -14,6 +14,9 @@ module Moto
       # Name of the class representing test
       attr_accessor :test_class_name
 
+      # Partially demodulized class name, used for display purposes
+      attr_accessor :display_name
+
       # Array of [Moto::Test::Result], each item represents a result of a single attempt to pass the test
       attr_reader :results
 

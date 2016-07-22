@@ -34,6 +34,7 @@ module Moto
         @status = Moto::Test::Status.new
         @status.name = @name
         @status.test_class_name = self.class.name
+        @status.display_name = @status.test_class_name.split('::')[2..-2].join('::')
         @status.env = Moto::Lib::Config.environment
       end
 
