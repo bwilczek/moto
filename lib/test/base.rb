@@ -73,7 +73,10 @@ module Moto
           @params = eval(File.read(@params_path)) if File.exists?(@params_path.to_s)
           @status.params = @params
         rescue Exception => exception
+          status.log_exception(exception)
           raise "ERROR: Invalid parameters file: #{@params_path}.\n\tMESSAGE: #{exception.message}"
+        ensure
+          status.finalize_run
         end
 
         begin
