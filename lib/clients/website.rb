@@ -72,7 +72,8 @@ module Moto
         Capybara.register_driver :chrome do |app|
           client = Selenium::WebDriver::Remote::Http::Default.new
           client.timeout = 180
-          Capybara::Selenium::Driver.new(app, browser: :chrome, http_client: client, desired_capabilities: { args: ['-no-sandbox']} )
+          caps = Selenium::WebDriver::Remote::Capabilities.chrome("chromeOptions" => {"args" => [ "-no-sandbox" , "--start-maximized"] })
+          Capybara::Selenium::Driver.new(app, browser: :chrome, http_client: client, desired_capabilities: caps )
         end
       end
       private :register_chrome_driver
