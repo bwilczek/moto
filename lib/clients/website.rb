@@ -1,4 +1,5 @@
 require 'capybara'
+require 'capybara/poltergeist'
 require_relative '../../lib/config'
 
 module Moto
@@ -11,6 +12,7 @@ module Moto
       def initialize
         register_grid_driver
         register_chrome_driver
+        register_poltergeist_driver
 
         if config[:default_selector]
           Capybara.default_selector = config[:default_selector]
@@ -70,10 +72,26 @@ module Moto
         Capybara.register_driver :chrome do |app|
           client = Selenium::WebDriver::Remote::Http::Default.new
           client.timeout = 180
-          Capybara::Selenium::Driver.new(app, browser: :chrome, http_client: client)
+          caps = Selenium::WebDriver::Remote::Capabilities.chrome("chromeOptions" => {"args" => [ "-no-sandbox" , "--start-maximized"] })
+          Capybara::Selenium::Driver.new(app, browser: :chrome, http_client: client, desired_capabilities: caps )
         end
       end
       private :register_chrome_driver
+
+      def register_poltergeist_driver
+        #Capybara.javascript_driver = :poltergeist
+        options =
+          {
+              screen_size: [1920,1080],
+              js_errors: false,
+              phantomjs_options: ['--ignore-ssl-errors=yes'],
+
+          }
+        Capybara.register_driver :poltergeist do |app|
+          Capybara::Poltergeist::Driver.new(app, options)
+        end
+      end
+      private :register_poltergeist_driver
 
 
       def handle_test_exception(test, exception)
