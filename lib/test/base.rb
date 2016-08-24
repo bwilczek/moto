@@ -52,17 +52,6 @@ module Moto
         @log_path
       end
 
-      #TODO Remove possibly?
-      # def dir
-      #   return File.dirname(static_path) unless static_path.nil?
-      #   File.dirname(self.path)
-      # end
-      #
-      # def filename
-      #   return File.basename(static_path, '.*') unless static_path.nil?
-      #   File.basename(path, '.*')
-      # end
-
       # Use this to run test
       # Initializes status, runs test, handles exceptions, finalizes status after run completion
       def run_test
