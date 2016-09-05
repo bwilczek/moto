@@ -12,10 +12,6 @@ module Moto
       
       def cls.method_added(name)
 
-        Moto::EmptyListener.instance_methods(false).each do |m|
-          full_name = "#{self.name}::#{m}"
-          @@ignore_logging << full_name unless @@ignore_logging.include? full_name
-        end
         @@ignore_logging << "#{self.name}::new"
         @@ignore_logging << "#{self.name}::initialize"
 

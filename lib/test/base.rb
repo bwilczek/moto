@@ -153,14 +153,6 @@ module Moto
         Moto::Lib::Config.environment_const(key)
       end
 
-      def client(name)
-        Thread.current['clients_manager'].client(name)
-      end
-
-      def session
-        client('Website').session
-      end
-
     end
   end
 end

@@ -1,7 +1,6 @@
 require 'erb'
 require 'fileutils'
 require_relative '../../lib/config'
-require_relative '../../lib/clients/clients_manager'
 
 module Moto
   module Runner
@@ -31,7 +30,6 @@ module Moto
 
         (1..max_attempts).each do |attempt|
 
-          Thread.current['clients_manager'].clients.each_value { |c| c.start_test(@test) }
           @test.before
           Thread.current['logger'].info("Start: #{@test.name} attempt #{attempt}/#{max_attempts}")
 
@@ -42,11 +40,9 @@ module Moto
           rescue Exception => e
             Thread.current['logger'].error("#{e.class.name}: #{e.message}")
             Thread.current['logger'].error(e.backtrace.join("\n"))
-            Thread.current['clients_manager'].clients.each_value { |c| c.handle_test_exception(@test, e) }
           end
 
           @test.after
-          Thread.current['clients_manager'].clients.each_value { |c| c.end_test(@test) }
 
           Thread.current['logger'].info("Result: #{@test.status.results.last.code}")
 
@@ -68,9 +64,6 @@ module Moto
 
         # Reporting: end_test
         @test_reporter.report_end_test(@test.status)
-
-        Thread.current['clients_manager'].clients.each_value { |c| c.end_run }
-
       end
 
       # @return [Hash] Hash with config for ThreadContext

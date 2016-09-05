@@ -33,8 +33,6 @@ module Moto
           Thread.new do
             Thread.current[:id] = index
             loop do
-              Thread.current['clients_manager'] = Moto::Lib::Clients::ClientsManager.new
-
               tc = ThreadContext.new(test_provider.get_test, @test_reporter)
               tc.run
             end

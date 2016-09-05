@@ -12,16 +12,13 @@ module Moto
   DIR = File.dirname(File.dirname(__FILE__))
 end
 
-require_relative './empty_listener'
 require_relative './test_logging'
 require_relative './runner_logging'
 require_relative './runner/test_runner'
 require_relative './runner/thread_context'
 require_relative './runner/test_generator'
 require_relative './test/base'
-require_relative './page'
 require_relative './version'
-require_relative './clients/base'
 require_relative './reporting/listeners/base'
 require_relative './reporting/listeners/console'
 require_relative './reporting/listeners/console_dots'
