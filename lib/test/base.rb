@@ -8,7 +8,6 @@ module Moto
       attr_reader   :env
       attr_reader   :params
       attr_accessor :static_path
-      attr_accessor :evaled
       attr_accessor :status
 
       class << self
@@ -134,12 +133,7 @@ module Moto
       # Checks if result of condition equals to True
       def assert(condition, message)
         if !condition
-          if evaled
-            # -1 because of added method header in generated class
-            line_number = caller.select { |l| l.match(/\(eval\):\d*:in `run'/) }.first[/\d+/].to_i
-          else
-            line_number = caller.select { |l| l.match(/#{static_path}:\d*:in `run'/) }.first[/\d+/].to_i
-          end
+          line_number = caller.select { |l| l.match(/#{static_path}:\d*:in `run'/) }.first[/\d+/].to_i
 
           status.log_failure("ASSERTION FAILED in line #{line_number}: #{message}")
           Thread.current['logger'].error(message)

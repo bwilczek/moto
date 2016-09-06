@@ -82,7 +82,6 @@ module Moto
         end
 
         test_object.static_path = test_path_absolute
-        test_object.evaled = false
         test_object
       end
       private :generate
