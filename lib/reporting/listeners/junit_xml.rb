@@ -11,7 +11,8 @@ module Moto
 
           run_status_hash = {
               errors:     run_status.tests_error.length,
-              failures:   run_status.tests_error.length,
+              failures:   run_status.tests_failed.length,
+              skipped:    run_status.tests_skipped.length,
               name:       custom_run_name,
               tests:      run_status.tests_all.length,
               time:       run_status.duration,
@@ -33,11 +34,11 @@ module Moto
                   if test_status.results.last.code == Moto::Test::Result::ERROR
                     xml.error(message: test_status.results.last.message)
                   elsif test_status.results.last.code == Moto::Test::Result::FAILURE
-
                     test_status.results.last.failures.each do |failure_message|
                       xml.failure(message: failure_message)
                     end
-
+                  elsif test_status.results.last.code == Moto::Test::Result::SKIPPED
+                    xml.skipped
                   end
                 end
               end
