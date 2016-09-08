@@ -1,4 +1,6 @@
 require_relative 'run_status'
+require_relative 'listeners/base'
+require_relative 'listeners/kernel_code'
 
 module Moto
   module Reporting
@@ -23,6 +25,9 @@ module Moto
         @listeners = []
         @custom_run_name = custom_run_name
         listeners.each { |l| add_listener(l) }
+
+        # Special listener used to generate code for Kernel.exit(code)
+        add_listener(Moto::Reporting::Listeners::KernelCode)
       end
 
       # Adds a listener to the list.

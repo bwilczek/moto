@@ -61,7 +61,7 @@ module Moto
       #TODO Display criteria used
       if test_paths_absolute.empty?
         puts 'No tests found for given arguments.'
-        exit 1
+        Kernel.exit!(-1)
       end
 
       # Requires custom initializer if provided by application that uses Moto
