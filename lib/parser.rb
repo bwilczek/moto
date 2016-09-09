@@ -20,8 +20,8 @@ module Moto
         else
           show_help
         end
-      rescue SystemExit
-        nil
+      rescue SystemExit => e
+        Kernel.exit(e.status)
       rescue Exception => e
         puts e.message + "\n\n"
         puts e.backtrace.join("\n")
