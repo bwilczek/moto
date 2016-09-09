@@ -34,34 +34,69 @@ module Moto
 
   class Cli
     def self.run(argv)
-      test_paths_absolute = []
 
-      #TODO Remove providing an array ?
-      unless argv[ :tests ].nil?
-        argv[ :tests ].each do |dir_name|
-          test_paths = Dir.glob("#{MotoApp::DIR}/tests/#{dir_name}/**/*.rb")
-          test_paths -= test_paths_absolute
-          test_paths_absolute += test_paths
+      test_paths_absolute = []
+      directories   = argv[:tests]
+      tags          = argv[:tags]
+      filters       = argv[:filters]
+
+      if directories
+        directories.each do |directory|
+          test_paths_absolute += Dir.glob("#{MotoApp::DIR}/tests/#{directory}/**/*.rb")
         end
       end
 
-      # TODO Optimization for files without #MOTO_TAGS - add support for tags in params (not here)
-      unless argv[:tags].nil?
+      if tags
         tests_total = Dir.glob("#{MotoApp::DIR}/tests/**/*.rb")
         tests_total.each do |test_path|
+
           test_body = File.read(test_path)
-          matches = test_body.match(/^#(\s*)MOTO_TAGS:([^\n\r]+)$/m)
+          matches = test_body.match(/^#(\s*)MOTO_TAGS:(.*?)$/)
+
           if matches
             test_tags = matches.to_a[2].gsub(/\s*/, '').split(',')
-            test_paths_absolute << test_path unless (argv[:tags]&test_tags).empty?
+            test_paths_absolute << test_path unless (tags & test_tags).empty?
           end
+
         end
       end
+
+      # Make sure there are no repetitions in gathered set
+      test_paths_absolute.uniq!
+
+      # Tests to be removed due to filtering will be gathered in this array
+      # [].delete(item) cannot be used since it interferes with [].each
+      filtered_test_paths = []
+
+      # Filter tests by provied tags
+      if filters
+        test_paths_absolute.each do |test_path|
+          test_body = File.read(test_path)
+
+          matches = test_body.match(/^#(\s*)MOTO_TAGS:(.*?)$/)
+
+          if matches
+
+            test_tags = matches.to_a[2].gsub(/\s*/, '').split(',')
+            if (filters & test_tags).empty?
+              # Test doesn't contain any tags to be filtered upon
+              filtered_test_paths << test_path
+            end
+
+          else
+            # Test has no tags at all
+            filtered_test_paths << test_path
+          end
+
+        end
+      end
+
+      test_paths_absolute -= filtered_test_paths
 
       #TODO Display criteria used
       if test_paths_absolute.empty?
         puts 'No tests found for given arguments.'
-        Kernel.exit!(-1)
+        Kernel.exit(-1)
       end
 
       # Requires custom initializer if provided by application that uses Moto

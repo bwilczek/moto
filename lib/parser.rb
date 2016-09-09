@@ -20,7 +20,8 @@ module Moto
         else
           show_help
         end
-
+      rescue SystemExit
+        nil
       rescue Exception => e
         puts e.message + "\n\n"
         puts e.backtrace.join("\n")
@@ -38,16 +39,17 @@ module Moto
 
       # Parse arguments
       OptionParser.new do |opts|
-        opts.on('-t', '--tests Tests', Array)              { |v| options[:tests ] = v }
-        opts.on('-g', '--tags Tags', Array)                { |v| options[:tags ] = v }
-        opts.on('-l', '--listeners Listeners', Array)      { |v| options[:listeners] = v }
-        opts.on('-e', '--environment Environment')         { |v| options[:environment] = v }
-        opts.on('-n', '--name Name')                       { |v| options[:name] = v }
-        opts.on('-c', '--config Config')                   { |v| options[:config_name] = v}
+        opts.on('-t', '--tests Tests', Array)              { |v| options[:tests]        = v }
+        opts.on('-g', '--tags Tags', Array)                { |v| options[:tags]         = v }
+        opts.on('-f', '--filters Filters', Array)          { |v| options[:filters]      = v }
+        opts.on('-l', '--listeners Listeners', Array)      { |v| options[:listeners]    = v }
+        opts.on('-e', '--environment Environment')         { |v| options[:environment]  = v }
+        opts.on('-n', '--name Name')                       { |v| options[:name]         = v }
+        opts.on('-c', '--config Config')                   { |v| options[:config_name]  = v }
       end.parse!
 
       if options[:name].empty?
-        options[:name] = evaluate_name(options[:tags], options[:tests])
+        options[:name] = evaluate_name(options[:tags], options[:tests], options[:filters])
       end
 
       if options[:environment]
@@ -55,23 +57,29 @@ module Moto
         Moto::Lib::Config.load_configuration(options[:config_name] ? options[:config_name] : 'moto')
       else
         puts 'ERROR: Environment is mandatory.'
-        exit 1
+        Kernel.exit(-1)
       end
-
 
       return options
     end
 
-    def self.evaluate_name(tags, tests)
-      tags ||= ''
-      tests ||= ''
-      if !tags.empty? && !tests.empty?
-        return "#{tags.count} tags + #{tests.count} tests"
-      elsif tags.empty?
-        return tests.count == 1 ? "Test: #{tests.first}" : "#{tests.count} tests"
-      elsif tests.empty?
-        return tags.count == 1 ? "Tag: #{tags.first}" : "#{tags.count} tags"
+    # Generate default name based on input parameters
+    def self.evaluate_name(tests, tags, filters)
+      name = ''
+
+      if tests
+        name << "Tests: #{tests.join(',')}  "
       end
+
+      if tags
+        name << "Tags: #{tags.join(',')}  "
+      end
+
+      if filters
+        name << "Filters: #{filters.join(',')}  "
+      end
+
+      return name
     end
 
     # Parses attributes passed to the application when run by 'moto generate'
@@ -103,8 +111,12 @@ module Moto
        -t, --tests       Tests to be executed.
        -g, --tags        Tags of tests to be executed.
                          Use # MOTO_TAGS: TAGNAME in test to assign tag.
+       -f, --filters     Tags that filter tests passed via -t parameter.
+                         Only tests in appropriate directory, having appropriate tag will be executed.
+                         Use # MOTO_TAGS: TAGNAME in test to assign tag.
        -l, --listeners   Reporters to be used.
-                         Defaults are Moto::Listeners::ConsoleDots, Moto::Listeners::JunitXml
+                         Defaults are Moto::Reporting::Listeners::ConsoleDots, Moto::Reporting::Listeners::JunitXml
+                         One reporter that is always used: Moto::Reporting::Listeners::KernelCode
        -e, --environment Mandatory environment. Environment constants and tests parametrized in certain way depend on this.
        -c, --config      Name of the config, without extension, to be loaded from MotoApp/config/CONFIG_NAME.rb
                          Default: moto (which loads: MotoApp/config/moto.rb)

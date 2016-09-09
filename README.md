@@ -1,7 +1,7 @@
 # moto
 
 ## Introduction
-`moto` is a testing framework dedicated for functional testing - particularly for web applications. The main motivation behind this project is to make the test developer write as little code as possible to get the tests running. To some degree one might say that this framework implements `rails` paradigm for testing.
+`moto` is a testing framework dedicated for functional testing. The main motivation behind this project is to make the test developer write as little code as possible to get the tests running. To some degree one might say that this framework implements `rails` paradigm for testing.
 
 ## Basic concepts
 ### Tests are an application
@@ -11,10 +11,6 @@
 No need to declare test class inheriting from some parent, or declare any `_test` methods - `moto` will do this for you. 
 
 ### Keeping tests DRY
-Any logic that could be reused between tests can be easily extracted to objects called `Clients`. Example `client` can be a web brower session (`Capybara`) or a SOAP client (`Savon`) or a database connection. `Website` client comes with a handy mechanism of `Pages`, which to some extent implements `PageObjects` pattern.
-
-Another way of reusing tests is implmented by concept of `environments` which allows running same scenario on different servers in the same execution to see first hand that things that work well on `integration` might not work on `staging`.
-
 Tests can also be parametrized, so that once scenario is executed multiple times with different sets of parameters.
 
 ### Logging & reporting
@@ -36,7 +32,7 @@ runner, thread_context, test, result
 under construction
 
 ### Test API
-When in test files the following methods are available:
+When in test files the following methods/fields are available:
 
 * `const('key')` - read const value specific for current environment from `config/const.yml` file
 * `logger.info(msg)` - write message to test execution log file. See Ruby Logger class for details.
@@ -47,18 +43,10 @@ When in test files the following methods are available:
 * `assert_equal(a, b)` - assertion, see class `Moto::Test::Base` for more assertion methods
 * `dir` - current test directory
 * `filename` - current test file name with no extension
-
-### `Client` API
-When editing `client` classes the following methods are available:
-
-* `const('key')` - read const value specific for current environment from `config/const.yml` file
-* `context.runner.my_config[:capybara][:default_driver]` - read config values for current class (here: `Moto::Clients::Website`) from `config/moto.rb` file
-* `logger.info(msg)` - write message to test execution log file. See Ruby Logger class for details.
-* `current_test` - reference to currently running test
-* `client('Website')` - access other client object instance for given class name.
-
-### Creating your own `client`
-under construction 
+* `run` - body of the test to be executed
+* `before` - invoked before run()
+* `after` - invoked after run(), even if there was an error in run()
+* `status` - info about execution status of the test (failures, problems etc.)
 
 ### Using `Website` client and creating your own `Pages`
 When editing `page` classes the following methods are available:
@@ -90,5 +78,6 @@ When editing `page` classes the following methods are available:
 * Access by `Moto::Lib::Config.moto`
 
 ### Creating your own `listener`
-under construction
+Custom listeners need to derive from Moto::Reporting::Listeners::Base  
+Code documentation in that class explains all the details
 
