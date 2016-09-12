@@ -93,6 +93,31 @@ module Moto
           when Moto::Test::Result::SKIPPED  then return 'SKIPPED'
         end
       end
+
+
+      # Inform about presence o errors/failures/skipped tests in current test run as a bitmap
+      # errors present: 0b100 & status_as_bitmap
+      # fails present:  0b010 & status_as_bitmap
+      # skips present:  0b001 & status_as_bitmap
+      # all passed:     status_as_bitmap == 0
+      def bitmap
+        status = 0
+
+        if tests_error.length > 0
+          status += 0b100
+        end
+
+        if tests_failed.length > 0
+          status += 0b010
+        end
+
+        if tests_skipped.length > 0
+          status += 0b001
+        end
+
+        status
+      end
+
     end
   end
 end

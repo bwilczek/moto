@@ -1,12 +1,14 @@
 require_relative 'run_status'
 require_relative 'listeners/base'
-require_relative 'listeners/kernel_code'
 
 module Moto
   module Reporting
 
     # Manages reporting test and run status' to attached listeners
     class TestReporter
+
+      attr_reader :run_status
+
       # @param [Array] listeners An array of strings, which represent qualified names of classes (listeners) that will be instantiated.
       #                empty array is passed then :default_listeners will be taken from config
       # @param [String] custom_run_name Optional, to be passed to listeners during creation
@@ -25,9 +27,6 @@ module Moto
         @listeners = []
         @custom_run_name = custom_run_name
         listeners.each { |l| add_listener(l) }
-
-        # Special listener used to generate code for Kernel.exit(code)
-        add_listener(Moto::Reporting::Listeners::KernelCode)
       end
 
       # Adds a listener to the list.

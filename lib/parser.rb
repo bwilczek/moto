@@ -36,6 +36,7 @@ module Moto
       options = {}
       options[:listeners] = []
       options[:name] = ''
+      options[:stop_on] = {error: false, fail: false, skip: false}
 
       # Parse arguments
       OptionParser.new do |opts|
@@ -46,6 +47,9 @@ module Moto
         opts.on('-e', '--environment Environment')         { |v| options[:environment]  = v }
         opts.on('-n', '--name Name')                       { |v| options[:name]         = v }
         opts.on('-c', '--config Config')                   { |v| options[:config_name]  = v }
+        opts.on('--stop-on-error')                         { options[:stop_on][:error] = true }
+        opts.on('--stop-on-fail')                          { options[:stop_on][:fail]  = true }
+        opts.on('--stop-on-skip')                          { options[:stop_on][:skip]  = true }
       end.parse!
 
       if options[:name].empty?
@@ -120,6 +124,9 @@ module Moto
        -e, --environment Mandatory environment. Environment constants and tests parametrized in certain way depend on this.
        -c, --config      Name of the config, without extension, to be loaded from MotoApp/config/CONFIG_NAME.rb
                          Default: moto (which loads: MotoApp/config/moto.rb)
+       --stop-on-error   Moto will stop test execution when an error is encountered in test results
+       --stop-on-fail    Moto will stop test execution when a failure is encountered in test results
+       --stop-on-skip    Moto will stop test execution when a skip is encountered in test results
 
 
       moto generate:

@@ -109,7 +109,7 @@ module Moto
 
       test_reporter = Moto::Reporting::TestReporter.new(argv[:listeners], argv[:name])
 
-      runner = Moto::Runner::TestRunner.new(test_paths_absolute, test_reporter)
+      runner = Moto::Runner::TestRunner.new(test_paths_absolute, test_reporter, argv[:stop_on])
       runner.run
     end
 
