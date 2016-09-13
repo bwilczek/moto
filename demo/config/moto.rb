@@ -12,13 +12,17 @@
         default_listeners: [Moto::Reporting::Listeners::ConsoleDots, Moto::Reporting::Listeners::JunitXml],
         listeners: {
             junit_xml: { output_file: 'junit_report.xml' },
-            webui: { url: 'http://your.address.com:3000' }
+            webui:
+                {
+                    send_log_on_pass: false,
+                    url: 'http://your.address.com:3000'
+                }
         }
     },
     clients: {
         website: {
             capybara: {
-                default_driver: :selenium,
+                default_driver: :chrome,
                 default_selector: :css,
                 polling_interval: 0.2,
             }

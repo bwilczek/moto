@@ -11,7 +11,8 @@ module Moto
 
         def start_run
 
-          @url = Moto::Lib::Config.moto[:test_reporter][:listeners][:webui][:url]
+          @url = config[:url]
+          @send_log_on_pass = config[:send_log_on_pass]
 
           data = {
               name: custom_run_name,
@@ -73,8 +74,16 @@ module Moto
         end
 
         def end_test(test_status)
+
+          # don't send the log if the test has passed and appropriate flag is set to false
+          if test_status.results.last.code == Moto::Test::Result::PASSED && !@send_log_on_pass
+            full_log = nil
+          else
+            full_log = File.read(test_status.log_path)
+          end
+
           data = {
-              log: File.read(test_status.log_path),
+              log: full_log,
               result: test_status.results.last.code,
               error: test_status.results.last.code == Moto::Test::Result::ERROR ? nil : test_status.results.last.message,
               failures: test_failures(test_status),
@@ -104,8 +113,13 @@ module Moto
             tries -= 1
             tries > 0 ? retry : raise
           end
-
         end
+
+        # @return [Hash] Hash with config for WebUI
+        def config
+          Moto::Lib::Config.moto[:test_reporter][:listeners][:webui]
+        end
+        private :config
 
       end
     end
