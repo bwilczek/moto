@@ -11,8 +11,9 @@ module Moto
 
       # @param [Array] listeners An array of strings, which represent qualified names of classes (listeners) that will be instantiated.
       #                empty array is passed then :default_listeners will be taken from config
-      # @param [String] custom_run_name Optional, to be passed to listeners during creation
-      def initialize(listeners, custom_run_name)
+      # @param [String] suite_name Name that identities the suite, may be custom made or automatically generated
+      # @param [String] run_name Name that identities the run, may be custom made or automatically generated
+      def initialize(listeners, suite_name, run_name)
 
         if listeners.empty?
           config[:default_listeners].each do |listener_class_name|
@@ -25,7 +26,8 @@ module Moto
         end
 
         @listeners = []
-        @custom_run_name = custom_run_name
+        @suite_name = suite_name
+        @run_name   = run_name
         listeners.each { |l| add_listener(l) }
       end
 
@@ -33,7 +35,7 @@ module Moto
       # All listeners on the list will have events reported to them.
       # @param [Moto::Listener::Base] listener class to be added
       def add_listener(listener)
-        @listeners << listener.new(@custom_run_name)
+        @listeners << listener.new(@suite_name, @run_name)
       end
 
       # Reports start of the whole run (set of tests) to attached listeners

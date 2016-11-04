@@ -1,99 +1,132 @@
 require 'rest-client'
 require 'sys/uname'
+require 'uri'
 
 module Moto
   module Reporting
     module Listeners
       class Webui < Base
 
-        REST_MAX_TRIES = 3
-        REST_TIMEOUT = 15
+        REST_MAX_TRIES = 1
+        REST_TIMEOUT = 15000
+
+        def initialize(suite_name, run_name)
+          super
+          @tester_id = 2
+
+          @tests = {}
+          @url = "#{config[:url]}/api"
+          @send_log_on_pass = config[:send_log_on_pass]
+        end
+
 
         def start_run
 
-          @url = config[:url]
-          @send_log_on_pass = config[:send_log_on_pass]
+          # Create Suite, if it did exist already nothing new will be created and existing data will be sent in the response
+          url_suites = "#{@url}/suites"
+          suite_data = {name: suite_name}.to_json
 
-          data = {
-              name: custom_run_name,
-              result: :running,
-              cnt_all: nil,
-              cnt_passed: nil,
-              cnt_failure: nil,
-              cnt_error: nil,
-              cnt_skipped: nil,
-              user: Sys::Uname.sysname.downcase.include?('windows') ? ENV['USERNAME'] : ENV['LOGNAME'],
-              host: Sys::Uname.nodename,
-              pid: Process.pid
+          response = try {
+            RestClient::Request.execute(method: :post,
+                                                 url: URI.escape(url_suites),
+                                                 payload: suite_data,
+                                                 timeout: REST_TIMEOUT,
+                                                 headers: {content_type: :json, accept: :json})
+          }
+          suite = JSON.parse(response, symbolize_names: true)
+
+          # Store ID of current Suite
+          @suite_id = suite[:id]
+
+          # Prepare data for new TestRun
+          url_runs = "#{@url}/suites/#{@suite_id}/runs"
+          run_data = {
+              name: run_name,
+              tester_id: @tester_id,
+              start_time: Time.now
+          }.to_json
+
+          # Create new TestRun based on prepared data
+          response = try {
+            RestClient::Request.execute(method: :post,
+                                                 url: URI.escape(url_runs),
+                                                 payload: run_data,
+                                                 timeout: REST_TIMEOUT,
+                                                 headers: {content_type: :json, accept: :json})
           }
 
-          result = try {
-            RestClient::Request.execute(method: :post, url: "#{@url}/api/runs", payload: data.to_json, timeout: REST_TIMEOUT, headers: {content_type: :json, accept: :json})
-          }
-
-          @run = JSON.parse(result)
-          @tests = {}
+          @run = JSON.parse(response, symbolize_names: true)
         end
+
 
         def end_run(run_status)
-          # PUT http://sandbox.dev:3000/api/runs/1
-          data = {
-              result: run_status.result,
-              cnt_all: run_status.tests_all.length,
-              cnt_passed: run_status.tests_passed.length,
-              cnt_failure: run_status.tests_failed.length,
-              cnt_error: run_status.tests_error.length,
-              cnt_skipped: run_status.tests_skipped.length,
-              duration: run_status.duration
-          }
 
-          result = try {
-              RestClient::Request.execute(method: :put, url: "#{@url}/api/runs/#{@run['id']}", payload: data.to_json, timeout: REST_TIMEOUT, headers: {content_type: :json, accept: :json})
+          url_run = "#{@url}/suites/#{@suite_id}/runs/#{@run[:id]}"
+          run_data = {
+              result_id: webui_result_id(run_status.result),
+              end_time: Time.now
+          }.to_json
+
+          response = try {
+            RestClient::Request.execute(method: :put,
+                                        url: URI.escape(url_run),
+                                        payload: run_data,
+                                        timeout: REST_TIMEOUT,
+                                        headers: {content_type: :json, accept: :json})
           }
-          @run = JSON.parse(result)
+          @run = JSON.parse(response, symbolize_names: true)
         end
+
 
         def start_test(test_status)
-          # POST http://sandbox.dev:3000/api/tests/create
-          data = {
-              name: test_status.name,
-              class_name: test_status.test_class_name,
-              log: nil,
-              run_id: @run['id'],
-              env: test_status.env,
-              parameters: test_status.params.to_s,
-              result: :running,
-              error: nil,
-              failures: nil
+
+          # Prepare data for new Test
+          url_tests = "#{@url}/suites/#{@suite_id}/runs/#{@run[:id]}/tests"
+          test_data = {
+              name: test_status.name, #test_status.test_class_name
+              run_id: @run[:id],
+              start_time: Time.now
+          }.to_json
+
+          # Create new Test based on prepared data
+          response = try {
+            RestClient::Request.execute(method: :post,
+                                                 url: URI.escape(url_tests),
+                                                 payload: test_data,
+                                                 timeout: REST_TIMEOUT,
+                                                 headers: {content_type: :json, accept: :json})
           }
 
-          result = try {
-            RestClient::Request.execute(method: :post, url: "#{@url}/api/tests", payload: data.to_json, timeout: REST_TIMEOUT, headers: {content_type: :json, accept: :json})
-          }
-          @tests[test_status.name] = JSON.parse(result)
+          test = JSON.parse(response, symbolize_names: true)
+
+          # Store Test in a hash with its name as key so later it can be accessed and server side ID can be retrieved
+          @tests[test[:name]] = test
         end
+
 
         def end_test(test_status)
 
-          # don't send the log if the test has passed and appropriate flag is set to false
-          if test_status.results.last.code == Moto::Test::Result::PASSED && !@send_log_on_pass
-            full_log = nil
-          else
-            full_log = File.read(test_status.log_path)
-          end
+          url_test = "#{@url}/suites/#{@suite_id}/runs/#{@run[:id]}/tests/#{@tests[test_status.name][:id]}"
+          test_data = {
+              log: (test_status.results.last.code == Moto::Test::Result::PASSED && !@send_log_on_pass) ? nil : File.read(test_status.log_path),
+              end_time: Time.now,
+              error_message: test_status.results.last.code == Moto::Test::Result::ERROR ? nil : test_status.results.last.message,
+              fail_message: test_failures(test_status),
+              result_id: webui_result_id(test_status.results.last.code),
+          }.to_json
 
-          data = {
-              log: full_log,
-              result: test_status.results.last.code,
-              error: test_status.results.last.code == Moto::Test::Result::ERROR ? nil : test_status.results.last.message,
-              failures: test_failures(test_status),
-              duration: test_status.duration
+          # Create new Test based on prepared data
+          response = try {
+            RestClient::Request.execute(method: :put,
+                                                 url: URI.escape(url_test),
+                                                 payload: test_data,
+                                                 timeout: REST_TIMEOUT,
+                                                 headers: {content_type: :json, accept: :json})
           }
 
-          result = try {
-            RestClient::Request.execute(method: :put, url: "#{@url}/api/tests/#{@tests[test_status.name]['id']}", payload: data.to_json, timeout: REST_TIMEOUT, headers: {content_type: :json, accept: :json})
-          }
-          @tests[test_status.name] = JSON.parse(result)
+          test = JSON.parse(response, symbolize_names: true)
+
+          @tests[test_status.name] = test
         end
 
         # @return [String] string with messages of all failures in a test
@@ -120,6 +153,22 @@ module Moto
           Moto::Lib::Config.moto[:test_reporter][:listeners][:webui]
         end
         private :config
+
+        def webui_result_id(code)
+          case code
+            when Moto::Test::Result::RUNNING
+              1
+            when Moto::Test::Result::PASSED
+              2
+            when Moto::Test::Result::FAILURE
+              3
+            when Moto::Test::Result::ERROR
+              4
+            when Moto::Test::Result::SKIPPED
+              5
+          end
+        end
+        private :webui_result_id
 
       end
     end

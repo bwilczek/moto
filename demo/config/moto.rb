@@ -12,10 +12,11 @@
         default_listeners: [Moto::Reporting::Listeners::ConsoleDots, Moto::Reporting::Listeners::JunitXml],
         listeners: {
             junit_xml: { output_file: 'junit_report.xml' },
+            # MotoWebUI can be obtained from: http://github.com/koojav/motowebui
             webui:
                 {
                     send_log_on_pass: false,
-                    url: 'http://your.address.com:3000'
+                    url: 'http://motowebui.host.com:3000'
                 }
         }
     },

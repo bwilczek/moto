@@ -35,7 +35,8 @@ module Moto
       # Default options
       options = {}
       options[:listeners] = []
-      options[:name] = ''
+      options[:run_name] = ''
+      options[:suite_name] = Time.now
       options[:stop_on] = {error: false, fail: false, skip: false}
 
       # Parse arguments
@@ -45,16 +46,18 @@ module Moto
         opts.on('-f', '--filters Filters', Array)          { |v| options[:filters]      = v }
         opts.on('-l', '--listeners Listeners', Array)      { |v| options[:listeners]    = v }
         opts.on('-e', '--environment Environment')         { |v| options[:environment]  = v }
-        opts.on('-n', '--name Name')                       { |v| options[:name]         = v }
+        opts.on('-r', '--run RunName')                     { |v| options[:run_name]     = v }
+        opts.on('-s', '--suite SuiteName')                 { |v| options[:suite_name]   = v }
         opts.on('-c', '--config Config')                   { |v| options[:config_name]  = v }
         opts.on('--stop-on-error')                         { options[:stop_on][:error] = true }
         opts.on('--stop-on-fail')                          { options[:stop_on][:fail]  = true }
         opts.on('--stop-on-skip')                          { options[:stop_on][:skip]  = true }
       end.parse!
 
-      if options[:name].empty?
-        options[:name] = evaluate_name(options[:tags], options[:tests], options[:filters])
+      if options[:run_name].empty?
+        options[:run_name] = evaluate_name(options[:tags], options[:tests], options[:filters])
       end
+
 
       if options[:environment]
         Moto::Lib::Config.environment = options[:environment]
@@ -124,6 +127,10 @@ module Moto
        -e, --environment Mandatory environment. Environment constants and tests parametrized in certain way depend on this.
        -c, --config      Name of the config, without extension, to be loaded from MotoApp/config/CONFIG_NAME.rb
                          Default: moto (which loads: MotoApp/config/moto.rb)
+       -s, --suiteName   Name of the test suite to which everything will be reported when using MotoWebUI.
+                         Default: Current timestamp.
+       -r, --runName     Name of the test run to which everything will be reported when using MotoWebUI.
+                         Default: Value of -g or -t depending on which one was specified.
        --stop-on-error   Moto will stop test execution when an error is encountered in test results
        --stop-on-fail    Moto will stop test execution when a failure is encountered in test results
        --stop-on-skip    Moto will stop test execution when a skip is encountered in test results
