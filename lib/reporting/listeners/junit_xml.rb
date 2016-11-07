@@ -13,7 +13,7 @@ module Moto
               errors:     run_status.tests_error.length,
               failures:   run_status.tests_failed.length,
               skipped:    run_status.tests_skipped.length,
-              name:       run_name,
+              name:       run_params[:run_name],
               tests:      run_status.tests_all.length,
               time:       run_status.duration,
               timestamp:  Time.at(run_status.time_start)

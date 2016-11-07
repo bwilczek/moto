@@ -34,10 +34,11 @@ module Moto
 
       # Default options
       options = {}
-      options[:listeners] = []
-      options[:run_name] = ''
-      options[:suite_name] = Time.now
-      options[:stop_on] = {error: false, fail: false, skip: false}
+      options[:listeners]   = []
+      options[:run_name]    = nil
+      options[:suite_name]  = nil
+      options[:assignee]    = nil
+      options[:stop_on]     = {error: false, fail: false, skip: false}
 
       # Parse arguments
       OptionParser.new do |opts|
@@ -48,13 +49,14 @@ module Moto
         opts.on('-e', '--environment Environment')         { |v| options[:environment]  = v }
         opts.on('-r', '--run RunName')                     { |v| options[:run_name]     = v }
         opts.on('-s', '--suite SuiteName')                 { |v| options[:suite_name]   = v }
+        opts.on('-a', '--assignee Assignee')               { |v| options[:assignee]     = v }
         opts.on('-c', '--config Config')                   { |v| options[:config_name]  = v }
         opts.on('--stop-on-error')                         { options[:stop_on][:error] = true }
         opts.on('--stop-on-fail')                          { options[:stop_on][:fail]  = true }
         opts.on('--stop-on-skip')                          { options[:stop_on][:skip]  = true }
       end.parse!
 
-      if options[:run_name].empty?
+      if options[:run_name].nil?
         options[:run_name] = evaluate_name(options[:tags], options[:tests], options[:filters])
       end
 
@@ -114,29 +116,36 @@ module Moto
       Moto (#{Moto::VERSION}) CLI Help:
       moto --version Display current version
 
-      moto run:      
+      MOTO RUN:
        -t, --tests       Tests to be executed.
        -g, --tags        Tags of tests to be executed.
                          Use # MOTO_TAGS: TAGNAME in test to assign tag.
        -f, --filters     Tags that filter tests passed via -t parameter.
                          Only tests in appropriate directory, having appropriate tag will be executed.
                          Use # MOTO_TAGS: TAGNAME in test to assign tag.
-       -l, --listeners   Reporters to be used.
-                         Defaults are Moto::Reporting::Listeners::ConsoleDots, Moto::Reporting::Listeners::JunitXml
-                         One reporter that is always used: Moto::Reporting::Listeners::KernelCode
+
+
        -e, --environment Mandatory environment. Environment constants and tests parametrized in certain way depend on this.
        -c, --config      Name of the config, without extension, to be loaded from MotoApp/config/CONFIG_NAME.rb
                          Default: moto (which loads: MotoApp/config/moto.rb)
-       -s, --suiteName   Name of the test suite to which everything will be reported when using MotoWebUI.
-                         Default: Current timestamp.
-       -r, --runName     Name of the test run to which everything will be reported when using MotoWebUI.
+
+
+       -l, --listeners   Reporters to be used.
+                         Defaults are Moto::Reporting::Listeners::ConsoleDots, Moto::Reporting::Listeners::JunitXml
+                         One reporter that is always used: Moto::Reporting::Listeners::KernelCode
+       -s, --suitename   Name of the test suite to which should aggregate the results of current test run.
+                         Required when specifying MotoWebUI as one of the listeners.
+       -r, --runname     Name of the test run to which everything will be reported when using MotoWebUI.
                          Default: Value of -g or -t depending on which one was specified.
+       -a, --assignee    ID of a person responsible for current test run.
+                         Can have a default value set in config/webui section.
+
        --stop-on-error   Moto will stop test execution when an error is encountered in test results
        --stop-on-fail    Moto will stop test execution when a failure is encountered in test results
        --stop-on-skip    Moto will stop test execution when a skip is encountered in test results
 
 
-      moto generate:
+      MOTO GENERATE:
        -t, --test        Path and name of the test to be created.
                          Examples:
                          -ttest_name          will create MotoApp/tests/test_name/test_name.rb

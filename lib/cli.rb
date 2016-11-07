@@ -107,7 +107,12 @@ module Moto
         initializer.init
       end
 
-      test_reporter = Moto::Reporting::TestReporter.new(argv[:listeners], argv[:suite_name], argv[:run_name])
+      run_params = {}
+      run_params[:run_name]   = argv[:run_name]
+      run_params[:suite_name] = argv[:suite_name]
+      run_params[:assignee]   = argv[:assignee]
+
+      test_reporter = Moto::Reporting::TestReporter.new(argv[:listeners], run_params)
 
       runner = Moto::Runner::TestRunner.new(test_paths_absolute, test_reporter, argv[:stop_on])
       runner.run

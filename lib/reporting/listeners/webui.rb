@@ -8,11 +8,20 @@ module Moto
       class Webui < Base
 
         REST_MAX_TRIES = 1
-        REST_TIMEOUT = 15000
+        REST_TIMEOUT = 15
 
-        def initialize(suite_name, run_name)
+        def initialize(run_params)
           super
-          @tester_id = 2
+
+          if run_params[:suite_name].nil?
+            raise 'ERROR: Please specify suite name (-s SUITE_NAME) when using MotoWebUI as one of the listeners.'
+          end
+
+          if run_params[:assignee]
+            @assignee = run_params[:assignee]
+          else
+            @assignee = config[:default_assignee]
+          end
 
           @tests = {}
           @url = "#{config[:url]}/api"
@@ -24,7 +33,7 @@ module Moto
 
           # Create Suite, if it did exist already nothing new will be created and existing data will be sent in the response
           url_suites = "#{@url}/suites"
-          suite_data = {name: suite_name}.to_json
+          suite_data = {name: run_params[:suite_name]}.to_json
 
           response = try {
             RestClient::Request.execute(method: :post,
@@ -41,10 +50,15 @@ module Moto
           # Prepare data for new TestRun
           url_runs = "#{@url}/suites/#{@suite_id}/runs"
           run_data = {
-              name: run_name,
-              tester_id: @tester_id,
+              name: run_params[:run_name],
               start_time: Time.now
-          }.to_json
+          }
+
+          if @assignee
+            run_data[:tester_id] = @assignee
+          end
+
+          run_data = run_data.to_json
 
           # Create new TestRun based on prepared data
           response = try {
@@ -83,7 +97,7 @@ module Moto
           # Prepare data for new Test
           url_tests = "#{@url}/suites/#{@suite_id}/runs/#{@run[:id]}/tests"
           test_data = {
-              name: test_status.name, #test_status.test_class_name
+              name: test_status.display_name, #test_status.test_class_name
               run_id: @run[:id],
               start_time: Time.now
           }.to_json
@@ -106,7 +120,7 @@ module Moto
 
         def end_test(test_status)
 
-          url_test = "#{@url}/suites/#{@suite_id}/runs/#{@run[:id]}/tests/#{@tests[test_status.name][:id]}"
+          url_test = "#{@url}/suites/#{@suite_id}/runs/#{@run[:id]}/tests/#{@tests[test_status.display_name][:id]}"
           test_data = {
               log: (test_status.results.last.code == Moto::Test::Result::PASSED && !@send_log_on_pass) ? nil : File.read(test_status.log_path),
               end_time: Time.now,

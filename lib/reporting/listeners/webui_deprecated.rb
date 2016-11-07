@@ -15,7 +15,7 @@ module Moto
           @send_log_on_pass = config[:send_log_on_pass]
 
           data = {
-              name: run_name,
+              name: run_params[:name],
               result: :running,
               cnt_all: nil,
               cnt_passed: nil,

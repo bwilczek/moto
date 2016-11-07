@@ -16,7 +16,10 @@
             webui:
                 {
                     send_log_on_pass: false,
-                    url: 'http://motowebui.host.com:3000'
+                    url: 'http://motowebui.host.com:3000',
+                    # Optional, can be removed in order to let MotoWebUI decide what to do with TestRun without assignee
+                    # Can also be set/overwritten by appropriate moto parametrization
+                    default_assignee: 0
                 }
         }
     },
