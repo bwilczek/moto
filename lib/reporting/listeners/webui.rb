@@ -92,7 +92,7 @@ module Moto
         end
 
 
-        def start_test(test_status)
+        def start_test(test_status, test_metadata)
 
           # Prepare data for new Test
           url_tests = "#{@url}/suites/#{@suite_id}/runs/#{@run[:id]}/tests"
@@ -100,7 +100,13 @@ module Moto
               name: test_status.display_name, #test_status.test_class_name
               run_id: @run[:id],
               start_time: Time.now
-          }.to_json
+          }
+
+          if test_metadata.ticket_url
+            test_data[:ticket_url] = test_metadata.ticket_url
+          end
+
+          test_data = test_data.to_json
 
           # Create new Test based on prepared data
           response = try {

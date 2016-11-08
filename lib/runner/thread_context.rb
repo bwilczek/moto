@@ -26,7 +26,7 @@ module Moto
         sleep_time   = config[:test_attempt_sleep] || 0
 
         # Reporting: start_test
-        @test_reporter.report_start_test(@test.status)
+        @test_reporter.report_start_test(@test.status, @test.metadata)
 
         (1..max_attempts).each do |attempt|
 

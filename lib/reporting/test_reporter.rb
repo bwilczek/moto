@@ -60,9 +60,10 @@ module Moto
 
       # Reports star of a test to all attached listeners
       # @param [Moto::Test::Status] test_status of test which's start is to be reported on
-      def report_start_test(test_status)
+      # @param [Moto::Test::Metadata] test_metadata of test which's start is to be reported on
+      def report_start_test(test_status, test_metadata)
         @listeners.each do |l|
-          l.start_test(test_status)
+          l.start_test(test_status, test_metadata)
         end
       end
 

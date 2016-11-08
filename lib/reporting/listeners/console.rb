@@ -17,10 +17,6 @@ module Moto
           puts "  Skipped:      #{run_status.tests_skipped.length}"
         end
 
-        def start_test(test_status)
-         # puts test_status.name
-        end
-
         def end_test(test_status)
           puts "\n#{test_status.name}\n\t#{test_status.results.last.message}"
         end

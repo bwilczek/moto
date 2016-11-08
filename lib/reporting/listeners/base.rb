@@ -25,7 +25,7 @@ module Moto
 
         # Abstract
         # Invoked when a single test is started
-        def start_test(test_status)
+        def start_test(test_status, test_metadata)
           # Abstract
         end
 

@@ -53,7 +53,7 @@ module Moto
           @run = JSON.parse(result)
         end
 
-        def start_test(test_status)
+        def start_test(test_status, test_metadata)
           # POST http://sandbox.dev:3000/api/tests/create
           data = {
               name: test_status.name,
