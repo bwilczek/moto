@@ -18,6 +18,7 @@ require_relative './runner/test_runner'
 require_relative './runner/thread_context'
 require_relative './runner/test_generator'
 require_relative './test/base'
+require_relative './test/metadata'
 require_relative './version'
 require_relative './reporting/listeners/base'
 require_relative './reporting/listeners/console'
@@ -35,14 +36,16 @@ module Moto
   class Cli
     def self.run(argv)
 
-      test_paths_absolute = []
+      tests_metadata = []
       directories   = argv[:tests]
       tags          = argv[:tags]
       filters       = argv[:filters]
 
       if directories
         directories.each do |directory|
-          test_paths_absolute += Dir.glob("#{MotoApp::DIR}/tests/#{directory}/**/*.rb")
+          Dir.glob("#{MotoApp::DIR}/tests/#{directory}/**/*.rb").each do |test_path|
+            tests_metadata << Moto::Test::Metadata.new(test_path)
+          end
         end
       end
 
@@ -50,51 +53,38 @@ module Moto
         tests_total = Dir.glob("#{MotoApp::DIR}/tests/**/*.rb")
         tests_total.each do |test_path|
 
-          test_body = File.read(test_path)
-          matches = test_body.match(/^#(\s*)MOTO_TAGS:(.*?)$/)
-
-          if matches
-            test_tags = matches.to_a[2].gsub(/\s*/, '').split(',')
-            test_paths_absolute << test_path unless (tags & test_tags).empty?
-          end
+          metadata = Moto::Test::Metadata.new(test_path)
+          tests_metadata << metadata unless (tags & metadata.tags).empty?
 
         end
       end
 
       # Make sure there are no repetitions in gathered set
-      test_paths_absolute.uniq!
+      tests_metadata.uniq! { |metadata| metadata.test_path }
 
       # Tests to be removed due to filtering will be gathered in this array
       # [].delete(item) cannot be used since it interferes with [].each
-      filtered_test_paths = []
+      unfit_metadata = []
 
       # Filter tests by provied tags
       if filters
-        test_paths_absolute.each do |test_path|
-          test_body = File.read(test_path)
+        tests_metadata.each do |metadata|
 
-          matches = test_body.match(/^#(\s*)MOTO_TAGS:(.*?)$/)
-
-          if matches
-
-            test_tags = matches.to_a[2].gsub(/\s*/, '').split(',')
-            if (filters & test_tags).empty?
-              # Test doesn't contain any tags to be filtered upon
-              filtered_test_paths << test_path
-            end
-
-          else
-            # Test has no tags at all
-            filtered_test_paths << test_path
+          # If test has no tags at all and filters are set it should be automatically removed
+          if metadata.tags.empty?
+            unfit_metadata << metadata
+          # Otherwise check provided tags and filters for compatibility
+          elsif (filters & metadata.tags).empty?
+            unfit_metadata << metadata
           end
 
         end
       end
 
-      test_paths_absolute -= filtered_test_paths
+      tests_metadata -= unfit_metadata
 
       #TODO Display criteria used
-      if test_paths_absolute.empty?
+      if tests_metadata.empty?
         puts 'No tests found for given arguments.'
         Kernel.exit(-1)
       end
@@ -114,7 +104,7 @@ module Moto
 
       test_reporter = Moto::Reporting::TestReporter.new(argv[:listeners], run_params)
 
-      runner = Moto::Runner::TestRunner.new(test_paths_absolute, test_reporter, argv[:stop_on])
+      runner = Moto::Runner::TestRunner.new(tests_metadata, test_reporter, argv[:stop_on])
       runner.run
     end
 

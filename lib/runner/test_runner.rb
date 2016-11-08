@@ -7,25 +7,25 @@ module Moto
 
       attr_reader :test_reporter
 
-      # @param [Array] test_paths_absolute Absolute paths to files with tests
+      # @param [Array] tests_metadata Collection of [Moto::Test::Metadata] objects describing Tests
       # @param [Moto::Reporting::TestReporter] test_reporter Reporter of test/run statuses that communicates with external status listeners
       # @param [Hash] stop_conditions Describe when TestRunner should abnormally stop its execution
       #   :error  [Boolean]
       #   :fail   [Boolean]
       #   :skip   [Boolean]
-      def initialize(test_paths_absolute, test_reporter, stop_conditions)
-        @test_paths_absolute = test_paths_absolute
+      def initialize(tests_metadata, test_reporter, stop_conditions)
+        @tests_metadata = tests_metadata
         @test_reporter = test_reporter
         @stop_conditions = stop_conditions
       end
 
       def run
-        test_provider = TestProvider.new(@test_paths_absolute)
+        test_provider = TestProvider.new(@tests_metadata)
         threads_max = Moto::Lib::Config.moto[:test_runner][:thread_count] || 1
 
         # remove log/screenshot files from previous execution
-        @test_paths_absolute.each do |test_path|
-          FileUtils.rm_rf("#{File.dirname(test_path)}/logs")
+        @tests_metadata.each do |metadata|
+          FileUtils.rm_rf("#{File.dirname(metadata.test_path)}/logs")
         end
 
         @test_reporter.report_start_run

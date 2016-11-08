@@ -6,13 +6,13 @@ module Moto
     # Thread safe provider of test instances
     class TestProvider
 
-      # @param [Array] test_paths_absolute
-      def initialize(test_paths_absolute)
+      # @param [Array] tests_metadata
+      def initialize(tests_metadata)
         super()
         @test_repeats = Moto::Lib::Config.moto[:test_runner][:test_repeats]
         @current_test_repeat = 1
         @queue = Queue.new
-        @test_paths_absolute = test_paths_absolute
+        @tests_metadata = tests_metadata
         @test_generator = TestGenerator.new
       end
 
@@ -26,9 +26,10 @@ module Moto
       def create_tests
         if @queue.empty?
 
-          test_variants = @test_generator.get_test_with_variants(get_test_path)
+          test_metadata = get_test_metadata
 
-          if test_variants
+          if test_metadata
+            test_variants = @test_generator.get_test_with_variants(test_metadata)
             test_variants.each do |test|
               @queue.push(test)
             end
@@ -38,12 +39,12 @@ module Moto
       end
       private :create_tests
 
-      # Returns path to the test while supporting the number of repeats specified by the user
-      # return [String] Path to the test
-      def get_test_path
+      # Returns metadata of the test while supporting the number of repeats specified by the user
+      # return [Moto::Test::Metadata]
+      def get_test_metadata
 
         if @current_test_repeat == 1
-          @test_path = @test_paths_absolute.shift
+          @test_metadata = @tests_metadata.shift
         end
 
         if @current_test_repeat == @test_repeats
@@ -52,9 +53,9 @@ module Moto
           @current_test_repeat += 1
         end
 
-        @test_path
+        @test_metadata
       end
-      private :get_test_path
+      private :get_test_metadata
 
       # Number of threads waiting for a job
       def num_waiting

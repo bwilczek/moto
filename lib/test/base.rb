@@ -10,6 +10,10 @@ module Moto
       attr_accessor :static_path
       attr_accessor :status
 
+      # Contains information specified by user in Test headers, marked with appropriate tags
+      # @return [Moto::Test::Metadata]
+      attr_accessor :metadata
+
       class << self
         attr_accessor :_path
       end
