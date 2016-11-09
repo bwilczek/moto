@@ -12,19 +12,30 @@ module Moto
       end
 
       # Text of the file with test
-      # TODO: Remake to store only text related to metatags, not whole file
-      def test_plaintext
-        if @test_plaintext.nil?
-          @test_plaintext = File.read(@test_path)
+      def text
+        if @text.nil?
+          @text = ''
+
+          File.foreach(@test_path) do |line|
+
+            # Read lines of file until class specification begins
+            if line.match(/^\s*(class|module)/)
+              break
+            end
+
+            @text += line
+          end
+
         end
 
-        @test_plaintext
+        @text
       end
+      private :text
 
       # @return [Array] of [String] which represent contents of #MOTO_TAGS
       def tags
         if @tags.nil?
-          matches = test_plaintext.match(/^#(\s*)MOTO_TAGS:(.*?)$/)
+          matches = text.match(/^#(\s*)MOTO_TAGS:(.*?)$/)
 
           if matches
             @tags = matches.to_a[2].gsub(/\s*/, '').split(',')
@@ -39,7 +50,7 @@ module Moto
       # @return [String] which represents contents of #TICKET_URL
       def ticket_url
         if @ticket_url.nil?
-          matches = test_plaintext.match(/^#(\s*)TICKET_URL:(.*?)$/)
+          matches = text.match(/^#(\s*)TICKET_URL:(.*?)$/)
 
           if matches
             @ticket_url = matches.to_a[2].gsub(/\s*/, '')

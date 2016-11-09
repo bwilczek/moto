@@ -106,6 +106,10 @@ module Moto
             test_data[:ticket_url] = test_metadata.ticket_url
           end
 
+          if test_metadata.tags
+            test_data[:tags] = test_metadata.tags.join(',')
+          end
+
           test_data = test_data.to_json
 
           # Create new Test based on prepared data
@@ -151,6 +155,10 @@ module Moto
 
         # @return [String] string with messages of all failures in a test
         def test_failures(test_status)
+          if test_status.results.last.failures.empty?
+            return nil
+          end
+
           test_status.results.last.failures.join("\n\t")
         end
 

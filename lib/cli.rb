@@ -67,6 +67,8 @@ module Moto
       unfit_metadata = []
 
       # Filter tests by provied tags
+      # - test must contain ALL tags specified with -f param
+      # - test may contain other tags
       if filters
         tests_metadata.each do |metadata|
 
@@ -74,7 +76,7 @@ module Moto
           if metadata.tags.empty?
             unfit_metadata << metadata
           # Otherwise check provided tags and filters for compatibility
-          elsif (filters & metadata.tags).empty?
+          elsif (metadata.tags & filters).length != filters.length
             unfit_metadata << metadata
           end
 

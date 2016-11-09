@@ -121,8 +121,8 @@ module Moto
        -g, --tags        Tags of tests to be executed.
                          Use # MOTO_TAGS: TAGNAME in test to assign tag.
        -f, --filters     Tags that filter tests passed via -t parameter.
-                         Only tests in appropriate directory, having appropriate tag will be executed.
-                         Use # MOTO_TAGS: TAGNAME in test to assign tag.
+                         Only tests in appropriate directory, having all of the specified tags will be executed.
+                         Use # MOTO_TAGS: TAGNAME1 in test to assign tag.
 
 
        -e, --environment Mandatory environment. Environment constants and tests parametrized in certain way depend on this.
