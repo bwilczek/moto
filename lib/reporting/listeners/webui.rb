@@ -77,7 +77,6 @@ module Moto
 
           url_run = "#{@url}/suites/#{@suite_id}/runs/#{@run[:id]}"
           run_data = {
-              result_id: webui_result_id(run_status.result),
               end_time: Time.now
           }.to_json
 
