@@ -77,7 +77,7 @@ module Moto
 
           url_run = "#{@url}/suites/#{@suite_id}/runs/#{@run[:id]}"
           run_data = {
-              end_time: Time.now
+              duration: (Time.now.to_f - run_status.time_start).to_i
           }.to_json
 
           response = try {
@@ -132,12 +132,13 @@ module Moto
           url_test = "#{@url}/suites/#{@suite_id}/runs/#{@run[:id]}/tests/#{@tests[test_status.display_name][:id]}"
           test_data = {
               log: (test_status.results.last.code == Moto::Test::Result::PASSED && !@send_log_on_pass) ? nil : File.read(test_status.log_path),
-              end_time: Time.now,
+              duration: (Time.now.to_f - test_status.time_start).to_i,
               error_message: test_status.results.last.code == Moto::Test::Result::ERROR ? nil : test_status.results.last.message,
               fail_message: test_failures(test_status),
               result_id: webui_result_id(test_status.results.last.code),
           }.to_json
 
+          test_data = test_data
           # Create new Test based on prepared data
           response = try {
             RestClient::Request.execute(method: :put,
