@@ -131,14 +131,12 @@ module Moto
 
           url_test = "#{@url}/suites/#{@suite_id}/runs/#{@run[:id]}/tests/#{@tests[test_status.display_name][:id]}"
           test_data = {
-              log: (test_status.results.last.code == Moto::Test::Result::PASSED && !@send_log_on_pass) ? nil : File.read(test_status.log_path),
               duration: (Time.now.to_f - test_status.time_start).to_i,
               error_message: test_status.results.last.code == Moto::Test::Result::ERROR ? nil : test_status.results.last.message,
               fail_message: test_failures(test_status),
               result_id: webui_result_id(test_status.results.last.code),
           }.to_json
 
-          test_data = test_data
           # Create new Test based on prepared data
           response = try {
             RestClient::Request.execute(method: :put,
@@ -151,6 +149,22 @@ module Moto
           test = JSON.parse(response, symbolize_names: true)
 
           @tests[test_status.name] = test
+
+          # Add Log to already existing Test
+          if (test_status.results.last.code == Moto::Test::Result::PASSED && @send_log_on_pass) || test_status.results.last.code != Moto::Test::Result::PASSED
+
+            url_log = "#{url_test}/logs"
+            log_data = { text: File.read(test_status.log_path) }.to_json
+
+            response = try {
+              RestClient::Request.execute(method: :post,
+                                          url: URI.escape(url_log),
+                                          payload: log_data,
+                                          timeout: REST_TIMEOUT,
+                                          headers: {content_type: :json, accept: :json})
+            }
+            response
+          end
         end
 
         # @return [String] string with messages of all failures in a test
