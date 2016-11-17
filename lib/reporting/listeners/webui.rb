@@ -97,7 +97,6 @@ module Moto
           url_tests = "#{@url}/suites/#{@suite_id}/runs/#{@run[:id]}/tests"
           test_data = {
               name: test_status.display_name, #test_status.test_class_name
-              run_id: @run[:id],
               start_time: Time.now
           }
 
