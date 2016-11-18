@@ -47,8 +47,8 @@ module Moto
         opts.on('-f', '--filters Filters', Array)          { |v| options[:filters]      = v }
         opts.on('-l', '--listeners Listeners', Array)      { |v| options[:listeners]    = v }
         opts.on('-e', '--environment Environment')         { |v| options[:environment]  = v }
-        opts.on('-r', '--run RunName')                     { |v| options[:run_name]     = v }
-        opts.on('-s', '--suite SuiteName')                 { |v| options[:suite_name]   = v }
+        opts.on('-r', '--runname RunName')                 { |v| options[:run_name]     = v }
+        opts.on('-s', '--suitename SuiteName')             { |v| options[:suite_name]   = v }
         opts.on('-a', '--assignee Assignee')               { |v| options[:assignee]     = v }
         opts.on('-c', '--config Config')                   { |v| options[:config_name]  = v }
         opts.on('--stop-on-error')                         { options[:stop_on][:error] = true }
@@ -57,7 +57,7 @@ module Moto
       end.parse!
 
       if options[:run_name].nil?
-        options[:run_name] = evaluate_name(options[:tags], options[:tests], options[:filters])
+        options[:run_name] = evaluate_name(options[:tests], options[:tags], options[:filters])
       end
 
 
