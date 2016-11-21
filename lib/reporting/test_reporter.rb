@@ -45,7 +45,11 @@ module Moto
         @run_status.initialize_run
 
         @listeners.each do |l|
-          l.start_run
+          begin
+            l.start_run
+          rescue Exception => e
+            puts "Listener #{l.class.name} on Start run: #{e.to_s}"
+          end
         end
       end
 
@@ -54,7 +58,11 @@ module Moto
         @run_status.finalize_run
 
         @listeners.each do |l|
-          l.end_run(@run_status)
+          begin
+            l.end_run(@run_status)
+          rescue Exception => e
+            puts "Listener #{l.class.name} on End run: #{e.to_s}"
+          end
         end
       end
 
@@ -63,7 +71,11 @@ module Moto
       # @param [Moto::Test::Metadata] test_metadata of test which's start is to be reported on
       def report_start_test(test_status, test_metadata)
         @listeners.each do |l|
-          l.start_test(test_status, test_metadata)
+          begin
+            l.start_test(test_status, test_metadata)
+          rescue Exception => e
+            puts "Listener #{l.class.name} on Start test: #{e.to_s}"
+          end
         end
       end
 
@@ -73,7 +85,11 @@ module Moto
         @run_status.add_test_status(test_status)
 
         @listeners.each do |l|
-          l.end_test(test_status)
+          begin
+            l.end_test(test_status)
+          rescue Exception => e
+            puts "Listener #{l.class.name} on End test: #{e.to_s}"
+          end
         end
       end
 
