@@ -131,9 +131,9 @@ module Moto
           url_test = "#{@url}/suites/#{@suite_id}/runs/#{@run[:id]}/tests/#{@tests[test_status.display_name][:id]}"
           test_data = {
               duration: (Time.now.to_f - test_status.time_start).to_i,
-              error_message: test_status.results.last.code == Moto::Test::Result::ERROR ? nil : test_status.results.last.message,
+              error_message: test_status.results.last.code == Moto::Test::Result::ERROR ? test_status.results.last.message : nil,
               fail_message: test_failures(test_status),
-              result_id: webui_result_id(test_status.results.last.code),
+              result_id: webui_result_id(test_status.results.last.code)
           }.to_json
 
           # Create new Test based on prepared data
