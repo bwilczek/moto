@@ -100,11 +100,11 @@ module Moto
               start_time: Time.now
           }
 
-          if test_metadata.ticket_url
-            test_data[:ticket_url] = test_metadata.ticket_url
+          if !test_metadata.ticket_urls.empty?
+            test_data[:ticket_urls] = test_metadata.ticket_urls.join(',')
           end
 
-          if test_metadata.tags
+          if !test_metadata.tags.empty?
             test_data[:tags] = test_metadata.tags.join(',')
           end
 

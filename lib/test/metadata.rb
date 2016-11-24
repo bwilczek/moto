@@ -47,19 +47,19 @@ module Moto
         @tags
       end
 
-      # @return [String] which represents contents of #TICKET_URL
-      def ticket_url
-        if @ticket_url.nil?
-          matches = text.match(/^#(\s*)TICKET_URL:(.*?)$/)
+      # @return [Array] of [String] which represent contents of #TICKET_URL
+      def ticket_urls
+        if @ticket_urls.nil?
+          matches = text.match(/^#(\s*)TICKET_URLS:(.*?)$/)
 
           if matches
-            @ticket_url = matches.to_a[2].gsub(/\s*/, '')
+            @ticket_urls = matches.to_a[2].gsub(/\s*/, '').split(',')
           else
-            @ticket_url = ''
+            @ticket_urls = []
           end
         end
 
-        @ticket_url
+        @ticket_urls
       end
 
       # Overriden eql? so various comparisons, array substractions etc. can be perfromed on
