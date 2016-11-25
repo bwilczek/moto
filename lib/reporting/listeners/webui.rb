@@ -28,7 +28,6 @@ module Moto
           @send_log_on_pass = config[:send_log_on_pass]
         end
 
-
         def start_run
 
           # Create Suite, if it did exist already nothing new will be created and existing data will be sent in the response
@@ -89,7 +88,6 @@ module Moto
           }
           @run = JSON.parse(response, symbolize_names: true)
         end
-
 
         def start_test(test_status, test_metadata)
 
