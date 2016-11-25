@@ -62,6 +62,24 @@ module Moto
         @ticket_urls
       end
 
+      # @return [Array] of [String] which represent contents of #TICKET_URL
+      def description
+        if @description.nil?
+          matches = text.scan(/^#(\s*)DESC:(.*?)$/)
+
+          @description = ''
+
+          if !matches.empty?
+            matches.each do |match|
+              @description += match[1] + "\n"
+            end
+          end
+        end
+
+        @description
+      end
+
+
       # Overriden eql? so various comparisons, array substractions etc. can be perfromed on
       # Metadata objects with them being represented by test's location
       def eql?(other)

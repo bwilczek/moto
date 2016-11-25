@@ -108,6 +108,10 @@ module Moto
             test_data[:tags] = test_metadata.tags.join(',')
           end
 
+          if !test_metadata.description.empty?
+            test_data[:description] = test_metadata.description
+          end
+
           test_data = test_data.to_json
 
           # Create new Test based on prepared data
