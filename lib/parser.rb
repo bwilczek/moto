@@ -51,6 +51,8 @@ module Moto
         opts.on('-s', '--suitename SuiteName')             { |v| options[:suite_name]   = v }
         opts.on('-a', '--assignee Assignee')               { |v| options[:assignee]     = v }
         opts.on('-c', '--config Config')                   { |v| options[:config_name]  = v }
+        opts.on('--threads ThreadCount', Integer)          { |v| options[:threads]      = v }
+        opts.on('--attempts AttemptCount', Integer)        { |v| options[:attempts]     = v }
         opts.on('--stop-on-error')                         { options[:stop_on][:error] = true }
         opts.on('--stop-on-fail')                          { options[:stop_on][:fail]  = true }
         opts.on('--stop-on-skip')                          { options[:stop_on][:skip]  = true }
@@ -60,7 +62,6 @@ module Moto
         options[:run_name] = evaluate_name(options[:tests], options[:tags], options[:filters])
       end
 
-
       if options[:environment]
         Moto::Lib::Config.environment = options[:environment]
         Moto::Lib::Config.load_configuration(options[:config_name] ? options[:config_name] : 'moto')
@@ -68,6 +69,9 @@ module Moto
         puts 'ERROR: Environment is mandatory.'
         Kernel.exit(-1)
       end
+
+      Moto::Lib::Config.moto[:test_runner][:thread_count] = options[:threads] if options[:threads]
+      Moto::Lib::Config.moto[:test_runner][:test_attempt_max] = options[:attempts] if options[:attempts]
 
       return options
     end
@@ -139,6 +143,8 @@ module Moto
                          Default: Value of -g or -t depending on which one was specified.
        -a, --assignee    ID of a person responsible for current test run.
                          Can have a default value set in config/webui section.
+       --threads         Thread count. Run tests in parallel.
+       --attempts        Attempt count. Max number of test execution times if failed.
 
        --stop-on-error   Moto will stop test execution when an error is encountered in test results
        --stop-on-fail    Moto will stop test execution when a failure is encountered in test results
