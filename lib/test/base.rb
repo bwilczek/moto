@@ -59,7 +59,7 @@ module Moto
 
       # Use this to run test
       # Initializes status, runs test, handles exceptions, finalizes status after run completion
-      def run_test(dry_run)
+      def run_test
         status.initialize_run
 
         #TODO Formatting/optimization
@@ -74,7 +74,7 @@ module Moto
         end
 
         begin
-          dry_run ? dry : run
+          run
         rescue Exception => exception
           status.log_exception(exception)
           raise
@@ -88,10 +88,6 @@ module Moto
       # Use :run_test in order to run test
       def run
         # abstract
-      end
-
-      def dry
-        skip('Dry run.')
       end
 
       def before

@@ -14,6 +14,7 @@ end
 
 require_relative './test_logging'
 require_relative './runner_logging'
+require_relative './runner/dry_runner'
 require_relative './runner/test_runner'
 require_relative './runner/thread_context'
 require_relative './runner/test_generator'
@@ -106,7 +107,11 @@ module Moto
 
       test_reporter = Moto::Reporting::TestReporter.new(argv[:listeners], run_params)
 
-      runner = Moto::Runner::TestRunner.new(tests_metadata, test_reporter, argv[:stop_on])
+      if Moto::Lib::Config.moto[:test_runner][:dry_run]
+        runner = Moto::Runner::DryRunner.new(tests_metadata, test_reporter)
+      else
+        runner = Moto::Runner::TestRunner.new(tests_metadata, test_reporter, argv[:stop_on])
+      end
       runner.run
     end
 

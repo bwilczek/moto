@@ -24,7 +24,6 @@ module Moto
       def run
         max_attempts = config[:test_attempt_max]   || 1
         sleep_time   = config[:test_attempt_sleep] || 0
-        dry_run      = config[:dry_run]            || false
 
         # Reporting: start_test
         @test_reporter.report_start_test(@test.status, @test.metadata)
@@ -35,7 +34,7 @@ module Moto
           Thread.current['logger'].info("Start: #{@test.name} attempt #{attempt}/#{max_attempts}")
 
           begin
-            @test.run_test(dry_run)
+            @test.run_test
           rescue Exceptions::TestForcedPassed, Exceptions::TestForcedFailure, Exceptions::TestSkipped => e
             Thread.current['logger'].info(e.message)
           rescue Exception => e
