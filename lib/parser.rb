@@ -56,6 +56,7 @@ module Moto
         opts.on('--stop-on-error')                         { options[:stop_on][:error] = true }
         opts.on('--stop-on-fail')                          { options[:stop_on][:fail]  = true }
         opts.on('--stop-on-skip')                          { options[:stop_on][:skip]  = true }
+        opts.on('--dry-run')                               { options[:dry_run]         = true }
       end.parse!
 
       if options[:run_name].nil?
@@ -72,6 +73,7 @@ module Moto
 
       Moto::Lib::Config.moto[:test_runner][:thread_count] = options[:threads] if options[:threads]
       Moto::Lib::Config.moto[:test_runner][:test_attempt_max] = options[:attempts] if options[:attempts]
+      Moto::Lib::Config.moto[:test_runner][:dry_run] = options[:dry_run] if options[:dry_run]
 
       return options
     end
@@ -149,6 +151,7 @@ module Moto
        --stop-on-error   Moto will stop test execution when an error is encountered in test results
        --stop-on-fail    Moto will stop test execution when a failure is encountered in test results
        --stop-on-skip    Moto will stop test execution when a skip is encountered in test results
+       --dry-run         Moto will list all test cases which would be run with provided arguments
 
 
       MOTO GENERATE:
