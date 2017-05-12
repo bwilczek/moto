@@ -61,8 +61,7 @@ module Moto
 
       if options[:tests]
         options[:tests].each do |path|
-          path.sub!(/^tests\//, '') # remove leading "tests/"
-          path.sub!(/\/$/, '')      # remove trailing "/"
+          path.sub!(%r{\/$}, '') # remove trailing "/"
         end
       end
 
