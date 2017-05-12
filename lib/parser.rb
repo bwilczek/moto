@@ -59,6 +59,12 @@ module Moto
         opts.on('--dry-run')                               { options[:dry_run]         = true }
       end.parse!
 
+      if options[:tests]
+        options[:tests].each do |path|
+          path.sub!(%r{\/$}, '') # remove trailing "/"
+        end
+      end
+
       if options[:run_name].nil?
         options[:run_name] = evaluate_name(options[:tests], options[:tags], options[:filters])
       end

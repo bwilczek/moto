@@ -52,6 +52,7 @@ module Moto
           when Moto::Test::Result::ERROR    then 'E'
           when Moto::Test::Result::SKIPPED  then 's'
           end
+          STDOUT.flush
         end
 
       end
