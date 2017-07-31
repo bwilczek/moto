@@ -70,6 +70,7 @@ module Moto
       if filters
         filters.each do |filter|
           filtered = tests_metadata.select do |metadata|
+            next if metadata.tags.empty?
             filter_matches_any_tag?(filter, metadata.tags) || filter_negation_matches_none_tag?(filter, metadata.tags)
           end
           tests_metadata &= filtered
