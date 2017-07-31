@@ -63,28 +63,18 @@ module Moto
       # Make sure there are no repetitions in gathered set
       tests_metadata.uniq! { |metadata| metadata.test_path }
 
-      # Tests to be removed due to filtering will be gathered in this array
-      # [].delete(item) cannot be used since it interferes with [].each
-      unfit_metadata = []
-
       # Filter tests by provied tags
       # - test must contain ALL tags specified with -f param
+      # - use ~ for negation
       # - test may contain other tags
       if filters
-        tests_metadata.each do |metadata|
-
-          # If test has no tags at all and filters are set it should be automatically removed
-          if metadata.tags.empty?
-            unfit_metadata << metadata
-          # Otherwise check provided tags and filters for compatibility
-          elsif (metadata.tags & filters).length != filters.length
-            unfit_metadata << metadata
+        filters.each do |filter|
+          filtered = tests_metadata.select do |metadata|
+            filter_matches_any_tag?(filter, metadata.tags) || filter_negation_matches_none_tag?(filter, metadata.tags)
           end
-
+          tests_metadata &= filtered
         end
       end
-
-      tests_metadata -= unfit_metadata
 
       #TODO Display criteria used
       if tests_metadata.empty?
@@ -114,6 +104,16 @@ module Moto
       end
       runner.run
     end
+
+    def self.filter_matches_any_tag?(filter, tags)
+      !filter.start_with?('~') && tags.any? { |tag| filter == tag }
+    end
+    private_class_method :filter_matches_any_tag?
+
+    def self.filter_negation_matches_none_tag?(filter, tags)
+      filter.start_with?('~') && tags.none? { |tag| filter[1..-1] == tag }
+    end
+    private_class_method :filter_negation_matches_none_tag?
 
   end
 end
