@@ -135,6 +135,7 @@ module Moto
        -f, --filters     Tags that filter tests passed via -t parameter.
                          Only tests in appropriate directory, having all of the specified tags will be executed.
                          Use # MOTO_TAGS: TAGNAME1 in test to assign tag.
+                         Use ~ to filter tests that do not contain specific tag, e.g. ~tag
 
 
        -e, --environment Mandatory environment. Environment constants and tests parametrized in certain way depend on this.
