@@ -17,7 +17,9 @@ module Moto
           FileUtils.mkdir_p(log_directory)
         end
 
-        Thread.current['logger'] = Logger.new(File.open(@test.log_path, File::WRONLY | File::TRUNC | File::CREAT))
+        file = File.open(@test.log_path, File::WRONLY | File::TRUNC | File::CREAT)
+        file.chmod(0o666)
+        Thread.current['logger'] = Logger.new(file)
         Thread.current['logger'].level = config[:test_log_level] || Logger::DEBUG
       end
 
