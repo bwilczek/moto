@@ -13,6 +13,7 @@ module Moto
         # @param [Hash] validation_options User input in form of a Hash - specifies options of validation
         # @param [Moto::Reporting::TestReporter] test_reporter Reporter of test/run statuses that communicates with external status listeners
         def initialize(tests_metadata, validation_options, test_reporter)
+
           @tests_metadata = tests_metadata
           @validation_options = validation_options
           @test_reporter = test_reporter
@@ -22,6 +23,7 @@ module Moto
           @test_reporter.report_start_run
 
           test_generator = Moto::Test::Generator.new
+
           @tests_metadata.each do |metadata|
             tests = test_generator.get_test_with_variants(metadata, 1)
             tests.each do |test|
@@ -30,19 +32,19 @@ module Moto
 
               # TODO: Validate tags here
 
-              if @validation_options[:has_tags]
-
+              if @validation_options[:has_tags] && metadata.tags.empty?
+                test.status.log_exception(Exceptions::TestForcedFailure.new('No tags.'))
               end
 
-              if @validation_options[:has_description]
-
+              if @validation_options[:has_description] && metadata.description.empty?
+                test.status.log_exception(Exceptions::TestForcedFailure.new('No description.'))
               end
 
               if @validation_options.key?(:tags_regex)
-
+                #TODO: Discuss with Maciek the format of regex and how to join array - on ',' ?
               end
 
-              test.status.log_exception(Exceptions::TestSkipped.new('Dry run.'))
+              # test.status.log_exception(Exceptions::TestSkipped.new('Dry run.'))
               test.status.finalize_run
               @test_reporter.report_end_test(test.status)
             end

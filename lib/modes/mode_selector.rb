@@ -34,11 +34,11 @@ module Moto
         test_reporter = prepare_test_reporter(parsed_arguments)
 
         validation_options = {}
-        validation_options[:tags_regex]       = parsed_arguments[:tags_regex] if parsed_arguments[:tags_regex]
+        validation_options[:tags_regex]       = parsed_arguments[:validator_regex] if parsed_arguments[:validator_regex]
         validation_options[:has_tags]         = parsed_arguments.key?(:validate_has_tags)
         validation_options[:has_description]  = parsed_arguments.key?(:validate_has_description)
 
-        validator = Moto::Modes::Validate::TestValidator.new(tests_metadata, parsed_arguments, test_reporter)
+        validator = Moto::Modes::Validate::TestValidator.new(tests_metadata, validation_options, test_reporter)
         validator.run
       end
 

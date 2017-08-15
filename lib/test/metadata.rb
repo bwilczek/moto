@@ -32,7 +32,7 @@ module Moto
       end
       private :text
 
-      # @return [Array] of [String] which represent contents of #MOTO_TAGS
+      # @return [Array<String>] which represent contents of #MOTO_TAGS
       def tags
         if @tags.nil?
           matches = text.match(/^#(\s*)MOTO_TAGS:(.*?)$/)
