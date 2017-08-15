@@ -28,7 +28,6 @@ module Moto
 
       # Initializes test to be executed with specified params and environment
       def init(params_path)
-        @env = Moto::Lib::Config.environment
         @params = []
         @params_path = params_path
 
@@ -40,7 +39,6 @@ module Moto
         @status.test_class_name = self.class.name
         @status.display_name = @status.test_class_name.split('::')[2..-2].join(' > ')
         @status.display_name += "_#{@params_path.split('/')[-1].chomp('.param')}" if @params_path
-        @status.env = Moto::Lib::Config.environment
       end
 
       # Setter for :log_path

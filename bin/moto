@@ -1,5 +1,12 @@
 #!/usr/bin/env ruby
 
-require_relative '../lib/parser'
+require_relative '../lib/test_logging'
+require_relative '../lib/test/base'
 
-Moto::Parser.run ARGV
+# require all listeners defined in moto/lib/reporting/listeners
+Dir[File.dirname(File.dirname(__FILE__)) + '/lib/reporting/listeners/*.rb'].each do |file|
+  require file
+end
+
+require_relative '../lib/parameter_parser'
+Moto::ParameterParser.parse_user_input(ARGV)

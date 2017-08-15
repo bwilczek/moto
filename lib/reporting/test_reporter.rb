@@ -1,5 +1,4 @@
 require_relative 'run_status'
-require_relative 'listeners/base'
 
 module Moto
   module Reporting
