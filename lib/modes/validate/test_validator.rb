@@ -30,21 +30,36 @@ module Moto
               @test_reporter.report_start_test(test.status, test.metadata)
               test.status.initialize_run
 
-              # TODO: Validate tags here
-
+              # Validate if tags are not empty
               if @validation_options[:has_tags] && metadata.tags.empty?
                 test.status.log_exception(Exceptions::TestForcedFailure.new('No tags.'))
               end
 
+              # Validate if test description was provided
               if @validation_options[:has_description] && metadata.description.empty?
                 test.status.log_exception(Exceptions::TestForcedFailure.new('No description.'))
               end
 
-              if @validation_options.key?(:tags_regex)
-                #TODO: Discuss with Maciek the format of regex and how to join array - on ',' ?
+              # Validate if provided regex is found within tags
+              if @validation_options.key?(:tags_regex_positive)
+                tags_string = metadata.tags.join(',')
+                regexp = Regexp.new(@validation_options[:tags_regex_positive])
+                result = regexp.match(tags_string)
+                if result.nil?
+                  test.status.log_exception(Exceptions::TestForcedFailure.new("Positive match should have been found in: #{metadata.tags.join(',')}"))
+                end
               end
 
-              # test.status.log_exception(Exceptions::TestSkipped.new('Dry run.'))
+              # Validate if provided regex is NOT found within tags
+              if @validation_options.key?(:tags_regex_negative)
+                tags_string = metadata.tags.join(',')
+                regexp = Regexp.new(@validation_options[:tags_regex_negative])
+                result = regexp.match(tags_string)
+                if !result.nil?
+                  test.status.log_exception(Exceptions::TestForcedFailure.new("Negative match shouldn't have been found in: #{metadata.tags.join(',')}"))
+                end
+              end
+
               test.status.finalize_run
               @test_reporter.report_end_test(test.status)
             end

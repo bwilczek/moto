@@ -107,7 +107,8 @@ module Moto
         opts.on('-s', '--suitename SuiteName') {|v| options[:suite_name] = v}
         opts.on('-a', '--assignee Assignee') {|v| options[:assignee] = v}
         opts.on('-c', '--config Config') {|v| options[:config_name] = v}
-        opts.on('-x', '--tagregex Regex') {|v| options[:validator_regex] = v}
+        opts.on('-p', '--tagregexpos RegexPositive') {|v| options[:validator_regex_positive] = v}
+        opts.on('-n', '--tagregexneg RegexNegative') {|v| options[:validator_regex_negative] = v}
         opts.on('-h', '--hastags') {|v| options[:validate_has_tags] = v}
         opts.on('-d', '--hasdescription') {|v| options[:validate_has_description] = v}
       end.parse!
@@ -242,7 +243,10 @@ module Moto
        -a, --assignee    ID of a person responsible for current test run.
                          Can have a default value set in config/webui section.
 
-       -x, --tagregex          Custom regex with which all tags will be validated.
+       -p, --tagregexpos       Regex which will be matched against tags joined on ','.
+                               Validation will pass if there is a match.
+       -n, --tagregexneg       Regex which will be matched against tags joined on ','.
+                               Validation will pass if there is no match.
        -h, --hastags           Validates if tests have #MOTO_TAGS with any tags.
        -d, --hasdescription    Validates if tests have #DESC with any text.
 
