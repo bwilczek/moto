@@ -1,6 +1,6 @@
 module Moto
   module Exceptions
-    class MotoException < RuntimeError
+    class Base < RuntimeError
       
     end
   end

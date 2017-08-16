@@ -20,9 +20,6 @@ module Moto
       # Array of [Moto::Test::Result], each item represents a result of a single attempt to pass the test
       attr_reader :results
 
-      # Environment on which test was run
-      attr_accessor :env
-
       # Set of params on which test was based
       attr_accessor :params
 

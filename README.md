@@ -1,38 +1,48 @@
-# moto
+# Moto Framework
 
 ## Introduction
-`moto` is a testing framework dedicated for functional testing. The main motivation behind this project is to make the test developer write as little code as possible to get the tests running. To some degree one might say that this framework implements `rails` paradigm for testing.
+`moto` is a testing framework dedicated for functional testing.  
+The main motivation behind this project is to make the test developer write as little code as possible to get the tests running.
 
 ## Basic concepts
-### Tests are an application
-`moto` tests project is a separate application, which follows some standards in file naming and location. Following a few simple rules can significantly reduce amount of code that has to be written in order to run the tests. `moto` will generate the scaffodling of the application as well an empty test scripts.
+### Structure
+Moto is delivered in form of a gem, executed from a directory where moto-based tests are stored.  
+Configuration overhead is minimal - simple folder structure is needed for `moto` to be able to recognize appropriate files.  
 
-### Test script contains only test logic
-No need to declare test class inheriting from some parent, or declare any `_test` methods - `moto` will do this for you. 
+### Tests
+Each test is a separate class which derives from `Moto::Test::Base` and needs to implement `run()` method where it's logic is described.
 
-### Keeping tests DRY
-Tests can also be parametrized, so that once scenario is executed multiple times with different sets of parameters.
+### DRY
+Tests can also be parametrized, so that a single scenario is executed multiple times with different sets of parameters.  
+Each parametrized variant of a scenario is then treated, result-wise, as a separate test entity.
 
-### Logging & reporting
-Test execution details can be reported in different ways: from simple console output to storing full details in the database, or saving `junit`-like XML file - friendly for any CI system.
+### Result reporting and summary
+Test execution details can be reported in multiple ways:
+#### 1. **Console output**: compact and more descriptive console reportes are available out of the box
+#### 2. **XML**: JUnit file
+#### 3. **[MotoWebUI](https://github.com/Koojav/motowebui)**: Easily deployable web interface for viewing and managing test results is available as a separate project.
+#### 4. **Open Source**: additional reporters-listeners can be easily added to fit any project.
 
-Every `Client` method call is logged into test execution log giving full trace of what went wrong. Standard Ruby `Logger` class is used for this purpose and log level is configurable. Writing to log file directly from the test is also supported so that debugging is made much easier.
+Every method call is logged into test execution log giving full trace of what went wrong. 
+Standard Ruby `Logger` class is used for this purpose and log level is configurable. 
+Writing to log file directly from the test is also supported so that debugging is made much easier. 
 
-### and more
-1. flexible configuration
-2. support for multi-threading
-3. multiple ways of selecting tests for execution (single, list, directory, tag)
-4. ... more to come as development is in progress
+## Configuration
+### 1. Flexible configuration with parameters or configuration file
+### 2. Multi-threading supported
+### 3. Multiple environments supported with configuration files
+### 4. Many ways to select full/sub-set of tests to be executed: tags, directories
 
-## More details
-### Framework architecture
-runner, thread_context, test, result
+## Additional features
+### 1. Test template generation via `moto generate`
+### 2. Test structure/description/tags validation via `moto validate`
+### 3. Dry-run available via `moto run --dry-run` 
 
-### Generating project and sample tests
-under construction
+## Usage
+Copy directory: `demo`, adjust to your needs and from that directory execute `moto run` - for list of available options please see help (just type `moto`).
 
 ### Test API
-When in test files the following methods/fields are available:
+From test class' level the following methods/fields are available:
 
 * `const('key')` - read const value specific for current environment from `config/const.yml` file
 * `logger.info(msg)` - write message to test execution log file. See Ruby Logger class for details.
@@ -41,23 +51,13 @@ When in test files the following methods/fields are available:
 * `pass(optional_reason)` - forcibly pass this test and finish execution immediatelly
 * `fail(optional_reason)` - forcibly fail this test and finish execution immediatelly
 * `assert_equal(a, b)` - assertion, see class `Moto::Test::Base` for more assertion methods
+* `assert(condition, failure message)` - assertion, see class `Moto::Test::Base` for more assertion methods
 * `dir` - current test directory
 * `filename` - current test file name with no extension
 * `run` - body of the test to be executed
-* `before` - invoked before run()
-* `after` - invoked after run(), even if there was an error in run()
+* `before` - invoked before run(). optional
+* `after` - invoked after run(), even if there was an error in run(), optional
 * `status` - info about execution status of the test (failures, problems etc.)
-
-### Using `Website` client and creating your own `Pages`
-When editing `page` classes the following methods are available:
-
-* `session` - reference to `Capybara` session
-* `page('Login')` - reference to other `page` object. Here: `MotoApp::Clients::WebsitePages::Login`
-* `const('key')` - read const value specific for current environment from `config/const.yml` file
-* `context.moto_app_config` - read config from YAML files in ./config
-* `logger.info(msg)` - write message to test execution log file. See Ruby Logger class for details.
-* `current_test` - reference to currently running test
-* `client('Website')` - access other client object instance for given class name.
 
 ### Environment
 
@@ -78,6 +78,6 @@ When editing `page` classes the following methods are available:
 * Access by `Moto::Lib::Config.moto`
 
 ### Creating your own `listener`
-Custom listeners need to derive from Moto::Reporting::Listeners::Base  
+Custom listeners need to derive from `Moto::Reporting::Listeners::Base`  
 Code documentation in that class explains all the details
 

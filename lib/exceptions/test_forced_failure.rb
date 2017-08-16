@@ -1,6 +1,8 @@
+require_relative 'base'
+
 module Moto
   module Exceptions
-    class TestForcedFailure  < MotoException
+    class TestForcedFailure  < Base
       
     end
   end

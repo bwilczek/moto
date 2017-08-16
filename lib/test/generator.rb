@@ -1,11 +1,13 @@
+require_relative 'base'
+
 module MotoApp
   module Tests
   end
 end
 
 module Moto
-  module Runner
-    class TestGenerator
+  module Test
+    class Generator
 
       def initialize
         @internal_counter = 0
@@ -16,10 +18,11 @@ module Moto
       #   Example: A test with a config file and 2 sets of parameters there will be returned as array with two elements.
       #
       # @param [Moto::Test::Metadata] test_metadata Metadata that describes test to be instantiated
+      # @param [Integer] variants_limit Limit how many params will be parsed per test. Default: 0 (no limit)
       # @return [Array] An array of [Moto::Test::Base] descendants
       #                 each entry is a Test with set of parameters injected
-      def get_test_with_variants(test_metadata)
-        variantize(test_metadata)
+      def get_test_with_variants(test_metadata, variants_limit = 0)
+        variantize(test_metadata, variants_limit)
       end
 
       # Converts test's path to an array of Moto::Base::Test instances that represent all test variants (params)
@@ -29,36 +32,36 @@ module Moto
       # they must be required prior to that. That might be done in overloaded app's initializer.
       #
       # @param [Moto::Test::Metadata] test_metadata Metadata that describes test to be instantiated, contains path to test
+      # @param [Integer] variants_limit Limit how many params will be parsed per test.
       # @return [Array] array of already initialized test's variants
-      def variantize(test_metadata)
+      def variantize(test_metadata, variants_limit)
         variants = []
 
-          # TODO CHANGED TEMPORARY
-          #params_path = test_path_absolute.sub(/\.rb\z/, '')
-          params_directory = File.dirname(test_metadata.test_path).to_s + '/params/**'
-          param_files_paths = Dir.glob(params_directory)
-          param_files_paths = [nil] if param_files_paths.empty?
+        # TODO CHANGED TEMPORARY
+        #params_path = test_path_absolute.sub(/\.rb\z/, '')
+        params_directory = File.dirname(test_metadata.test_path).to_s + '/params/**'
+        param_files_paths = Dir.glob(params_directory)
+        param_files_paths = [nil] if param_files_paths.empty?
 
-          param_files_paths.each do |params_path|
+        param_files_paths.each do |params_path|
 
-            #TODO environment support
-            # Filtering out param sets that are specific to certain envs
-            # unless params['__env'].nil?
-            #   allowed_envs = params['__env'].is_a?(String) ? [params['__env']] : params['__env']
-            #   next unless allowed_envs.include?(Moto::Lib::Config.environment)
-            # end
+          # TODO Name/logname/displayname
+          test = generate(test_metadata)
+          test.init(params_path)
+          test.log_path = "#{File.dirname(test_metadata.test_path).to_s}/logs/#{test.name.gsub(/[^0-9A-Za-z.\-]/, '_')}.log"
+          @internal_counter += 1
 
-            #TODO Name/logname/displayname
-            test = generate(test_metadata)
-            test.init(params_path)
-            test.log_path = "#{File.dirname(test_metadata.test_path).to_s}/logs/#{test.name.gsub(/[^0-9A-Za-z.\-]/, '_')}.log"
-            @internal_counter += 1
+          variants << test
 
-            variants << test
+          # Break if limit of parametrized variants has been reached
+          if variants_limit > 0 && variants.length == variants_limit
+            break
           end
+        end
 
         variants
       end
+
       private :variantize
 
       # Generates test instances
