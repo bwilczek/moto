@@ -38,6 +38,7 @@ module Moto
         validation_options[:tags_regex_negative] = parsed_arguments[:validator_regex_negative] if parsed_arguments[:validator_regex_negative]
         validation_options[:has_tags]            = parsed_arguments.key?(:validate_has_tags)
         validation_options[:has_description]     = parsed_arguments.key?(:validate_has_description)
+        validation_options[:tag_whitelist]       = parsed_arguments[:tag_whitelist] if parsed_arguments[:tag_whitelist]
 
         validator = Moto::Modes::Validate::TestValidator.new(tests_metadata, validation_options, test_reporter)
         validator.run
