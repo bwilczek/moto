@@ -1,5 +1,6 @@
 require_relative '../../reporting/test_reporter'
 require_relative 'test_provider'
+require_relative 'thread_context'
 
 module Moto
   module Modes
