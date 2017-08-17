@@ -1,3 +1,5 @@
+require 'base'
+
 module Moto
   module Reporting
     module Listeners
