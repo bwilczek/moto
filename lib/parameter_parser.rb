@@ -1,8 +1,12 @@
-require 'bundler/setup'
-Bundler.require
+begin
+  require 'bundler/setup'
+  Bundler.require
+rescue
+  nil
+end
+
 
 require 'optparse'
-require 'yaml'
 
 require_relative 'config'
 require_relative 'modes/mode_selector'
@@ -111,6 +115,7 @@ module Moto
         opts.on('-n', '--tagregexneg RegexNegative') {|v| options[:validator_regex_negative] = v}
         opts.on('-h', '--hastags') {|v| options[:validate_has_tags] = v}
         opts.on('-d', '--hasdescription') {|v| options[:validate_has_description] = v}
+        opts.on('-w', '--tagwhitelist TagWhitelist', Array) {|v| options[:tag_whitelist] = v}
       end.parse!
 
       if options[:tests]
@@ -249,6 +254,8 @@ module Moto
                                Validation will pass if there is no match.
        -h, --hastags           Validates if tests have #MOTO_TAGS with any tags.
        -d, --hasdescription    Validates if tests have #DESC with any text.
+       -w, --tagwhitelist      Only tags from the whitelist will be allowed.
+                               Provide in format: tag1,tag2,tag3 etc.
 
 
 

@@ -40,6 +40,16 @@ module Moto
                 test.status.log_exception(Exceptions::TestForcedFailure.new('No description.'))
               end
 
+              # Validate if tags contain entries only from the whitelist
+              if @validation_options.key?(:tag_whitelist)
+                metadata.tags.each do |tag|
+                  if !@validation_options[:tag_whitelist].include?(tag)
+                    test.status.log_exception(Exceptions::TestForcedFailure.new("Tags contain non-whitelisted entry: #{tag}"))
+                    break
+                  end
+                end
+              end
+
               # Validate if provided regex is found within tags
               if @validation_options.key?(:tags_regex_positive)
                 tags_string = metadata.tags.join(',')
