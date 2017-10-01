@@ -65,6 +65,7 @@ module Moto
         opts.on('--stop-on-fail') {options[:stop_on][:fail] = true}
         opts.on('--stop-on-skip') {options[:stop_on][:skip] = true}
         opts.on('--dry-run') {options[:dry_run] = true}
+        opts.on('-x', '--explicit_errors') {options[:explicit_errors] = true}
       end.parse!
 
       if options[:tests]
@@ -89,6 +90,7 @@ module Moto
       Moto::Lib::Config.moto[:test_runner][:thread_count] = options[:threads] if options[:threads]
       Moto::Lib::Config.moto[:test_runner][:test_attempt_max] = options[:attempts] if options[:attempts]
       Moto::Lib::Config.moto[:test_runner][:dry_run] = options[:dry_run] if options[:dry_run]
+      Moto::Lib::Config.moto[:test_runner][:explicit_errors] = options[:explicit_errors] if options[:explicit_errors]
 
       return options
     end
@@ -219,6 +221,11 @@ module Moto
        --stop-on-fail    Moto will stop test execution when a failure is encountered in test results
        --stop-on-skip    Moto will stop test execution when a skip is encountered in test results
        --dry-run         Moto will list all test cases which would be run with provided arguments
+
+       --x, explicit_errors   Use for development of tests - each code error in test will be caught,
+                              logged as would normally do but will be also additionaly re-thrown.
+                              This will obviously stop execution of selected set of tests but will provide
+                              full stack and error message to the developer.
 
 
 

@@ -1,4 +1,5 @@
 require_relative 'status'
+require 'logger'
 
 module Moto
   module Test
@@ -140,7 +141,7 @@ module Moto
           line_number = caller.select { |l| l.match(/#{static_path}:\d*:in `run'/) }.first[/\d+/].to_i
 
           status.log_failure("ASSERTION FAILED in line #{line_number}: #{message}")
-          Thread.current['logger'].error(message)
+          logger.error(message)
         end
       end
 
@@ -149,6 +150,11 @@ module Moto
       # @return [String] Value of the key or nil if not found
       def const(key)
         Moto::Lib::Config.environment_const(key)
+      end
+
+      # @return [Logger]
+      def logger
+        Thread.current['logger']
       end
 
     end

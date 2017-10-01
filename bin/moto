@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 
-require_relative '../lib/test_logging'
 require_relative '../lib/test/base'
 
 require_relative '../lib/reporting/listeners/base'
@@ -10,4 +9,5 @@ require_relative '../lib/reporting/listeners/junit_xml'
 require_relative '../lib/reporting/listeners/webui'
 
 require_relative '../lib/parameter_parser'
+
 Moto::ParameterParser.parse_user_input(ARGV)

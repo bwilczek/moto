@@ -1,7 +1,14 @@
+require 'thread'
+
 module Moto
   module Reporting
     module Listeners
       class ConsoleDots < Base
+
+        def initialize(run_params)
+          @displayed_results = 0
+          @semaphore = Mutex.new
+        end
 
         def end_run(run_status)
           puts ''
@@ -46,15 +53,25 @@ module Moto
         end
 
         def end_test(test_status)
-          print case test_status.results.last.code
-          when Moto::Test::Result::PASSED   then '.'
-          when Moto::Test::Result::FAILURE  then 'F'
-          when Moto::Test::Result::ERROR    then 'E'
-          when Moto::Test::Result::SKIPPED  then 's'
-          end
-          STDOUT.flush
-        end
+          @semaphore.synchronize do
+            @displayed_results += 1
 
+            representation =
+                case test_status.results.last.code
+                  when Moto::Test::Result::PASSED   then '.'
+                  when Moto::Test::Result::FAILURE  then 'F'
+                  when Moto::Test::Result::ERROR    then 'E'
+                  when Moto::Test::Result::SKIPPED  then 's'
+                end
+
+            if @displayed_results%50 != 0
+              print representation
+            else
+              puts representation
+            end
+
+          end
+        end
       end
     end
   end

@@ -18,10 +18,7 @@ module Moto
             FileUtils.mkdir_p(log_directory)
           end
 
-          file = File.open(@test.log_path, File::WRONLY | File::TRUNC | File::CREAT)
-          file.chmod(0o666)
-          Thread.current['logger'] = Logger.new(file)
-          Thread.current['logger'].level = config[:test_log_level] || Logger::DEBUG
+          setup_logger
         end
 
         def run
@@ -34,20 +31,25 @@ module Moto
           (1..max_attempts).each do |attempt|
 
             @test.before
-            Thread.current['logger'].info("Start: #{@test.name} attempt #{attempt}/#{max_attempts}")
+            logger.info("Start: #{@test.name} attempt #{attempt}/#{max_attempts}")
 
             begin
               @test.run_test
             rescue Exceptions::TestForcedPassed, Exceptions::TestForcedFailure, Exceptions::TestSkipped => e
-              Thread.current['logger'].info(e.message)
+              logger.info(e.message)
             rescue Exception => e
-              Thread.current['logger'].error("#{e.class.name}: #{e.message}")
-              Thread.current['logger'].error(e.backtrace.join("\n"))
+              logger.error("#{e.class.name}: #{e.message}")
+              logger.error(e.backtrace.join("\n"))
+
+              if config[:explicit_errors]
+                raise e
+              end
+
             end
 
             @test.after
 
-            Thread.current['logger'].info("Result: #{@test.status.results.last.code}")
+            logger.info("Result: #{@test.status.results.last.code}")
 
             # test should have another attempt in case of an error / failure / none at all
             unless (@test.status.results.last.code == Moto::Test::Result::ERROR && config[:test_reattempt_on_error]) ||
@@ -63,7 +65,7 @@ module Moto
           end # Make another attempt
 
           # Close and flush stream to file
-          Thread.current['logger'].close
+          logger.close
 
           # Reporting: end_test
           @test_reporter.report_end_test(@test.status)
@@ -74,6 +76,18 @@ module Moto
           Moto::Lib::Config.moto[:test_runner]
         end
         private :config
+
+        def setup_logger
+          file = File.open(@test.log_path, File::WRONLY | File::TRUNC | File::CREAT)
+          file.chmod(0o666)
+
+          Thread.current['logger'] = Logger.new(file)
+          logger.level = config[:test_log_level] || Logger::DEBUG
+        end
+
+        def logger
+          Thread.current['logger']
+        end
 
       end
     end
