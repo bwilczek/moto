@@ -39,9 +39,24 @@ module Moto
 
         # TODO CHANGED TEMPORARY
         #params_path = test_path_absolute.sub(/\.rb\z/, '')
-        params_directory = File.dirname(test_metadata.test_path).to_s + '/params/**'
+        params_directory = File.dirname(test_metadata.test_path).to_s + '/params/'
+
+        # Depending on param_name being provided or not filter files in param directory in appropriate way
+        if config[:param_name]
+          params_directory << "*#{config[:param_name]}*.param"
+        else
+          params_directory << '*.param'
+        end
+
         param_files_paths = Dir.glob(params_directory)
-        param_files_paths = [nil] if param_files_paths.empty?
+
+        # If param name is not specified then it's possible to run a test without params - they might not be there at all,
+        # but when param name is provided only matching ones need to be executed.
+        if config[:param_name]
+          param_files_paths = [] if param_files_paths.empty?
+        else
+          param_files_paths = [nil] if param_files_paths.empty?
+        end
 
         param_files_paths.each do |params_path|
 
@@ -61,7 +76,6 @@ module Moto
 
         variants
       end
-
       private :variantize
 
       # Generates test instances
@@ -105,6 +119,12 @@ module Moto
 
         test.injected_error_message = error_message
       end
+
+      # @return [Hash] Hash with config for test generator
+      def config
+        Moto::Lib::Config.moto[:test_generator]
+      end
+      private :config
 
     end
   end

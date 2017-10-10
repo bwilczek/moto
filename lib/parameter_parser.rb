@@ -7,7 +7,7 @@ end
 
 
 require 'optparse'
-
+require 'logger'
 require_relative 'config'
 require_relative 'modes/mode_selector'
 
@@ -65,7 +65,10 @@ module Moto
         opts.on('--stop-on-fail') {options[:stop_on][:fail] = true}
         opts.on('--stop-on-skip') {options[:stop_on][:skip] = true}
         opts.on('--dry-run') {options[:dry_run] = true}
-        opts.on('-x', '--explicit_errors') {options[:explicit_errors] = true}
+        opts.on('-x', '--explicit-errors') {options[:explicit_errors] = true}
+        opts.on('--log-level LogLevel') {|v| options[:log_level] = v}
+        opts.on('--param-name ParamName') {|v| options[:param_name] = v}
+
       end.parse!
 
       if options[:tests]
@@ -87,10 +90,38 @@ module Moto
 
       Moto::Lib::Config.load_configuration(options[:config_name] ? options[:config_name] : 'moto')
 
+      if !Moto::Lib::Config.moto[:test_runner]
+        Moto::Lib::Config.moto[:test_runner] = {}
+      end
+
+      if !Moto::Lib::Config.moto[:test_generator]
+        Moto::Lib::Config.moto[:test_generator] = {}
+      end
+
+      # Runner configuration
+
       Moto::Lib::Config.moto[:test_runner][:thread_count] = options[:threads] if options[:threads]
       Moto::Lib::Config.moto[:test_runner][:test_attempt_max] = options[:attempts] if options[:attempts]
       Moto::Lib::Config.moto[:test_runner][:dry_run] = options[:dry_run] if options[:dry_run]
       Moto::Lib::Config.moto[:test_runner][:explicit_errors] = options[:explicit_errors] if options[:explicit_errors]
+
+      # Test log level parsing
+
+      if options[:log_level]
+        Moto::Lib::Config.moto[:test_runner][:log_level] = case options[:log_level].downcase
+        when 'info'   then Logger::INFO
+        when 'warn'   then Logger::WARN
+        when 'error'  then  Logger::ERROR
+        when 'fatal'  then Logger::FATAL
+        else Logger::DEBUG
+        end
+      else
+        Moto::Lib::Config.moto[:test_runner][:log_level] = Logger::DEBUG
+      end
+
+      # Generator configuration
+
+      Moto::Lib::Config.moto[:test_generator][:param_name] = options[:param_name] if options[:param_name]
 
       return options
     end
@@ -220,12 +251,17 @@ module Moto
        --stop-on-error   Moto will stop test execution when an error is encountered in test results
        --stop-on-fail    Moto will stop test execution when a failure is encountered in test results
        --stop-on-skip    Moto will stop test execution when a skip is encountered in test results
+
        --dry-run         Moto will list all test cases which would be run with provided arguments
 
-       --x, explicit_errors   Use for development of tests - each code error in test will be caught,
+       --x, explicit-errors   Use for development of tests - each code error in test will be caught,
                               logged as would normally do but will be also additionaly re-thrown.
                               This will obviously stop execution of selected set of tests but will provide
                               full stack and error message to the developer.
+
+       --log-level       Defines level at which Logger works. Use one of following: debug, info, warn, error, fatal.
+
+       --param-name      Only parameters that contain provided string will be executed.
 
 
 

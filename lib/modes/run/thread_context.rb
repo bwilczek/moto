@@ -1,4 +1,3 @@
-require 'erb'
 require 'fileutils'
 require_relative '../../config'
 
@@ -82,7 +81,7 @@ module Moto
           file.chmod(0o666)
 
           Thread.current['logger'] = Logger.new(file)
-          logger.level = config[:test_log_level] || Logger::DEBUG
+          logger.level = config[:log_level]
         end
 
         def logger

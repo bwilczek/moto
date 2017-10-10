@@ -2,7 +2,6 @@
     test_runner: {
         thread_count: 5,
         test_repeats: 1,
-        test_log_level: Logger::DEBUG,
         test_attempt_max: 3,
         test_attempt_sleep: 1,
         test_reattempt_on_error: false,
