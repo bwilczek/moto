@@ -36,14 +36,20 @@ module Moto
       # Path to test's log, for purpose of making test logs accessible via listeners
       attr_accessor :log_path
 
+      # Amount of attempts that have been made to successfuly complete a test
+      attr_accessor :attempts
+
       def initialize
         @results = []
+        @attempts = 0
       end
 
       def initialize_run
         if @time_start.nil?
           @time_start = Time.now.to_f
         end
+
+        @attempts += 1
 
         result = Moto::Test::Result.new
         result.code = Moto::Test::Result::RUNNING

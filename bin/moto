@@ -3,8 +3,11 @@
 require_relative '../lib/test/base'
 
 require_relative '../lib/reporting/listeners/base'
-require_relative '../lib/reporting/listeners/console'
 require_relative '../lib/reporting/listeners/console_dots'
+require_relative '../lib/reporting/listeners/silent'
+require_relative '../lib/reporting/listeners/summary_short'
+require_relative '../lib/reporting/listeners/summary_only'
+require_relative '../lib/reporting/listeners/attempts'
 require_relative '../lib/reporting/listeners/junit_xml'
 require_relative '../lib/reporting/listeners/webui'
 

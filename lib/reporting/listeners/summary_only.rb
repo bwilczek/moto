@@ -1,10 +1,9 @@
 module Moto
   module Reporting
     module Listeners
-      class Console < Base
+      class SummaryOnly < Base
 
         def start_run
-         # puts 'START'
         end
 
         def end_run(run_status)
@@ -17,8 +16,10 @@ module Moto
           puts "  Skipped:      #{run_status.tests_skipped.length}"
         end
 
+        def start_test(test_status, test_metadata)
+        end
+
         def end_test(test_status)
-          puts "\n#{test_status.name}\n\t#{test_status.results.last.message}"
         end
 
       end

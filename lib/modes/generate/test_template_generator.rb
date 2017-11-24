@@ -26,7 +26,13 @@ module Moto
           if options[:base_class].nil?
             base_class_qualified_name = 'Moto::Test::Base'
           else
-            base_class_qualified_name = "#{options[:app_name]}::Lib::Test::#{options[:base_class].split('/').join('::').camelize}"
+            name_parts = options[:base_class].split('/')
+
+            name_parts.each_with_index do |part,index|
+              name_parts[index] = part.camelize
+            end
+
+            base_class_qualified_name = "#{options[:app_name]}::Lib::Test::#{name_parts.join('::')}"
           end
 
           # Where to put finished template
@@ -43,9 +49,11 @@ module Moto
 
               indent = 0
 
-              if options[:base_class].nil?
-                file << "\n"
-              else
+              file << "# MOTO_TAGS: \n"
+              file << "# DESC: Template genereated by 'moto generate'\n"
+              file << "# DESC: line2\n\n"
+
+              if options[:base_class]
                 file << "require './lib/test/#{options[:base_class]}.rb'\n\n"
               end
 
@@ -54,7 +62,6 @@ module Moto
                 indent += 2
               end
 
-              file << (' ' * indent) + "# Class template genereated by 'moto generate'\n"
               file << (' ' * indent) + "class #{class_name} < #{base_class_qualified_name}\n\n"
               indent += 2
               file << (' ' * indent) + "def run\n"

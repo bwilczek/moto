@@ -19,6 +19,13 @@ module Moto
 
         mode_selector = Moto::Modes::ModeSelector.new
 
+        self.prepare_config(argv)
+
+        # TODO: IMPORTANT ISSUE
+        # xxx_parse functions should not return parsed arguments and pass them to functions
+        # but instead all should inject proper values into Moto::Lib::Config.moto[:xxx][:yyy]
+        # on which all further components should relay
+
         if argv[0] == '--version'
           mode_selector.version
         elsif argv[0] == 'run' && argv.length > 1
@@ -37,6 +44,38 @@ module Moto
         puts e.message + "\n\n"
         puts e.backtrace.join("\n")
       end
+    end
+
+    def self.prepare_config(argv)
+      options = {}
+
+      # Parse arguments
+      begin
+        OptionParser.new do |opts|
+          opts.on('-c', '--config Config') {|v| options[:config_name] = v}
+        end
+      rescue OptionParser::InvalidOption
+        nil
+      end
+
+      Moto::Lib::Config.load_configuration(options[:config_name] ? options[:config_name] : 'moto')
+
+      if !config_test_runner
+        Moto::Lib::Config.moto[:test_runner] = {}
+      end
+
+      if !config_test_generator
+        Moto::Lib::Config.moto[:test_generator] = {}
+      end
+
+    end
+
+    def self.config_test_runner
+      Moto::Lib::Config.moto[:test_runner]
+    end
+
+    def self.config_test_generator
+      Moto::Lib::Config.moto[:test_generator]
     end
 
     def self.run_parse(argv)
@@ -68,7 +107,6 @@ module Moto
         opts.on('-x', '--explicit-errors') {options[:explicit_errors] = true}
         opts.on('--log-level LogLevel') {|v| options[:log_level] = v}
         opts.on('--param-name ParamName') {|v| options[:param_name] = v}
-
       end.parse!
 
       if options[:tests]
@@ -86,16 +124,6 @@ module Moto
       else
         puts 'ERROR: Environment is mandatory.'
         Kernel.exit(-1)
-      end
-
-      Moto::Lib::Config.load_configuration(options[:config_name] ? options[:config_name] : 'moto')
-
-      if !Moto::Lib::Config.moto[:test_runner]
-        Moto::Lib::Config.moto[:test_runner] = {}
-      end
-
-      if !Moto::Lib::Config.moto[:test_generator]
-        Moto::Lib::Config.moto[:test_generator] = {}
       end
 
       # Runner configuration
@@ -120,7 +148,6 @@ module Moto
       end
 
       # Generator configuration
-
       Moto::Lib::Config.moto[:test_generator][:param_name] = options[:param_name] if options[:param_name]
 
       return options
@@ -160,8 +187,6 @@ module Moto
       if options[:run_name].nil?
         options[:run_name] = evaluate_name(options[:tests], options[:tags], options[:filters])
       end
-
-      Moto::Lib::Config.load_configuration(options[:config_name] ? options[:config_name] : 'moto')
 
       return options
     end
