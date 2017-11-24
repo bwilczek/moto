@@ -5,7 +5,6 @@ rescue
   nil
 end
 
-
 require 'optparse'
 require 'logger'
 require_relative 'config'
@@ -57,7 +56,7 @@ module Moto
 
       opt.default_argv = ARGV.dup
 
-      while !opt.default_argv.empty?
+      while opt.default_argv.length > 1
         begin
           opt.parse!
         rescue OptionParser::InvalidOption
