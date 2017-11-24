@@ -50,15 +50,22 @@ module Moto
       options = {}
 
       # Parse arguments
-      begin
-        OptionParser.new do |opts|
-          opts.on('-c', '--config Config') {|v| options[:config_name] = v}
-        end
-      rescue OptionParser::InvalidOption
-        nil
+      opt = OptionParser.new do |opts|
+        opts.on('-c', '--config Config')           {|v| options[:config_name] = v}
+        opts.on('-e', '--environment Environment') {|v| options[:environment] = v}
       end
 
-      Moto::Lib::Config.load_configuration(options[:config_name] ? options[:config_name] : 'moto')
+      opt.default_argv = ARGV.dup
+
+      while !opt.default_argv.empty?
+        begin
+          opt.parse!
+        rescue OptionParser::InvalidOption
+          nil
+        end
+      end
+
+      Moto::Lib::Config.load_configuration(options[:config_name] ? options[:config_name] : 'moto', options[:environment])
 
       if !config_test_runner
         Moto::Lib::Config.moto[:test_runner] = {}
@@ -93,7 +100,6 @@ module Moto
         opts.on('-g', '--tags Tags', Array) {|v| options[:tags] = v}
         opts.on('-f', '--filters Filters', Array) {|v| options[:filters] = v}
         opts.on('-l', '--listeners Listeners', Array) {|v| options[:listeners] = v}
-        opts.on('-e', '--environment Environment') {|v| options[:environment] = v}
         opts.on('-r', '--runname RunName') {|v| options[:run_name] = v}
         opts.on('-s', '--suitename SuiteName') {|v| options[:suite_name] = v}
         opts.on('-a', '--assignee Assignee') {|v| options[:assignee] = v}
@@ -117,13 +123,6 @@ module Moto
 
       if options[:run_name].nil?
         options[:run_name] = evaluate_name(options[:tests], options[:tags], options[:filters])
-      end
-
-      if options[:environment]
-        Moto::Lib::Config.environment = options[:environment]
-      else
-        puts 'ERROR: Environment is mandatory.'
-        Kernel.exit(-1)
       end
 
       # Runner configuration
@@ -256,7 +255,10 @@ module Moto
                          Use ~ to filter tests that do not contain specific tag, e.g. ~tag
 
 
-       -e, --environment Mandatory environment. Environment constants and tests parametrized in certain way depend on this.
+       -e, --environment Environment constants and tests parametrized in certain way depend on this.
+                         Without this param only `config/environment/common.rb` will be loaded.
+                         If provided moto will try to load additionally `config/environment/NAME.rb` and apply changes
+                         on top of already loaded common configuration.
        -c, --config      Name of the config, without extension, to be loaded from MotoApp/config/CONFIG_NAME.rb
                          Default: moto (which loads: MotoApp/config/moto.rb)
 
