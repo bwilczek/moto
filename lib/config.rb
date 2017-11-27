@@ -19,7 +19,12 @@ module Moto
       # @param [String] config_name Name of the main Moto/MotoApp config to be loaded. Without extension.
       # @param [String] env Name of the env config to be loaded in addition to /config/environments/common. Without extension.
       def self.load_configuration(config_name, env)
-        config_path = "#{MotoApp::DIR}/config/#{config_name}.rb"
+
+        if config_name
+          config_path = "#{MotoApp::DIR}/config/#{config_name}.rb"
+        else
+          config_path = "#{MotoApp::DIR}/config/moto.rb"
+        end
 
         if File.exists?(config_path)
           @@moto = eval(File.read(config_path))

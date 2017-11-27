@@ -18,8 +18,6 @@ module Moto
 
         mode_selector = Moto::Modes::ModeSelector.new
 
-        self.prepare_config(argv)
-
         # TODO: IMPORTANT ISSUE
         # xxx_parse functions should not return parsed arguments and pass them to functions
         # but instead all should inject proper values into Moto::Lib::Config.moto[:xxx][:yyy]
@@ -45,26 +43,8 @@ module Moto
       end
     end
 
-    def self.prepare_config(argv)
-      options = {}
-
-      # Parse arguments
-      opt = OptionParser.new do |opts|
-        opts.on('-c', '--config Config')           {|v| options[:config_name] = v}
-        opts.on('-e', '--environment Environment') {|v| options[:environment] = v}
-      end
-
-      opt.default_argv = ARGV.dup
-
-      while opt.default_argv.length > 1
-        begin
-          opt.parse!
-        rescue OptionParser::InvalidOption
-          nil
-        end
-      end
-
-      Moto::Lib::Config.load_configuration(options[:config_name] ? options[:config_name] : 'moto', options[:environment])
+    def self.prepare_config(options)
+      Moto::Lib::Config.load_configuration(options[:config_name], options[:environment])
 
       if !config_test_runner
         Moto::Lib::Config.moto[:test_runner] = {}
@@ -95,24 +75,28 @@ module Moto
 
       # Parse arguments
       OptionParser.new do |opts|
-        opts.on('-t', '--tests Tests', Array) {|v| options[:tests] = v}
-        opts.on('-g', '--tags Tags', Array) {|v| options[:tags] = v}
-        opts.on('-f', '--filters Filters', Array) {|v| options[:filters] = v}
+        opts.on('-c', '--config Config')              {|v| options[:config_name] = v}
+        opts.on('-e', '--environment Environment')    {|v| options[:environment] = v}
+        opts.on('-t', '--tests Tests', Array)         {|v| options[:tests] = v}
+        opts.on('-g', '--tags Tags', Array)           {|v| options[:tags] = v}
+        opts.on('-f', '--filters Filters', Array)     {|v| options[:filters] = v}
         opts.on('-l', '--listeners Listeners', Array) {|v| options[:listeners] = v}
-        opts.on('-r', '--runname RunName') {|v| options[:run_name] = v}
-        opts.on('-s', '--suitename SuiteName') {|v| options[:suite_name] = v}
-        opts.on('-a', '--assignee Assignee') {|v| options[:assignee] = v}
-        opts.on('-c', '--config Config') {|v| options[:config_name] = v}
-        opts.on('--threads ThreadCount', Integer) {|v| options[:threads] = v}
-        opts.on('--attempts AttemptCount', Integer) {|v| options[:attempts] = v}
-        opts.on('--stop-on-error') {options[:stop_on][:error] = true}
-        opts.on('--stop-on-fail') {options[:stop_on][:fail] = true}
-        opts.on('--stop-on-skip') {options[:stop_on][:skip] = true}
-        opts.on('--dry-run') {options[:dry_run] = true}
-        opts.on('-x', '--explicit-errors') {options[:explicit_errors] = true}
-        opts.on('--log-level LogLevel') {|v| options[:log_level] = v}
-        opts.on('--param-name ParamName') {|v| options[:param_name] = v}
+        opts.on('-r', '--runname RunName')            {|v| options[:run_name] = v}
+        opts.on('-s', '--suitename SuiteName')        {|v| options[:suite_name] = v}
+        opts.on('-a', '--assignee Assignee')          {|v| options[:assignee] = v}
+        opts.on('-c', '--config Config')              {|v| options[:config_name] = v}
+        opts.on('--threads ThreadCount', Integer)     {|v| options[:threads] = v}
+        opts.on('--attempts AttemptCount', Integer)   {|v| options[:attempts] = v}
+        opts.on('--stop-on-error')                    {options[:stop_on][:error] = true}
+        opts.on('--stop-on-fail')                     {options[:stop_on][:fail] = true}
+        opts.on('--stop-on-skip')                     {options[:stop_on][:skip] = true}
+        opts.on('--dry-run')                          {options[:dry_run] = true}
+        opts.on('-x', '--explicit-errors')            {options[:explicit_errors] = true}
+        opts.on('--log-level LogLevel')               {|v| options[:log_level] = v}
+        opts.on('--param-name ParamName')             {|v| options[:param_name] = v}
       end.parse!
+
+      self.prepare_config(options)
 
       if options[:tests]
         options[:tests].each do |path|
@@ -161,6 +145,7 @@ module Moto
 
       # Parse arguments
       OptionParser.new do |opts|
+        opts.on('-c', '--config Config') {|v| options[:config_name] = v}
         opts.on('-t', '--tests Tests', Array) {|v| options[:tests] = v}
         opts.on('-g', '--tags Tags', Array) {|v| options[:tags] = v}
         opts.on('-f', '--filters Filters', Array) {|v| options[:filters] = v}
@@ -168,13 +153,14 @@ module Moto
         opts.on('-r', '--runname RunName') {|v| options[:run_name] = v}
         opts.on('-s', '--suitename SuiteName') {|v| options[:suite_name] = v}
         opts.on('-a', '--assignee Assignee') {|v| options[:assignee] = v}
-        opts.on('-c', '--config Config') {|v| options[:config_name] = v}
         opts.on('-p', '--tagregexpos RegexPositive') {|v| options[:validator_regex_positive] = v}
         opts.on('-n', '--tagregexneg RegexNegative') {|v| options[:validator_regex_negative] = v}
         opts.on('-h', '--hastags') {|v| options[:validate_has_tags] = v}
         opts.on('-d', '--hasdescription') {|v| options[:validate_has_description] = v}
         opts.on('-w', '--tagwhitelist TagWhitelist', Array) {|v| options[:tag_whitelist] = v}
       end.parse!
+
+      self.prepare_config(options)
 
       if options[:tests]
         options[:tests].each do |path|
@@ -218,6 +204,8 @@ module Moto
         opts.on('-b', '--baseclass BaseClass') {|v| options[:base_class] = v}
         opts.on('-f', '--force') {options[:force] = true}
       end.parse!
+
+      self.prepare_config(options)
 
       options[:dir] = options[:dir].underscore
 
