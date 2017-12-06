@@ -1,7 +1,7 @@
 module Moto
   module Reporting
     module Listeners
-      class NoProgress < Base
+      class SummaryShort < Base
 
         def initialize(run_params)
           @displayed_results = 0
