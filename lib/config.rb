@@ -80,7 +80,7 @@ module Moto
           raise "There is no const defined for key: #{key}."
         end
 
-        value
+        Marshal.load(Marshal.dump(value))
       end
 
     end
