@@ -68,9 +68,8 @@ module Moto
       # Default options
       options = {}
       options[:listeners] = []
-      options[:run_name] = nil
-      options[:suite_name] = nil
-      options[:assignee] = nil
+      options[:mwui_path] = nil
+      options[:mwui_assignee_id] = nil
       options[:stop_on] = {error: false, fail: false, skip: false}
 
       # Parse arguments
@@ -81,9 +80,8 @@ module Moto
         opts.on('-g', '--tags Tags', Array)           {|v| options[:tags] = v}
         opts.on('-f', '--filters Filters', Array)     {|v| options[:filters] = v}
         opts.on('-l', '--listeners Listeners', Array) {|v| options[:listeners] = v}
-        opts.on('-r', '--runname RunName')            {|v| options[:run_name] = v}
-        opts.on('-s', '--suitename SuiteName')        {|v| options[:suite_name] = v}
-        opts.on('-a', '--assignee Assignee')          {|v| options[:assignee] = v}
+        opts.on('--mwui-path MwuiPath')               {|v| options[:mwui_path] = v}
+        opts.on('--mwui-assignee-id MwuiAssignee')    {|v| options[:mwui_assignee_id] = v}
         opts.on('-c', '--config Config')              {|v| options[:config_name] = v}
         opts.on('--threads ThreadCount', Integer)     {|v| options[:threads] = v}
         opts.on('--attempts AttemptCount', Integer)   {|v| options[:attempts] = v}
@@ -102,10 +100,6 @@ module Moto
         options[:tests].each do |path|
           path.sub!(%r{\/$}, '') # remove trailing "/"
         end
-      end
-
-      if options[:run_name].nil?
-        options[:run_name] = evaluate_name(options[:tests], options[:tags], options[:filters])
       end
 
       # Runner configuration
@@ -139,24 +133,20 @@ module Moto
       # Default options
       options = {}
       options[:listeners] = []
-      options[:run_name] = nil
-      options[:suite_name] = nil
-      options[:assignee] = nil
 
       # Parse arguments
       OptionParser.new do |opts|
-        opts.on('-c', '--config Config') {|v| options[:config_name] = v}
-        opts.on('-t', '--tests Tests', Array) {|v| options[:tests] = v}
-        opts.on('-g', '--tags Tags', Array) {|v| options[:tags] = v}
-        opts.on('-f', '--filters Filters', Array) {|v| options[:filters] = v}
-        opts.on('-l', '--listeners Listeners', Array) {|v| options[:listeners] = v}
-        opts.on('-r', '--runname RunName') {|v| options[:run_name] = v}
-        opts.on('-s', '--suitename SuiteName') {|v| options[:suite_name] = v}
-        opts.on('-a', '--assignee Assignee') {|v| options[:assignee] = v}
-        opts.on('-p', '--tagregexpos RegexPositive') {|v| options[:validator_regex_positive] = v}
-        opts.on('-n', '--tagregexneg RegexNegative') {|v| options[:validator_regex_negative] = v}
-        opts.on('-h', '--hastags') {|v| options[:validate_has_tags] = v}
-        opts.on('-d', '--hasdescription') {|v| options[:validate_has_description] = v}
+        opts.on('-c', '--config Config')                    {|v| options[:config_name] = v}
+        opts.on('-t', '--tests Tests', Array)               {|v| options[:tests] = v}
+        opts.on('-g', '--tags Tags', Array)                 {|v| options[:tags] = v}
+        opts.on('-f', '--filters Filters', Array)           {|v| options[:filters] = v}
+        opts.on('-l', '--listeners Listeners', Array)       {|v| options[:listeners] = v}
+        opts.on('--mwui-path MwuiPath')                     {|v| options[:mwui_path] = v}
+        opts.on('--mwui-assignee-id MwuiAssignee')          {|v| options[:mwui_assignee_id] = v}
+        opts.on('-p', '--tagregexpos RegexPositive')        {|v| options[:validator_regex_positive] = v}
+        opts.on('-n', '--tagregexneg RegexNegative')        {|v| options[:validator_regex_negative] = v}
+        opts.on('-h', '--hastags')                          {|v| options[:validate_has_tags] = v}
+        opts.on('-d', '--hasdescription')                   {|v| options[:validate_has_description] = v}
         opts.on('-w', '--tagwhitelist TagWhitelist', Array) {|v| options[:tag_whitelist] = v}
       end.parse!
 
@@ -168,30 +158,7 @@ module Moto
         end
       end
 
-      if options[:run_name].nil?
-        options[:run_name] = evaluate_name(options[:tests], options[:tags], options[:filters])
-      end
-
       return options
-    end
-
-    # Generate default name based on input parameters
-    def self.evaluate_name(tests, tags, filters)
-      name = ''
-
-      if tests
-        name << "Tests: #{tests.join(',')}  "
-      end
-
-      if tags
-        name << "Tags: #{tags.join(',')}  "
-      end
-
-      if filters
-        name << "Filters: #{filters.join(',')}  "
-      end
-
-      return name
     end
 
     # Parses attributes passed to the application when run by 'moto generate'

@@ -10,10 +10,6 @@ module Moto
 
       # @param [Array] listeners An array of strings, which represent qualified names of classes (listeners) that will be instantiated.
       #                empty array is passed then :default_listeners will be taken from config
-      # @param[Hash] run_params Variables specified by the user when parametrizing current moto run
-      #       suite_name: String Name of the test suite
-      #       run_name:   String Name of the test run, may be custom made or automatically generated
-      #       assignee:   ID of person responsible for test run
       def initialize(listeners, run_params)
 
         if listeners.empty?
@@ -65,7 +61,7 @@ module Moto
         end
       end
 
-      # Reports star of a test to all attached listeners
+      # Reports start of a test to all attached listeners
       # @param [Moto::Test::Status] test_status of test which's start is to be reported on
       # @param [Moto::Test::Metadata] test_metadata of test which's start is to be reported on
       def report_start_test(test_status, test_metadata)

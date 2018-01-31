@@ -6,6 +6,9 @@ module Moto
       # Absolute test path
       attr_reader :test_path
 
+      # Indicates which repetition of the same test is represented by this metadata
+      attr_accessor :test_repeat
+
       # @param [String] test_path Absolute path to file with test
       def initialize(test_path)
         @test_path = test_path

@@ -49,13 +49,19 @@ module Moto
             @test_metadata = @tests_metadata.shift
           end
 
+          test_metadata = Marshal.load(Marshal.dump(@test_metadata))
+
+          if test_metadata
+            test_metadata.test_repeat = @current_test_repeat
+          end
+
           if @current_test_repeat == @test_repeats
             @current_test_repeat = 1
           else
             @current_test_repeat += 1
           end
 
-          @test_metadata
+          test_metadata
         end
         private :get_test_metadata
 

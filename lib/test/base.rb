@@ -40,6 +40,7 @@ module Moto
         @status.test_class_name = self.class.name
         @status.display_name = @status.test_class_name.split('::')[2..-2].join(' > ')
         @status.display_name += "_#{@params_path.split('/')[-1].chomp('.param')}" if @params_path
+        @status.display_name += "(#{metadata.test_repeat})" if metadata.test_repeat > 1
       end
 
       # Setter for :log_path

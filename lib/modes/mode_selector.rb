@@ -65,9 +65,8 @@ module Moto
 
       def prepare_test_reporter(parsed_arguments)
         run_params = {}
-        run_params[:run_name] = parsed_arguments[:run_name]
-        run_params[:suite_name] = parsed_arguments[:suite_name]
-        run_params[:assignee] = parsed_arguments[:assignee]
+        run_params[:mwui_path] = parsed_arguments[:mwui_path]
+        run_params[:mwui_assignee_id] = parsed_arguments[:mwui_assignee_id]
 
         Moto::Reporting::TestReporter.new(parsed_arguments[:listeners], run_params)
       end

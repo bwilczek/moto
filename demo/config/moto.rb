@@ -23,12 +23,18 @@
         }
     },
     clients: {
-        website: {
-            capybara: {
-                default_driver: :chrome,
-                default_selector: :css,
-                polling_interval: 0.2,
-            }
+        capybara: {
+            browser: {
+                type: 'chrome',       # 'chrome' (requires chromedriver), 'firefox' (requires geckodriver)
+                dockerization: {
+                    enabled: false,   # will use dockerized selenium + browser instead of locally installed
+                    debug: false      # starts additional VNC server in container on port 5900
+                },
+                width: 1920,
+                height: 1080
+            },
+            default_selector: :css,
+            polling_interval: 0.2
         }
     }
 }
