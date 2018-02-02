@@ -9,7 +9,6 @@ module Moto
 
         REST_MAX_TRIES = 1
         REST_TIMEOUT = 15
-        REST_RESULTS_AT_ONCE = 500
 
         def initialize(run_params)
           super
@@ -94,11 +93,13 @@ module Moto
           # we're just duplicating the same data
           @tests = @tests.values
 
+          start_time = Time.now.to_f
+
           while !@tests.empty?
             partial_run_data = {
                 path: @mwui_path,
                 tester_id: @assignee,
-                tests: @tests.shift(REST_RESULTS_AT_ONCE)
+                tests: @tests.shift(config[:results_in_request])
             }.to_json
 
             response = try {
@@ -110,6 +111,9 @@ module Moto
             }
 
             response = JSON.parse(response, symbolize_names: true)
+
+            pp Time.now.to_f - start_time
+
             response
           end
 
