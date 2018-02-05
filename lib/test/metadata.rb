@@ -12,6 +12,7 @@ module Moto
       # @param [String] test_path Absolute path to file with test
       def initialize(test_path)
         @test_path = test_path
+        @test_repeat = 1
       end
 
       # Text of the file with test
