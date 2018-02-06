@@ -220,12 +220,7 @@ module Moto
        -l, --listeners   Reporters to be used.
                          Defaults are Moto::Reporting::Listeners::ConsoleDots, Moto::Reporting::Listeners::JunitXml
                          One reporter that is always used: Moto::Reporting::Listeners::KernelCode
-       -s, --suitename   Name of the test suite to which should aggregate the results of current test run.
-                         Required when specifying MotoWebUI as one of the listeners.
-       -r, --runname     Name of the test run to which everything will be reported when using MotoWebUI.
-                         Default: Value of -g or -t depending on which one was specified.
-       -a, --assignee    ID of a person responsible for current test run.
-                         Can have a default value set in config/webui section.
+
        --threads         Thread count. Run tests in parallel.
        --attempts        Attempt count. Max number of test execution times if failed.
 
@@ -244,6 +239,12 @@ module Moto
 
        --param-name      Only parameters that contain provided string will be executed.
 
+       --mwui-path           [MotoWebUI 2.0] Directory path (eg. /regression/areaname) to which results of the current run
+                             should be aggregated.
+                             Required when specifying MotoWebUI as one of the listeners.
+       --mwui-assignee-id    [MotoWebUI 2.0] ID of a person responsible for current test run.
+                             Can have a default value set in config/webui section.
+
 
 
       ==============
@@ -257,20 +258,12 @@ module Moto
                          Use # MOTO_TAGS: TAGNAME1 in test to assign tag.
                          Use ~ to filter tests that do not contain specific tag, e.g. ~tag
 
-
        -c, --config      Name of the config, without extension, to be loaded from MotoApp/config/CONFIG_NAME.rb
                          Default: moto (which loads: MotoApp/config/moto.rb)
-
 
        -l, --listeners   Reporters to be used.
                          Defaults are Moto::Reporting::Listeners::ConsoleDots, Moto::Reporting::Listeners::JunitXml
                          One reporter that is always used: Moto::Reporting::Listeners::KernelCode
-       -s, --suitename   Name of the test suite to which should aggregate the results of current test run.
-                         Required when specifying MotoWebUI as one of the listeners.
-       -r, --runname     Name of the test run to which everything will be reported when using MotoWebUI.
-                         Default: Value of -g or -t depending on which one was specified.
-       -a, --assignee    ID of a person responsible for current test run.
-                         Can have a default value set in config/webui section.
 
        -p, --tagregexpos       Regex which will be matched against tags joined on ','.
                                Validation will pass if there is a match.
@@ -280,6 +273,12 @@ module Moto
        -d, --hasdescription    Validates if tests have #DESC with any text.
        -w, --tagwhitelist      Only tags from the whitelist will be allowed.
                                Provide in format: tag1,tag2,tag3 etc.
+
+       --mwui-path           [MotoWebUI 2.0] Directory path (eg. /regression/areaname) to which results of the current run
+                             should be aggregated.
+                             Required when specifying MotoWebUI as one of the listeners.
+       --mwui-assignee-id    [MotoWebUI 2.0] ID of a person responsible for current test run.
+                             Can have a default value set in config/webui section.
 
 
 
