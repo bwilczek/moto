@@ -1,5 +1,4 @@
 require 'rest-client'
-require 'sys/uname'
 require 'uri'
 
 module Moto

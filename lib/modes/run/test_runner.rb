@@ -40,16 +40,22 @@ module Moto
 
           (1..threads_max).each do |index|
             Thread.new do
-              Thread.current[:id] = index
+
               loop do
                 tc = ThreadContext.new(test_provider.get_test, @test_reporter)
                 tc.run
+
+                # unset all leftover variables stored 'globally' in Thread
+                Thread.current.keys.each do |k|
+                  Thread.current[k] = nil
+                end
+
               end
             end
           end
 
           # Waiting for all threads to run out of work so we can end the application
-          # or abonormal termination to be triggered based on options provided by the user
+          # or abnormal termination to be triggered based on options provided by the user
           loop do
             run_status = @test_reporter.run_status
             if (test_provider.num_waiting == threads_max) ||

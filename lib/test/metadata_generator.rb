@@ -1,7 +1,3 @@
-require 'logger'
-require 'pp'
-require 'yaml'
-
 module MotoApp
   DIR = Dir.pwd
 end

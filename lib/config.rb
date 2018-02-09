@@ -1,4 +1,4 @@
-require 'active_support'
+require 'active_support/core_ext/hash/deep_merge'
 
 module Moto
   module Lib
@@ -61,26 +61,10 @@ module Moto
         @@moto
       end
 
-      #
-      # @param [String] key Name of the key which's value is to be retrieved
-      # @return [String] Value of the key
-      def self.environment_const(key)
-        key = key.to_s
 
-        code = if key.include? '.'
-                 "@@env_consts#{key.split('.').map { |a| "[:#{a}]" }.join('')}"
-               else
-                 "@@env_consts[:#{key}]"
-               end
-
-        begin
-          value = eval(code)
-          raise if value.nil?
-        rescue
-          raise "There is no const defined for key: #{key}."
-        end
-
-        Marshal.load(Marshal.dump(value))
+      # @return [Hash] Configuration for selected environment + current thread combination
+      def self.environment_config
+        Thread.current['environment_config'] ||= Marshal.load(Marshal.dump(@@env_consts))
       end
 
     end

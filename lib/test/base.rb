@@ -6,7 +6,6 @@ module Moto
     class Base
 
       attr_reader   :name
-      attr_reader   :env
       attr_reader   :params
       attr_accessor :static_path
       attr_accessor :status
@@ -120,22 +119,6 @@ module Moto
         raise Exceptions::TestForcedPassed.new msg
       end
 
-
-      # Checks for equality of both arguments
-      def assert_equal(a, b)
-        assert(a == b, "Arguments should be equal: #{a} != #{b}.")
-      end
-
-      # Checks if passed value is equal to True
-      def assert_true(value)
-        assert(value, 'Logical condition not met, expecting true, given false.')
-      end
-
-      # Checks if passed value is equal to False
-      def assert_false(value)
-        assert(!value, 'Logical condition not met, expecting false, given true.')
-      end
-
       # Checks if result of condition equals to True
       def assert(condition, message)
         if !condition
@@ -143,14 +126,13 @@ module Moto
 
           status.log_failure("ASSERTION FAILED in line #{line_number}: #{message}")
           logger.error(message)
+          env
         end
       end
 
-      # Read a constants value from configuration files while taking the execution environment into the account.
-      # @param [String] key Key to be searched for.
-      # @return [String] Value of the key or nil if not found
-      def const(key)
-        Moto::Lib::Config.environment_const(key)
+      # @return [Hash] Configuration for selected environment + current thread combination
+      def env
+        Moto::Lib::Config.environment_config
       end
 
       # @return [Logger]
