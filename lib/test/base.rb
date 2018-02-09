@@ -119,15 +119,46 @@ module Moto
         raise Exceptions::TestForcedPassed.new msg
       end
 
-      # Checks if result of condition equals to True
-      def assert(condition, message)
-        if !condition
-          line_number = caller.select { |l| l.match(/#{static_path}:\d*:in `run'/) }.first[/\d+/].to_i
-
-          status.log_failure("ASSERTION FAILED in line #{line_number}: #{message}")
-          logger.error(message)
-          env
+      # Checks for equality of both values using operator ==
+      #
+      # @param [Object] value1
+      # @param [Object] value2
+      # @param [String] failure_message Will be logged/displayed when assertion fails.
+      #   Substrings '$1' and '$2' (without quotes) found in string will be replaced,
+      #   respectively, with value1.to_s and value2.to_s
+      def assert_equal(value1, value2, failure_message = "Arguments should be equal: $1 != $2")
+        if value1 != value2
+          report_failed_assertion(failure_message.gsub('$1', value1.to_s).gsub('$2', value2.to_s))
         end
+      end
+
+      # Checks if passed value is equal to True
+      #
+      # @param [Object] value
+      # @param [String] failure_message Will be logged/displayed when assertion fails.
+      #   Substring '$1' (without quotes) found in string will be replaced with value.to_s
+      def assert_true(value, failure_message = "Logical condition not met, expecting true, given $1")
+        if !value
+          report_failed_assertion(failure_message.gsub('$1', value.to_s))
+        end
+      end
+      alias_method :assert, :assert_true
+
+      # Checks if passed value is equal to False
+      #
+      # @param [Object] value
+      # @param [String] failure_message Will be logged/displayed when assertion fails.
+      #   Substring '$1' (without quotes) found in string will be replaced with value.to_s
+      def assert_false(value, failure_message = "Logical condition not met, expecting false, given $1")
+        if value
+          report_failed_assertion(failure_message.gsub('$1', value.to_s))
+        end
+      end
+
+      def report_failed_assertion(failure_message)
+        line_number = caller.select { |l| l.match(/#{static_path}:\d*:in `run'/) }.first[/\d+/].to_i
+        status.log_failure("ASSERTION FAILED in line #{line_number}: #{failure_message}")
+        logger.error(message)
       end
 
       # @return [Hash] Configuration for selected environment + current thread combination
