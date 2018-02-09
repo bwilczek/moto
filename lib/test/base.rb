@@ -158,7 +158,7 @@ module Moto
       def report_failed_assertion(failure_message)
         line_number = caller.select { |l| l.match(/#{static_path}:\d*:in `run'/) }.first[/\d+/].to_i
         status.log_failure("ASSERTION FAILED in line #{line_number}: #{failure_message}")
-        logger.error(message)
+        logger.error(failure_message)
       end
 
       # @return [Hash] Configuration for selected environment + current thread combination
