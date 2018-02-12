@@ -92,8 +92,6 @@ module Moto
           # we're just duplicating the same data
           @tests = @tests.values
 
-          start_time = Time.now.to_f
-
           while !@tests.empty?
             partial_run_data = {
                 path: @mwui_path,
@@ -110,9 +108,6 @@ module Moto
             }
 
             response = JSON.parse(response, symbolize_names: true)
-
-            pp Time.now.to_f - start_time
-
             response
           end
 
