@@ -1,5 +1,5 @@
 require 'fileutils'
-require_relative '../../config/config'
+require_relative '../../config/manager'
 
 module Moto
   module Modes
