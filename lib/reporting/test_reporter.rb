@@ -90,7 +90,7 @@ module Moto
 
       # @return [Hash] Hash with config for TestReporter
       def config
-        Moto::Lib::Config.moto[:test_reporter]
+        Moto::Config::Manager.config_moto[:test_reporter]
       end
       private :config
 

@@ -163,7 +163,7 @@ module Moto
 
       # @return [Hash] Configuration for selected environment + current thread combination
       def env
-        Moto::Lib::Config.environment_config
+        Moto::Config::Manager.config_environment
       end
 
       # @return [Logger]

@@ -1,7 +1,7 @@
 {
   section_name1:
   {
-    key1: 'This value can be accessed by Moto::Lib::Config.environment_const(section_name1.key1)',
+    key1: 'This value can be accessed by Moto::Config::Manager.environment_const(section_name1.key1)',
     key2: 'common value 2'
   },
 

@@ -66,7 +66,8 @@ From test class' level the following methods/fields are available:
 * `config/environments/ENVNAME.rb` - constants specific for environment specified with -e ENVNAME when running moto
 *
 * Both types of files should contain just ruby hashes with keys and values. They will be automatically deep merged by
-* moto and can be accessed by `Moto::Lib::Config.environment_const(key)`
+* moto and can be accessed by `Moto::Config::Manager.config_environment` - this will return `Moto::Config::Hash` which derives from `Hash` 
+and allows for safer monkey patching custom methods which return and/or combine different keys from config files.
 *
 * Please refer to rdoc in appropriate class for further information.
 
@@ -75,7 +76,7 @@ From test class' level the following methods/fields are available:
 * Configuration for the framework and project classes stored in `config/moto.rb`.
 * File should contain only hash with appropriate key/value pairs.
 *
-* Access by `Moto::Lib::Config.moto`
+* Access by `Moto::Config::Manager.config_moto`
 
 ### Creating your own `listener`
 Custom listeners need to derive from `Moto::Reporting::Listeners::Base`  

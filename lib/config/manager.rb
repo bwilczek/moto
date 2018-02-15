@@ -1,8 +1,9 @@
 require 'active_support/core_ext/hash/deep_merge'
+require_relative 'hash'
 
 module Moto
-  module Lib
-    class Config
+  module Config
+    class Manager
 
       # @return [String] String representing the name of the current environment
       def self.environment
@@ -57,14 +58,14 @@ module Moto
       end
 
       # @return [Hash] Hash representing data from MotoApp/config/moto.rb file
-      def self.moto
+      def self.config_moto
         @@moto
       end
 
 
       # @return [Hash] Configuration for selected environment + current thread combination
-      def self.environment_config
-        Thread.current['environment_config'] ||= Marshal.load(Marshal.dump(@@env_consts))
+      def self.config_environment
+        Thread.current['config_environment'] ||= Moto::Config::Hash.new.merge!(Marshal.load(Marshal.dump(@@env_consts)))
       end
 
     end

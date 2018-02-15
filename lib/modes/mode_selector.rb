@@ -16,7 +16,7 @@ module Moto
         tests_metadata = prepare_metadata(parsed_arguments)
         test_reporter = prepare_test_reporter(parsed_arguments)
 
-        if Moto::Lib::Config.moto[:test_runner][:dry_run]
+        if Moto::Config::Manager.config_moto[:test_runner][:dry_run]
           runner = Moto::Modes::Run::DryRunner.new(tests_metadata, test_reporter)
         else
           runner = Moto::Modes::Run::TestRunner.new(tests_metadata, test_reporter, parsed_arguments[:stop_on])

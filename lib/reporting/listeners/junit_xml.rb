@@ -7,7 +7,7 @@ module Moto
 
         def end_run(run_status)
 
-          path =  Moto::Lib::Config.moto[:test_reporter][:listeners][:junit_xml][:output_file]
+          path =  Moto::Config::Manager.config_moto[:test_reporter][:listeners][:junit_xml][:output_file]
 
           run_status_hash = {
               errors:     run_status.tests_error.length,

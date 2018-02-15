@@ -11,7 +11,7 @@ module Moto
         # @param [Array] tests_metadata
         def initialize(tests_metadata)
           super()
-          @test_repeats = Moto::Lib::Config.moto[:test_runner][:test_repeats]
+          @test_repeats = Moto::Config::Manager.config_moto[:test_runner][:test_repeats]
           @current_test_repeat = 1
           @queue = Queue.new
           @tests_metadata = tests_metadata

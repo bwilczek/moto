@@ -138,7 +138,7 @@ module Moto
 
         # @return [Hash] Hash with config for WebUI
         def config
-          Moto::Lib::Config.moto[:test_reporter][:listeners][:webui]
+          Moto::Config::Manager.config_moto[:test_reporter][:listeners][:webui]
         end
         private :config
 

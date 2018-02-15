@@ -4,7 +4,7 @@ end
 
 require_relative 'metadata'
 require_relative '../version'
-require_relative '../config'
+require_relative '../config/manager'
 
 module Moto
   module Test

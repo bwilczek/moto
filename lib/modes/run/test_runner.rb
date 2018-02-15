@@ -23,7 +23,7 @@ module Moto
 
         def run
           test_provider = TestProvider.new(@tests_metadata)
-          threads_max = Moto::Lib::Config.moto[:test_runner][:thread_count] || 1
+          threads_max = Moto::Config::Manager.config_moto[:test_runner][:thread_count] || 1
 
           # remove log/screenshot files from previous execution
           @tests_metadata.each do |metadata|
@@ -38,7 +38,7 @@ module Moto
 
           Thread.abort_on_exception = true
 
-          (1..threads_max).each do |index|
+          threads_max.times do
             Thread.new do
 
               loop do

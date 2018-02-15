@@ -7,7 +7,7 @@ end
 
 require 'optparse'
 require 'logger'
-require_relative 'config'
+require_relative 'config/manager'
 require_relative 'modes/mode_selector'
 
 module Moto
@@ -20,7 +20,7 @@ module Moto
 
         # TODO: IMPORTANT ISSUE
         # xxx_parse functions should not return parsed arguments and pass them to functions
-        # but instead all should inject proper values into Moto::Lib::Config.moto[:xxx][:yyy]
+        # but instead all should inject proper values into Moto::Config::Manager.config_moto[:xxx][:yyy]
         # on which all further components should relay
 
         if argv[0] == '--version'
@@ -44,24 +44,24 @@ module Moto
     end
 
     def self.prepare_config(options)
-      Moto::Lib::Config.load_configuration(options[:config_name], options[:environment])
+      Moto::Config::Manager.load_configuration(options[:config_name], options[:environment])
 
       if !config_test_runner
-        Moto::Lib::Config.moto[:test_runner] = {}
+        Moto::Config::Manager.config_moto[:test_runner] = {}
       end
 
       if !config_test_generator
-        Moto::Lib::Config.moto[:test_generator] = {}
+        Moto::Config::Manager.config_moto[:test_generator] = {}
       end
 
     end
 
     def self.config_test_runner
-      Moto::Lib::Config.moto[:test_runner]
+      Moto::Config::Manager.config_moto[:test_runner]
     end
 
     def self.config_test_generator
-      Moto::Lib::Config.moto[:test_generator]
+      Moto::Config::Manager.config_moto[:test_generator]
     end
 
     def self.run_parse(argv)
@@ -104,15 +104,15 @@ module Moto
 
       # Runner configuration
 
-      Moto::Lib::Config.moto[:test_runner][:thread_count] = options[:threads] if options[:threads]
-      Moto::Lib::Config.moto[:test_runner][:test_attempt_max] = options[:attempts] if options[:attempts]
-      Moto::Lib::Config.moto[:test_runner][:dry_run] = options[:dry_run] if options[:dry_run]
-      Moto::Lib::Config.moto[:test_runner][:explicit_errors] = options[:explicit_errors] if options[:explicit_errors]
+      Moto::Config::Manager.config_moto[:test_runner][:thread_count] = options[:threads] if options[:threads]
+      Moto::Config::Manager.config_moto[:test_runner][:test_attempt_max] = options[:attempts] if options[:attempts]
+      Moto::Config::Manager.config_moto[:test_runner][:dry_run] = options[:dry_run] if options[:dry_run]
+      Moto::Config::Manager.config_moto[:test_runner][:explicit_errors] = options[:explicit_errors] if options[:explicit_errors]
 
       # Test log level parsing
 
       if options[:log_level]
-        Moto::Lib::Config.moto[:test_runner][:log_level] = case options[:log_level].downcase
+        Moto::Config::Manager.config_moto[:test_runner][:log_level] = case options[:log_level].downcase
         when 'info'   then Logger::INFO
         when 'warn'   then Logger::WARN
         when 'error'  then  Logger::ERROR
@@ -120,11 +120,11 @@ module Moto
         else Logger::DEBUG
         end
       else
-        Moto::Lib::Config.moto[:test_runner][:log_level] = Logger::DEBUG
+        Moto::Config::Manager.config_moto[:test_runner][:log_level] = Logger::DEBUG
       end
 
       # Generator configuration
-      Moto::Lib::Config.moto[:test_generator][:param_name] = options[:param_name] if options[:param_name]
+      Moto::Config::Manager.config_moto[:test_generator][:param_name] = options[:param_name] if options[:param_name]
 
       return options
     end

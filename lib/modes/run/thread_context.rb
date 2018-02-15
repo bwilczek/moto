@@ -1,5 +1,5 @@
 require 'fileutils'
-require_relative '../../config'
+require_relative '../../config/config'
 
 module Moto
   module Modes
@@ -72,7 +72,7 @@ module Moto
 
         # @return [Hash] Hash with config for ThreadContext
         def config
-          Moto::Lib::Config.moto[:test_runner]
+          Moto::Config::Manager.config_moto[:test_runner]
         end
         private :config
 

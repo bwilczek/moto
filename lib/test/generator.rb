@@ -122,7 +122,7 @@ module Moto
 
       # @return [Hash] Hash with config for test generator
       def config
-        Moto::Lib::Config.moto[:test_generator]
+        Moto::Config::Manager.config_moto[:test_generator]
       end
       private :config
 
