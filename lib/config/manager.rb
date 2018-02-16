@@ -63,7 +63,7 @@ module Moto
       end
 
 
-      # @return [Hash] Configuration for selected environment + current thread combination
+      # @return [Moto::Config::Hash] Configuration for selected environment + current thread combination
       def self.config_environment
         Thread.current['config_environment'] ||= Moto::Config::Hash.new.merge!(Marshal.load(Marshal.dump(@@env_consts)))
       end
