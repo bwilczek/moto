@@ -69,6 +69,7 @@ module Moto
             else
               puts representation
             end
+            $stdout.flush
 
           end
         end
